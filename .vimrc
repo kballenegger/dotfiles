@@ -1,4 +1,4 @@
-:set autoindent
+:set smartindent
 :set number
 :set tabstop=4
 :syntax on
