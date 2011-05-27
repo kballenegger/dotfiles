@@ -20,14 +20,14 @@ export NODE_PATH="/usr/local/lib/node"
 export MANPATH=/opt/local/share/man:$MANPATH
 # Finished adapting your MANPATH environment variable for use with MacPorts.
 
+# Get the aliases and functions
+if [ -f ~/.bashrc ]; then
+	. ~/.bashrc
+fi
+
 if [ -f /opt/local/etc/bash_completion ]; then
     . /opt/local/etc/bash_completion
 fi
-
-
-# MacPorts Installer addition on 2010-06-12_at_18:38:32: adding an appropriate PATH variable for use with MacPorts.
-export PATH=/opt/local/bin:/opt/local/sbin:$PATH
-# Finished adapting your PATH environment variable for use with MacPorts.
 
 
 alias mysql='mysql5'
@@ -37,7 +37,6 @@ alias ssh-tunnel='ssh -D 9999 azure -N'
 alias fgr='fgrep -r -n'
 
 alias free='free -m'
-
 
 # bashmarks
 # source ~/.local/bin/bashmarks.sh
