@@ -36,6 +36,8 @@ alias ssh-tunnel='ssh -D 9999 azure -N'
 
 alias fgr='fgrep -r -n'
 
+alias free='free -m'
+
 
 # bashmarks
 # source ~/.local/bin/bashmarks.sh
