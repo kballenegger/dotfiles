@@ -4,6 +4,8 @@
 ##  ygit-push-all.py
 ##
 ##  Copyright 2008 Jeet Sukumaran.
+## 
+##  With modification by Kenneth Ballenegger
 ##
 ##  This program is free software; you can redistribute it and/or modify
 ##  it under the terms of the GNU General Public License as published by
@@ -80,6 +82,12 @@ def main():
         dest='force',
         default=False,
         help='force push')          
+
+    parser.add_option('--reset-hard',
+        action='store_true',
+        dest='reset_hard',
+        default=False,
+        help='also reset --hard remotely')          
  
  
     (opts, args) = parser.parse_args()    
@@ -120,6 +128,15 @@ def main():
             shell=True,
             stdout=git_stdout)
         retcode = push.wait()
+	
+        if opts.reset_hard:
+            command = "ssh %s 'git reset --hard'" % (remote)
+            show_command(command, opts)
+            reset = subprocess.Popen(command,
+                shell=True,
+                stdout=git_stdout)
+            retcode = push.wait()
+
  
 if __name__ == '__main__':
     main()
