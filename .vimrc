@@ -12,3 +12,9 @@ set expandtab
 map <S-Enter> O<Esc>
 map <CR> o<Esc>
 
+" mapping to quick no indent
+
+nnoremap <C-p> :set invpaste paste?<CR>
+set pastetoggle=<C-p>
+set showmode
+
