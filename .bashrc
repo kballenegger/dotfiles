@@ -1,8 +1,8 @@
 export PATH="/opt/local/bin:/opt/local/sbin:$PATH"
 export DISPLAY=:0.0
 export PATH="/usr/local/bin:/usr/local/sbin:/usr/local/mysql/bin:$PATH"
-export EDITOR="vi"
-export GIT_EDITOR="vi"
+export EDITOR="vim"
+export GIT_EDITOR="vim"
 export CLICOLOR="xterm-color"
 export PATH="/opt/local/apache2/bin:$PATH"
 export PATH="~/bin/:$PATH"
@@ -22,11 +22,6 @@ export PATH="/var/www/server/current/scripts/bin:$PATH"
 # MacPorts Installer addition on 2009-06-27_at_11:16:43: adding an appropriate MANPATH variable for use with MacPorts.
 export MANPATH=/opt/local/share/man:$MANPATH
 # Finished adapting your MANPATH environment variable for use with MacPorts.
-
-# Get the aliases and functions
-if [ -f ~/.bashrc ]; then
-	. ~/.bashrc
-fi
 
 if [ -f /opt/local/etc/bash_completion ]; then
     . /opt/local/etc/bash_completion
