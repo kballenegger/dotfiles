@@ -54,3 +54,35 @@ alias php-shell="php-shell.sh"
 #source `brew --prefix git`/etc/bash_completion.d
 
 
+# ----------------------------------------------------------------------
+# LS AND DIRCOLORS
+# ----------------------------------------------------------------------
+
+# we always pass these to ls(1)
+LS_COMMON="-hBG"
+
+# setup the main ls alias if we've established common args
+test -n "$LS_COMMON" &&
+alias ls="command ls $LS_COMMON"
+
+# these use the ls aliases above
+alias ll="ls -l"
+alias l.="ls -d .*"
+
+# --- end LS ---
+
+# --------------------------------------------------------------------
+# PATH MANIPULATION FUNCTIONS
+# --------------------------------------------------------------------
+
+puniq () {
+    echo "$1" |tr : '\n' |nl |sort -u -k 2,2 |sort -n |
+    cut -f 2- |tr '\n' : |sed -e 's/:$//' -e 's/^://'
+}
+
+# condense PATH entries
+PATH=$(puniq $PATH)
+MANPATH=$(puniq $MANPATH)
+
+
+
