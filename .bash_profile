@@ -16,6 +16,9 @@ export PS1='[\[\033[0;35m\]\h\[\033[0;36m\] \w\[\033[00m\]]\$ '
 
 export NODE_PATH="/usr/local/lib/node"
 
+# bin path for scripts on server nodes
+export PATH="/var/www/server/current/scripts/bin:$PATH"
+
 # MacPorts Installer addition on 2009-06-27_at_11:16:43: adding an appropriate MANPATH variable for use with MacPorts.
 export MANPATH=/opt/local/share/man:$MANPATH
 # Finished adapting your MANPATH environment variable for use with MacPorts.
