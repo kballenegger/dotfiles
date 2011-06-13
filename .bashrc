@@ -19,11 +19,22 @@ export HISTCONTROL=erasedups
 export HISTSIZE=10000
 shopt -s histappend
 
-# sexy prompt
-export PS1='[\[\033[0;35m\]\h\[\033[0;36m\] \w\[\033[00m\]]\$ '
-
 # path
 export PATH="/Users/kenneth/bin:$PATH"
+
+# -----------------------------------------------------------------
+# BASH PROMPT
+# -----------------------------------------------------------------
+
+parse_git_branch() {
+    git_branch=`git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'`
+    if [ $git_branch ]; then
+        echo "•$git_branch"
+    fi
+}
+
+# sexy prompt
+export PS1='[\[\033[0;35m\]\h\[\033[0;36m\] \w\[\033[00m\]\[\033[33m\]$(parse_git_branch)\[\033[00m\]]\$ '
 
 # -----------------------------------------------------------------
 # APACHE, MYSQL, PHP
