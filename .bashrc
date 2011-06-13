@@ -34,7 +34,7 @@ export PATH="/opt/local/apache2/bin:$PATH"
 
 # mysql
 export PATH="/usr/local/bin:/usr/local/sbin:/usr/local/mysql/bin:$PATH"
-export PATH=/opt/local/lib/mysql5/bin:$PATH
+export PATH="/opt/local/lib/mysql5/bin:$PATH"
 
 alias mysql='mysql5'
 
@@ -59,7 +59,6 @@ export NODE_PATH="/usr/local/lib/node"
 # -----------------------------------------------------------------
 
 export PATH="/opt/local/bin:/opt/local/sbin:$PATH"
-export MANPATH="/opt/local/share/man:$MANPATH"
 
 if [ -f /opt/local/etc/bash_completion ]; then
     . /opt/local/etc/bash_completion
@@ -111,7 +110,7 @@ puniq () {
 
 # condense PATH entries
 PATH=$(puniq $PATH)
-MANPATH=$(puniq $MANPATH)
+#MANPATH=$(puniq $MANPATH)
 
 
 
