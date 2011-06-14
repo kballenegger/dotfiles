@@ -38,3 +38,6 @@ set directory=~/.vim-tmp,~/.tmp,~/tmp,/var/tmp,/tmp
 nnoremap <C-e> 3<C-e>
 nnoremap <C-y> 3<C-y>
 
+" switching windows faster
+map <C-J> <C-W>j<C-W>_
+map <C-K> <C-W>k<C-W>_
