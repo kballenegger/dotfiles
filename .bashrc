@@ -75,6 +75,7 @@ if [ -f /opt/local/etc/bash_completion ]; then
     . /opt/local/etc/bash_completion
 fi
 
+
 # -----------------------------------------------------------------
 # CHARTBOOST-SPECIFIC CONFIGURATION
 # -----------------------------------------------------------------
@@ -90,6 +91,7 @@ export PATH="/var/www/server/current/scripts/bin:$PATH"
 alias ssh-tunnel='ssh -D 9999 azure -N'
 alias fgr='fgrep -r -n'
 alias free='free -m'
+
 
 # -----------------------------------------------------------------
 # LS AND DIRCOLORS
@@ -108,7 +110,6 @@ alias l.="ls -d .*"
 alias ll.="ls -dl .*"
 alias lla="ls -al"
 
-# --- end LS ---
 
 # -----------------------------------------------------------------
 # PATH MANIPULATION FUNCTIONS
@@ -123,5 +124,21 @@ puniq () {
 PATH=$(puniq $PATH)
 #MANPATH=$(puniq $MANPATH)
 
+
+# -----------------------------------------------------------------
+# SOURCING LOCAL .BASHRC
+# -----------------------------------------------------------------
+
+if [ -f ~/.bashrc.local ]; then
+    source ~/.bashrc.local
+fi
+
+
+# -----------------------------------------------------------------
+# AMAZON EC2 KEY PATHS
+# -----------------------------------------------------------------
+
+export EC2_PRIVATE_KEY="/var/www/server/current/config/amazon.key.pem"
+export EC2_CERT="/var/www/server/current/config/amazon.cert.pem"
 
 
