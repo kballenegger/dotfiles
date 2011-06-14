@@ -18,3 +18,23 @@ nnoremap <C-p> :set invpaste paste?<CR>
 set pastetoggle=<C-p>
 set showmode
 
+" matching of brackets, if else, etc
+runtime macros/matchit.vim
+
+" better buffers
+set hidden
+
+" better completion
+set wildmode=list:longest
+
+" scroll by three lines when cursor moves off screen
+set scrolloff=3
+
+" swap files location
+set backupdir=~/.vim-tmp,~/.tmp,~/tmp,/var/tmp,/tmp
+set directory=~/.vim-tmp,~/.tmp,~/tmp,/var/tmp,/tmp
+
+" scroll viewport faster
+nnoremap <C-e> 3<C-e>
+nnoremap <C-y> 3<C-y>
+
