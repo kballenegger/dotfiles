@@ -83,6 +83,9 @@ fi
 # bin path for scripts on server nodes
 export PATH="/var/www/server/current/scripts/bin:$PATH"
 
+# paraglide-live / dev
+alias paraglide-live="export PARAGLIDE_ENVIRONMENT=live"
+alias paraglide-dev="export PARAGLIDE_ENVIRONMENT=dev"
 
 # -----------------------------------------------------------------
 # ALIASES
