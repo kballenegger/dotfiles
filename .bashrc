@@ -87,6 +87,9 @@ export PATH="/var/www/server/current/scripts/bin:$PATH"
 alias paraglide-live="export PARAGLIDE_ENVIRONMENT=live"
 alias paraglide-dev="export PARAGLIDE_ENVIRONMENT=dev"
 
+# misc shortcuts
+alias cd-current="cd /var/www/server/current"
+
 # -----------------------------------------------------------------
 # ALIASES
 # -----------------------------------------------------------------
