@@ -102,12 +102,15 @@ alias paraglide-dev="export PARAGLIDE_ENVIRONMENT=dev"
 alias remote-deploy="ssh cap 'cd server && cap production deploy'"
 alias cd-current="cd /var/www/server/current"
 
+# reverse proxy dev.chartboost.com:9999 traffic to localhost
+alias cb-proxy='ssh -R 9999:localhost:80 dev -N'
+
 # -----------------------------------------------------------------
 # ALIASES
 # -----------------------------------------------------------------
 
 alias ssh-proxy='ssh -D 9999 azure -N'
-alias ssh-reverse-http='ssh -R 9999:localhost:80 dev -N'
+alias ssh-reverse-http='ssh -R 9999:localhost:80 azure -N'
 alias fgr='fgrep -r -n'
 alias free='free -m'
 
