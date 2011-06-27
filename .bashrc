@@ -106,7 +106,8 @@ alias cd-current="cd /var/www/server/current"
 # ALIASES
 # -----------------------------------------------------------------
 
-alias ssh-tunnel='ssh -D 9999 azure -N'
+alias ssh-proxy='ssh -D 9999 azure -N'
+alias ssh-reverse-http='ssh -R 9999:localhost:80 dev -N'
 alias fgr='fgrep -r -n'
 alias free='free -m'
 
