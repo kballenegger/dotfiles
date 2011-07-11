@@ -105,6 +105,9 @@ alias cd-current="cd /var/www/server/current"
 # reverse proxy dev.chartboost.com:9999 traffic to localhost
 alias cb-proxy='ssh -R 9999:localhost:80 dev -N'
 
+# reverse proxy for xdebug sessions
+alias xdebug-tunnel='ssh -R 19000:localhost:19000 dev -N'
+
 # -----------------------------------------------------------------
 # ALIASES
 # -----------------------------------------------------------------
