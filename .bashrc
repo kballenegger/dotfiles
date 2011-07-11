@@ -108,6 +108,9 @@ alias cb-proxy='ssh -R 9999:localhost:80 dev -N'
 # reverse proxy for xdebug sessions
 alias xdebug-tunnel='ssh -R 19000:localhost:19000 dev -N'
 
+# connect to mongo / chartboost
+alias mcg='mongo localhost/chartboost'
+
 # -----------------------------------------------------------------
 # ALIASES
 # -----------------------------------------------------------------
