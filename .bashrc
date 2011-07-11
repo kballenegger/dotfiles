@@ -56,7 +56,7 @@ alias php-shell="php-shell.sh"
 # GIT, RUBY, NODE
 # -----------------------------------------------------------------
 
- # git
+# git
 export GIT_EDITOR="vim"
 
 alias gco="git checkout"
@@ -66,6 +66,8 @@ alias gm="git merge"
 alias gcm="git commit -m"
 alias gc="git commit"
 alias gs="git status"
+alias gd="git diff"
+alias gcp="git cherry-pick"
 alias ga="git add"
 alias gmv="git mv"
 alias grm="git rm"
