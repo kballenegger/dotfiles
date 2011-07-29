@@ -122,7 +122,16 @@ alias ssh-reverse-http='ssh -R 9999:localhost:80 azure -N'
 alias fgr='fgrep -r -n'
 alias free='free -m'
 
-alias pbgist='_out=`pbpaste | gist` && echo $_out && echo $_out | pbcopy'
+function pbgist {
+    if [ -z $1 ]; then
+        _opt=""
+    else
+        _opt="-t $1"
+    fi
+    _out=`pbpaste | gist $_opt`
+    echo $_out | pbcopy
+    echo $_out
+}
 
 
 # -----------------------------------------------------------------
