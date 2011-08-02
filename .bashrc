@@ -128,7 +128,7 @@ function pbgist {
     else
         _opt="-t $1"
     fi
-    _out=`pbpaste | gist $_opt`
+    _out=`pbpaste | tab2space  | gist $_opt`
     echo $_out | pbcopy
     echo $_out
 }
