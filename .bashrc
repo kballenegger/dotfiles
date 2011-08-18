@@ -133,6 +133,14 @@ function pbgist {
     echo $_out
 }
 
+function macc {
+    if [ -z $1]; then
+        open /Applications/Macchiato.app
+    else
+        touch $1
+        open -a /Applications/Macchiato.app $1
+    fi
+}
 
 # -----------------------------------------------------------------
 # LS AND DIRCOLORS
