@@ -130,7 +130,7 @@ def main():
         retcode = push.wait()
 	
         if opts.pull:
-            command = "ssh %s 'git pull origin master'" % (remote)
+            command = "ssh %s 'git pull origin dotfiles'" % (remote)
             show_command(command, opts)
             reset = subprocess.Popen(command,
                 shell=True,
