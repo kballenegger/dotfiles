@@ -102,6 +102,7 @@ alias paraglide-dev="export PARAGLIDE_ENVIRONMENT=dev"
 
 # misc shortcuts
 alias remote-deploy="ssh cap 'cd server && cap production deploy'"
+alias cd-cb="cd ~/dev/caffeine/server"
 alias cd-current="cd /var/www/server/current"
 
 # reverse proxy dev.chartboost.com:9999 traffic to localhost
