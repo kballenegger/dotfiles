@@ -75,6 +75,11 @@ alias grm="git rm"
 # rubygems
 export PATH="/Users/kenneth/.gem/ruby/1.8/bin:$PATH"
 
+# rvm
+if [[ -s /Users/kenneth/.rvm/scripts/rvm ]] ; then
+    source /Users/kenneth/.rvm/scripts/rvm
+fi
+
 # node
 export NODE_PATH="/usr/local/lib/node"
 
@@ -120,8 +125,11 @@ alias mcb='mongo localhost/chartboost'
 
 alias ssh-proxy='ssh -D 9999 azure -N'
 alias ssh-reverse-http='ssh -R 9999:localhost:80 azure -N'
-alias fgr='fgrep -r -n'
 alias free='free -m'
+
+function fgr {
+    fgrep -r -n $@ .
+}
 
 function pbgist {
     if [ -z $1 ]; then
