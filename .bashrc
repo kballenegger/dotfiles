@@ -87,7 +87,7 @@ export NODE_PATH="/usr/local/lib/node"
 # AUTOJUMP CONFIGURATION
 # -----------------------------------------------------------------
 
-if [ -f `brew --prefix`/etc/autojump ]; then
+if [ -n `which brew` -a -f `brew --prefix`/etc/autojump ]; then
     . `brew --prefix`/etc/autojump
 fi
 
