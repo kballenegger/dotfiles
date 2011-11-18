@@ -92,7 +92,7 @@ if [ -x /usr/local/bin/brew -a -f `brew --prefix`/etc/autojump ]; then
 fi
 
 # -----------------------------------------------------------------
-# MACPORTS CONFIGUREATION
+# PACKAGE MANAGER CONFIGUREATION
 # -----------------------------------------------------------------
 
 export PATH="/opt/local/bin:/opt/local/sbin:$PATH"
@@ -100,6 +100,8 @@ export PATH="/opt/local/bin:/opt/local/sbin:$PATH"
 if [ -f /opt/local/etc/bash_completion ]; then
     . /opt/local/etc/bash_completion
 fi
+
+export PATH="/usr/local/bin:$PATH"
 
 
 # -----------------------------------------------------------------
