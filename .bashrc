@@ -87,8 +87,10 @@ export NODE_PATH="/usr/local/lib/node"
 # AUTOJUMP CONFIGURATION
 # -----------------------------------------------------------------
 
-if [ -x /usr/local/bin/brew -a -f `brew --prefix`/etc/autojump ]; then
-    . `brew --prefix`/etc/autojump
+if [ -x /usr/local/bin/brew ]; then
+    if [ -f `brew --prefix`/etc/autojump ]; then
+        . `brew --prefix`/etc/autojump
+    fi
 fi
 
 # -----------------------------------------------------------------
@@ -136,6 +138,7 @@ alias mcb='mongo localhost/chartboost'
 alias ssh-proxy='ssh -D 9999 azure -N'
 alias ssh-reverse-http='ssh -R 9999:localhost:80 azure -N'
 alias free='free -m'
+alias flushdns='dscacheutil -flushcache'
 
 function fgr {
     fgrep -r -n $@ .
