@@ -25,7 +25,7 @@ ssh $hostname 'mkdir .dotfiles && cd .dotfiles && git init --bare'
 echo "Adding new remote on the local home repo..."
 git remote add $hostname $hostname:.dotfiles
 echo "Pushing data to remote..."
-git push $hostname dotfiles
+git push $hostname dotfiles:master
 
 echo "Setting up remote home dir with repo..."
 ssh $hostname 'git init && git remote add origin .dotfiles'

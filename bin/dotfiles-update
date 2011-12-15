@@ -84,9 +84,9 @@ def main():
         help='force push')          
 
     parser.add_option('--pull',
-        action='store_true',
+        action='store_false',
         dest='pull',
-        default=False,
+        default=True,
         help='also pull remotely')          
  
  
@@ -122,7 +122,7 @@ def main():
     else:
         force = ""
     for remote in remotes:
-        command = "git push %s%s" % (force, remote)
+        command = "git push %s%s dotfiles:master" % (force, remote)
         show_command(command, opts)
         push = subprocess.Popen(command,
             shell=True,
@@ -130,7 +130,7 @@ def main():
         retcode = push.wait()
 	
         if opts.pull:
-            command = "ssh %s 'git pull origin dotfiles'" % (remote)
+            command = "ssh %s 'git pull origin master'" % (remote)
             show_command(command, opts)
             reset = subprocess.Popen(command,
                 shell=True,
