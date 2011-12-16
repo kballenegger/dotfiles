@@ -1,0 +1,18 @@
+# Look and feel
+caption always "%{= bb}%{+b w}Screen: %n | %h %=%t %c"
+hardstatus alwayslastline "%-Lw%{= BW}%50>%n%f* %t%{-}%+Lw%<"
+
+# Our warning of activity
+activity "Activity in %t(%n)"
+
+# Make ` (backtick) the default command key
+escape ``
+
+vbell off
+
+startup_message off
+
+defscrollback 100000
+
+termcapinfo xterm* ti@:te@
+
