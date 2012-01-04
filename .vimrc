@@ -46,3 +46,7 @@ nmap <C-l> :wincmd l<CR>
 
 " backspace bullshit
 set backspace=indent,eol,start
+
+" case search
+set ignorecase
+set smartcase
