@@ -31,7 +31,7 @@ echo "Setting up remote home dir with repo..."
 ssh $hostname 'git init && git remote add origin .dotfiles'
 scp .git/hooks/post-merge $hostname:.git/hooks/post-merge
 echo "Pulling data.."
-ssh $hostname 'git pull origin dotfiles && chmod 0644 .ssh/authorized_keys'
+ssh $hostname 'git pull origin master && chmod 0644 .ssh/authorized_keys'
 
 
 cd $dir
