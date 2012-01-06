@@ -144,6 +144,9 @@ alias ssh-reverse-http='ssh -R 9999:localhost:80 azure -N'
 alias free='free -m'
 alias flushdns='dscacheutil -flushcache'
 
+# keep environment when doing sudo su
+alias ssu='sudo su -m'
+
 function fgr {
     fgrep -r -n $@ .
 }
