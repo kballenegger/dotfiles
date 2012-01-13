@@ -119,6 +119,8 @@ alias paraglide-dev="export PARAGLIDE_ENVIRONMENT=dev"
 
 # misc shortcuts
 alias remote-deploy="ssh cap 'cd server && git pull && cap production deploy'"
+alias remote-deploy-lb="ssh cap 'cd server && git pull && cap lb deploy'"
+alias remote-deploy-queue="ssh cap 'cd server && git pull && cap queue deploy'"
 #alias cd-cb="cd ~/dev/caffeine/server"
 alias cd-current="cd /var/www/server/current"
 
