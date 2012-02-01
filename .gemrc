@@ -8,4 +8,6 @@
 :backtrace: false
 :verbose: true
 
-gem: --no-ri --no-rdoc
+install: --no-rdoc --no-ri 
+update:  --no-rdoc --no-ri
+
