@@ -37,7 +37,7 @@ parse_git_branch() {
 export PS1='[\[\033[0;35m\]\h\[\033[0;36m\] \w\[\033[00m\]\[\033[33m\]$(parse_git_branch)\[\033[00m\]]\$ '
 
 # -----------------------------------------------------------------
-# APACHE, MYSQL, PHP
+# APACHE, MYSQL, VERTICA, PHP
 # -----------------------------------------------------------------
 
 # apache
@@ -48,6 +48,10 @@ export PATH="/usr/local/bin:/usr/local/sbin:/usr/local/mysql/bin:$PATH"
 export PATH="/opt/local/lib/mysql5/bin:$PATH"
 
 alias mysql='mysql5'
+
+# vertica
+
+alias vsql="/opt/vertica/bin/vsql -h 10.79.61.102 -U super_reader -w 67Unic0rns"
 
 # php-shell
 alias php-shell="php-shell.sh"
@@ -66,6 +70,7 @@ alias gm="git merge"
 alias gcm="git commit -m"
 alias gc="git commit"
 alias gs="git status"
+alias gb="git branch"
 alias gd="git diff"
 alias gcp="git cherry-pick"
 alias ga="git add"
