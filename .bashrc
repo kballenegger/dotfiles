@@ -6,6 +6,14 @@
 
 
 # -----------------------------------------------------------------
+# LOCAL BASHRC
+# -----------------------------------------------------------------
+
+if [ -f .local.bashrc ]; then
+    source .local.bashrc
+fi
+
+# -----------------------------------------------------------------
 # BASH CONFIGURATION
 # -----------------------------------------------------------------
 
@@ -57,7 +65,7 @@ alias vsql="/opt/vertica/bin/vsql -h 10.79.61.102 -U super_reader -w 67Unic0rns"
 alias php-shell="php-shell.sh"
 
 # -----------------------------------------------------------------
-# GIT, RUBY, NODE
+# GIT, RUBY, PYTHON, CLOJURE, NODE, COFFEE, LESS
 # -----------------------------------------------------------------
 
 # git
@@ -85,8 +93,18 @@ if [[ -s /Users/kenneth/.rvm/scripts/rvm ]] ; then
     source /Users/kenneth/.rvm/scripts/rvm
 fi
 
+# python
+
+alias pyi="easy_install"
+
+#clojure
+
+alias pyclj="clojurepy"
+
 # node
 export NODE_PATH="/usr/local/lib/node"
+
+alias less-watch="coffee ~/lib/lessc-watch/src/lessc-watch.coffee"
 
 # -----------------------------------------------------------------
 # AUTOJUMP CONFIGURATION
