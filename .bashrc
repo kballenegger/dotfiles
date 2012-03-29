@@ -104,7 +104,7 @@ alias pyclj="clojurepy"
 # node
 export NODE_PATH="/usr/local/lib/node"
 
-alias less-watch="coffee ~/lib/lessc-watch/src/lessc-watch.coffee"
+alias less-watch="coffee ~/lib/lessc-watch/src/lessc-watch.coffee . ."
 
 # -----------------------------------------------------------------
 # AUTOJUMP CONFIGURATION
