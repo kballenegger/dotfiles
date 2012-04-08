@@ -92,6 +92,10 @@ export PATH="/Users/kenneth/.gem/ruby/1.8/bin:$PATH"
 if [[ -s /Users/kenneth/.rvm/scripts/rvm ]] ; then
     source /Users/kenneth/.rvm/scripts/rvm
 fi
+# rvm
+if [[ -s /home/kenneth/.rvm/scripts/rvm ]] ; then
+    source /home/kenneth/.rvm/scripts/rvm
+fi
 
 # python
 
