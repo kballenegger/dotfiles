@@ -104,6 +104,7 @@ alias pyi="easy_install"
 #clojure
 
 alias pyclj="clojurepy"
+alias cake="/Users/kenneth/.rvm/gems/ruby-1.9.2-p290/gems/cake-0.6.3/bin/cake"
 
 # node
 export NODE_PATH="/usr/local/lib/node"
