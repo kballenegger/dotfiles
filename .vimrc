@@ -7,6 +7,15 @@ filetype indent on
 set shiftwidth=4
 set expandtab
 
+set wildignore+=*/tmp/*,*.so,*.swp,*.zip   " Linux/MacOSX
+
+" ctrl-t
+
+let g:ctrlp_map = '<c-t>'
+let g:ctrlp_cmd = 'CtrlP'
+let g:ctrlp_working_path_mode = 2
+let g:ctrlp_custom_ignore = '\.git$\|\.hg$\|\.svn$'
+
 " mapping enter and shift enter to newline without insert mode
 
 map <S-Enter> O<Esc>
