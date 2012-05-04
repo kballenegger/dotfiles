@@ -59,3 +59,8 @@ set backspace=indent,eol,start
 " case search
 set ignorecase
 set smartcase
+
+" vlj
+let vimclojure#HighlightBuiltins=1
+let vimclojure#ParenRainbow=1
+
