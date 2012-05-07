@@ -250,3 +250,5 @@ export EC2_PRIVATE_KEY="/var/www/server/current/config/amazon.key.pem"
 export EC2_CERT="/var/www/server/current/config/amazon.cert.pem"
 
 
+
+PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
