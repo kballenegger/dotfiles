@@ -29,6 +29,7 @@ shopt -s histappend
 
 # path
 export PATH="/Users/kenneth/bin:$PATH"
+export PATH="/usr/class/cs143/cool/bin:$PATH"
 
 # -----------------------------------------------------------------
 # BASH PROMPT
@@ -204,7 +205,7 @@ function macc {
 }
 
 # -----------------------------------------------------------------
-# LS AND DIRCOLORS
+# LS, GREP AND DIRCOLORS
 # -----------------------------------------------------------------
 
 # we always pass these to ls(1)
@@ -219,6 +220,12 @@ alias ll="ls -l"
 alias l.="ls -d .*"
 alias ll.="ls -dl .*"
 alias lla="ls -al"
+
+# grep colors
+if echo hello|grep --color=auto l >/dev/null 2>&1; then
+    export GREP_OPTIONS='--color=auto' GREP_COLOR='1;32'
+fi
+
 
 
 # -----------------------------------------------------------------
@@ -253,4 +260,5 @@ export EC2_CERT="/var/www/server/current/config/amazon.cert.pem"
 
 
 
+# misc
 PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
