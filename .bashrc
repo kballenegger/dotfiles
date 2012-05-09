@@ -43,6 +43,7 @@ parse_git_branch() {
 
 # sexy prompt
 export PS1='[\[\033[0;35m\]\h\[\033[0;36m\] \w\[\033[00m\]\[\033[33m\]$(parse_git_branch)\[\033[00m\]]\$ '
+export PS1="\[\033[G\]$PS1"
 
 # -----------------------------------------------------------------
 # APACHE, MYSQL, VERTICA, PHP
