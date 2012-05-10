@@ -9,6 +9,11 @@ set expandtab
 
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip   " Linux/MacOSX
 
+" filetypes
+
+au BufNewFile,BufRead *.cljs setfiletype clj
+au BufNewFile,BufRead *.flex setfiletype l
+
 " tabs & buffers
 
 map <leader>o :tabnew<CR>
