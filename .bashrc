@@ -163,6 +163,10 @@ alias xdebug-tunnel='ssh -R 19000:localhost:19000 dev -N'
 # connect to mongo / chartboost
 alias mcb='mongo localhost/chartboost'
 
+# tail scribe logs
+
+alias tail-production="ssh scribe 'tail -f /external/scribe/primary/httpd/httpd_current'"
+
 # resque
 alias resque-remote-web='ssh -L 8282:redis_queue:8282 && open http://localhost:8282/'
 alias resque-kill="ps aux | grep \"resque-1.0\" | grep -v grep | awk '{print \$2}' | xargs kill"
