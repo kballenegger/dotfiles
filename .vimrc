@@ -13,6 +13,8 @@ set wildignore+=*/tmp/*,*.so,*.swp,*.zip   " Linux/MacOSX
 
 au BufNewFile,BufRead *.cljs setfiletype clojure
 
+autocmd Filetype ruby setlocal ts=2 sts=2 sw=2
+
 " tabs & buffers
 
 map <leader>o :tabnew<CR>
