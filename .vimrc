@@ -12,6 +12,7 @@ set wildignore+=*/tmp/*,*.so,*.swp,*.zip   " Linux/MacOSX
 " filetypes
 
 au BufNewFile,BufRead *.cljs setfiletype clojure
+au BufNewFile,BufRead *.md setfiletype markdown
 
 autocmd Filetype ruby setlocal ts=2 sw=2 expandtab
 
@@ -76,4 +77,16 @@ set smartcase
 " vlj
 let vimclojure#HighlightBuiltins=1
 let vimclojure#ParenRainbow=1
+
+" fix arrow keys in tmux
+
+nnoremap <Esc>A <up>
+nnoremap <Esc>B <down>
+nnoremap <Esc>C <right>
+nnoremap <Esc>D <left>
+inoremap <Esc>A <up>
+inoremap <Esc>B <down>
+inoremap <Esc>C <right>
+inoremap <Esc>D <left>
+
 
