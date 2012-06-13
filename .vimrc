@@ -89,4 +89,8 @@ inoremap <Esc>B <down>
 inoremap <Esc>C <right>
 inoremap <Esc>D <left>
 
+" copy to os x pasteboard
+
+vmap <C-c> :w !pbcopy<CR>
+
 
