@@ -13,6 +13,7 @@ set wildignore+=*/tmp/*,*.so,*.swp,*.zip   " Linux/MacOSX
 
 au BufNewFile,BufRead *.cljs setfiletype clojure
 au BufNewFile,BufRead *.md setfiletype markdown
+au BufNewFile,BufRead *.md setfiletype css
 
 autocmd Filetype ruby setlocal ts=2 sw=2 expandtab
 
