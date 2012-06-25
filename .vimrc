@@ -9,6 +9,9 @@ set expandtab
 
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip   " Linux/MacOSX
 
+" autoreload buffers
+set autoread
+
 " filetypes
 
 au BufNewFile,BufRead *.cljs setfiletype clojure
