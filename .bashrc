@@ -6,14 +6,6 @@
 
 
 # -----------------------------------------------------------------
-# LOCAL BASHRC
-# -----------------------------------------------------------------
-
-if [ -f .local.bashrc ]; then
-    source .local.bashrc
-fi
-
-# -----------------------------------------------------------------
 # BASH CONFIGURATION
 # -----------------------------------------------------------------
 
@@ -44,7 +36,6 @@ parse_git_branch() {
 
 # sexy prompt
 export PS1='[\[\033[0;35m\]\h\[\033[0;36m\] \w\[\033[00m\]\[\033[33m\]$(parse_git_branch)\[\033[00m\]]\$ '
-#export PS1="\[\033[G\]$PS1"
 
 # -----------------------------------------------------------------
 # APACHE, MYSQL, VERTICA, PHP
@@ -100,11 +91,9 @@ if [[ -s /home/kenneth/.rvm/scripts/rvm ]] ; then
 fi
 
 # python
-
 alias pyi="easy_install"
 
 #clojure
-
 alias pyclj="clojurepy"
 alias cake="/Users/kenneth/.rvm/gems/ruby-1.9.2-p290/gems/cake-0.6.3/bin/cake"
 
@@ -114,13 +103,17 @@ export NODE_PATH="/usr/local/lib/node"
 alias less-watch="coffee ~/lib/lessc-watch/src/lessc-watch.coffee . ."
 
 # -----------------------------------------------------------------
-# AUTOJUMP CONFIGURATION
+# AUTOJUMP AND BASH COMPLETION CONFIGURATION
 # -----------------------------------------------------------------
 
-if [ -x /usr/local/bin/brew ]; then
-    if [ -f `brew --prefix`/etc/autojump ]; then
-        . `brew --prefix`/etc/autojump
-    fi
+# bash completion
+if [ -f /usr/local/etc/bash_completion ]; then
+    . /usr/local/etc/bash_completion
+fi
+
+# autojump
+if [ -f /usr/local/etc/autojump ]; then
+    . /usr/local/etc/autojump
 fi
 
 # -----------------------------------------------------------------

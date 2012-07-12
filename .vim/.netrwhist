@@ -1,5 +1,5 @@
 let g:netrw_dirhistmax  =10
-let g:netrw_dirhist_cnt =8
+let g:netrw_dirhist_cnt =9
 let g:netrw_dirhist_1='/Library/Ruby/Gems'
 let g:netrw_dirhist_2='/Users/kenneth/Dropbox/dev/caffeine/server'
 let g:netrw_dirhist_3='/Users/kenneth/Library/Application Support/Vico/Bundles'
@@ -8,3 +8,4 @@ let g:netrw_dirhist_5='/Users/kenneth/Dropbox/dev/apps/iphone/ilaugh/api'
 let g:netrw_dirhist_6='/Users/kenneth/Dropbox/dev/apps/iphone/ilaugh/api/.git'
 let g:netrw_dirhist_7='/Users/kenneth/Dropbox/dev/apps/iphone/ilaugh/api'
 let g:netrw_dirhist_8='/Users/kenneth/Dropbox/dev/apps/iphone/ilaugh/api/iphoneapi'
+let g:netrw_dirhist_9='/Users/kenneth/.gem'
