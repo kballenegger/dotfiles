@@ -1,0 +1,34 @@
+[user]
+	name = Kenneth Ballenegger
+	email = kenneth@ballenegger.com
+[color]
+	diff = auto
+	ui = auto
+[core]
+	excludesfile = ~/.gitignore.global
+	whitespace = trailing-space,space-before-tab
+[github]
+	user = kballenegger
+	token = SECRET
+	password = SECRET
+[rerere]
+	enabled = true
+[gist]
+	private = yes
+[color "diff"]
+    meta = blue
+    frag = magenta
+    old = red
+    new = green
+[color "branch"]
+    current = yellow reverse
+    local = yellow
+    remote = green
+    plain = red
+[color "status"]
+    added = yellow
+    changed = green
+    untracked = blue
+
+[alias]
+	lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --
