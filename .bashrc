@@ -177,6 +177,7 @@ function cb-ssh {
 
 # spin up client builds
 alias client-build="ssh scd 'cd .buildservr/client && git pull && ./package build-ul'"
+alias client-build-ul="ssh scd 'cd .buildservr/client && git pull && ./package ul'"
 
 # -----------------------------------------------------------------
 # ALIASES
