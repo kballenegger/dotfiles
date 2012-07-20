@@ -159,7 +159,6 @@ alias xdebug-tunnel='ssh -R 19000:localhost:19000 dev -N'
 alias mcb='mongo localhost/chartboost'
 
 # tail scribe logs
-
 alias tail-production="ssh scribe 'tail -f /external/scribe/primary/httpd/httpd_current'"
 
 # resque
@@ -169,6 +168,11 @@ alias resque-kill="ps aux | grep \"resque-1.0\" | grep -v grep | awk '{print \$2
 # salt
 function mcp-salt {
     ssh mcp "salt $(printf \''%s'\'' ' "$@")"
+}
+
+# ssh into new nodes
+function cb-ssh {
+    ssh -i ~/.ssh/cb.pem "cb@""$1"".caffeine.io"
 }
 
 # spin up client builds
