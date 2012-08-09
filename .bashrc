@@ -141,11 +141,16 @@ alias paraglide-live="export PARAGLIDE_ENVIRONMENT=live"
 alias paraglide-dev="export PARAGLIDE_ENVIRONMENT=dev"
 
 # misc shortcuts
-alias remote-deploy="ssh cap 'cd server && git pull && cap production deploy'"
-alias remote-deploy-lb="ssh cap 'cd server && git pull && cap lb deploy'"
-alias remote-deploy-stage="ssh cap 'cd server && git pull && cap stage deploy'"
-alias remote-deploy-dev="ssh cap 'cd server && git pull && cap dev deploy'"
-alias remote-deploy-queue="ssh cap 'cd server && git pull && cap queue deploy'"
+#alias remote-deploy="ssh cap 'cd server && git pull && cap production deploy'"
+#alias remote-deploy-lb="ssh cap 'cd server && git pull && cap lb deploy'"
+#alias remote-deploy-stage="ssh cap 'cd server && git pull && cap stage deploy'"
+#alias remote-deploy-dev="ssh cap 'cd server && git pull && cap dev deploy'"
+#alias remote-deploy-queue="ssh cap 'cd server && git pull && cap queue deploy'"
+
+alias remote-deploy="ssh cb@mcp2.caffeine.io -i ~/.ssh/cb.pem './cb-ctl -a deploy -d api-php'"
+alias remote-deploy-dashboard="ssh cb@mcp2.caffeine.io -i ~/.ssh/cb.pem './cb-ctl -a deploy -d dashboard'"
+alias remote-deploy-cron="ssh cb@mcp2.caffeine.io -i ~/.ssh/cb.pem './cb-ctl -a deploy -d cron'"
+
 #alias cd-cb="cd ~/dev/caffeine/server"
 alias cd-current="cd /var/www/server/current"
 
