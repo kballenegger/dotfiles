@@ -64,6 +64,8 @@ alias php-shell="php-shell.sh"
 # git
 export GIT_EDITOR="vim"
 
+eval "$(hub alias -s)"
+
 alias gco="git checkout"
 alias gps="git push"
 alias gpl="git pull"
