@@ -147,9 +147,9 @@ alias paraglide-dev="export PARAGLIDE_ENVIRONMENT=dev"
 #alias remote-deploy-dev="ssh cap 'cd server && git pull && cap dev deploy'"
 #alias remote-deploy-queue="ssh cap 'cd server && git pull && cap queue deploy'"
 
-alias remote-deploy="ssh cb@mcp2.caffeine.io -i ~/.ssh/cb.pem 'cb-ctl -a deploy -d api-php'"
-alias remote-deploy-dashboard="ssh cb@mcp2.caffeine.io -i ~/.ssh/cb.pem 'cb-ctl -a deploy -d dashboard'"
-alias remote-deploy-cron="ssh cb@mcp2.caffeine.io -i ~/.ssh/cb.pem 'cb-ctl -a deploy -d cron'"
+alias remote-deploy="ssh cb@mcp2.caffeine.io -i ~/.ssh/cb.pem 'bash -c \"cb-ctl -a deploy -d api-php\"'"
+alias remote-deploy-dashboard="ssh cb@mcp2.caffeine.io -i ~/.ssh/cb.pem 'bash -c \"cb-ctl -a deploy -d dashboard\"'"
+alias remote-deploy-cron="ssh cb@mcp2.caffeine.io -i ~/.ssh/cb.pem 'bash -c \"cb-ctl -a deploy -d cron\"'"
 
 #alias cd-cb="cd ~/dev/caffeine/server"
 alias cd-current="cd /var/www/server/current"
