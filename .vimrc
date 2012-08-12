@@ -82,16 +82,38 @@ set smartcase
 let vimclojure#HighlightBuiltins=1
 let vimclojure#ParenRainbow=1
 
+" disable arrow keys
+
+nnoremap <up> <nop>
+nnoremap <down> <nop>
+nnoremap <left> <nop>
+nnoremap <right> <nop>
+inoremap <up> <nop>
+inoremap <down> <nop>
+inoremap <left> <nop>
+inoremap <right> <nop>
+nnoremap j gj
+nnoremap k gk
+
+
 " fix arrow keys in tmux
 
-nnoremap <Esc>A <up>
-nnoremap <Esc>B <down>
-nnoremap <Esc>C <right>
-nnoremap <Esc>D <left>
-inoremap <Esc>A <up>
-inoremap <Esc>B <down>
-inoremap <Esc>C <right>
-inoremap <Esc>D <left>
+nnoremap <Esc>A <nop>
+nnoremap <Esc>B <nop>
+nnoremap <Esc>C <nop>
+nnoremap <Esc>D <nop>
+inoremap <Esc>A <nop>
+inoremap <Esc>B <nop>
+inoremap <Esc>C <nop>
+inoremap <Esc>D <nop>
+" nnoremap <Esc>A <up>
+" nnoremap <Esc>B <down>
+" nnoremap <Esc>C <right>
+" nnoremap <Esc>D <left>
+" inoremap <Esc>A <up>
+" inoremap <Esc>B <down>
+" inoremap <Esc>C <right>
+" inoremap <Esc>D <left>
 
 " copy to os x pasteboard
 
