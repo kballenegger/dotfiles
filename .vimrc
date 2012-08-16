@@ -130,4 +130,10 @@ set textwidth=79
 set formatoptions=qrn1
 
 " color scheme
-colorschem desert
+let g:solarized_termcolors=256
+set background=dark
+colorscheme solarized
+
+" nmap <F8> :TagbarToggle<CR> 
+nnoremap <leader>t :TagbarToggle<CR> 
+
