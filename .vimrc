@@ -16,7 +16,7 @@ set autoread
 
 au BufNewFile,BufRead *.cljs setfiletype clojure
 au BufNewFile,BufRead *.md setfiletype markdown
-au BufNewFile,BufRead *.md setfiletype css
+au BufNewFile,BufRead *.less setfiletype css
 
 autocmd Filetype ruby setlocal ts=2 sw=2 expandtab
 
@@ -88,10 +88,10 @@ nnoremap <up> <nop>
 nnoremap <down> <nop>
 nnoremap <left> <nop>
 nnoremap <right> <nop>
-inoremap <up> <nop>
-inoremap <down> <nop>
-inoremap <left> <nop>
-inoremap <right> <nop>
+"inoremap <up> <nop>
+"inoremap <down> <nop>
+"inoremap <left> <nop>
+"inoremap <right> <nop>
 nnoremap j gj
 nnoremap k gk
 
@@ -118,5 +118,9 @@ inoremap <Esc>D <nop>
 " copy to os x pasteboard
 
 vmap <C-c> :w !pbcopy<CR>
+
+" search with sane regexes
+nnoremap / /\v
+vnoremap / /\v
 
 
