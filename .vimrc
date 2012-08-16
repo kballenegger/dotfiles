@@ -124,3 +124,10 @@ nnoremap / /\v
 vnoremap / /\v
 
 
+" Make Vim to handle long lines nicely.
+set wrap
+set textwidth=79
+set formatoptions=qrn1
+
+" color scheme
+colorschem desert
