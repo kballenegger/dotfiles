@@ -83,6 +83,8 @@ alias grm="git rm"
 # rubygems
 export PATH="/Users/kenneth/.gem/ruby/1.8/bin:$PATH"
 
+alias bundle-install-ser="bundle install --gemfile=ruby/Gemfile"
+
 # rvm
 if [[ -s /Users/kenneth/.rvm/scripts/rvm ]] ; then
     source /Users/kenneth/.rvm/scripts/rvm
