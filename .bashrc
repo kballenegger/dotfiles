@@ -51,8 +51,10 @@ export PATH="/opt/local/lib/mysql5/bin:$PATH"
 alias mysql='mysql5'
 
 # vertica
-
 alias vsql="/opt/vertica/bin/vsql -h 10.79.61.102 -U super_reader -w 67Unic0rns"
+
+# php
+export PATH="/usr/local/php/bin:$PATH"
 
 # php-shell
 alias php-shell="php-shell.sh"
