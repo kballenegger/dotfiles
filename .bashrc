@@ -95,7 +95,10 @@ if [[ -s /home/kenneth/.rvm/scripts/rvm ]] ; then
 fi
 
 # note this needs to be after rvm, otherwise wrong ruby will be used
-eval "$(hub alias -s)"
+which hub > /dev/null
+if [ $? -eq 0 ]; then
+    eval "$(hub alias -s)"
+fi
 
 # python
 alias pyi="easy_install"
