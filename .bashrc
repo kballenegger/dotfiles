@@ -56,8 +56,8 @@ alias vsql="/opt/vertica/bin/vsql -h 10.79.61.102 -U super_reader -w 67Unic0rns"
 # php
 export PATH="/usr/local/php/bin:$PATH"
 
-# php-shell
-alias php-shell="php-shell.sh"
+# php
+alias cbsh="phpsh php/paraglide.php"
 
 # -----------------------------------------------------------------
 # GIT, RUBY, PYTHON, CLOJURE, NODE, COFFEE, LESS
@@ -65,8 +65,6 @@ alias php-shell="php-shell.sh"
 
 # git
 export GIT_EDITOR="vim"
-
-eval "$(hub alias -s)"
 
 alias gco="git checkout"
 alias gps="git push"
@@ -95,6 +93,9 @@ fi
 if [[ -s /home/kenneth/.rvm/scripts/rvm ]] ; then
     source /home/kenneth/.rvm/scripts/rvm
 fi
+
+# note this needs to be after rvm, otherwise wrong ruby will be used
+eval "$(hub alias -s)"
 
 # python
 alias pyi="easy_install"
