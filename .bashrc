@@ -95,7 +95,7 @@ if [[ -s /home/kenneth/.rvm/scripts/rvm ]] ; then
 fi
 
 # note this needs to be after rvm, otherwise wrong ruby will be used
-which hub 2>&1 > /dev/null
+which hub 2>&1 >/dev/null
 if [ $? -eq 0 ]; then
     eval "$(hub alias -s)"
 fi
