@@ -136,5 +136,5 @@ colorscheme solarized
 
 " nmap <F8> :TagbarToggle<CR> 
 nnoremap <leader>t :TagbarToggle<CR> 
-au BufNewFile,BufRead * TagbarToggle
+"au BufNewFile,BufRead * TagbarToggle
 
