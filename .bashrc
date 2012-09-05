@@ -161,7 +161,7 @@ alias remote-deploy="ssh cb@mcp2.caffeine.io -t -i ~/.ssh/cb.pem 'bash -c \"/ops
 alias remote-deploy-dashboard="ssh cb@mcp2.caffeine.io -t -i ~/.ssh/cb.pem 'bash -c \"/ops/bin/cb-ctl --no-merge -a deploy -d dashboard\"'"
 alias remote-deploy-cron="ssh cb@mcp2.caffeine.io -t -i ~/.ssh/cb.pem 'bash -c \"/ops/bin/cb-ctl --no-merge -a deploy -d cron\"'"
 alias remote-deploy-firehose="ssh cb@mcp2.caffeine.io -t -i ~/.ssh/cb.pem 'bash -c \"/ops/bin/cb-ctl --no-merge -a deploy-firehose\"'"
-alias remote-deploy-linkservice="ssh cb@mcp2.caffeine.io -t -i ~/.ssh/cb.pem 'bash -c \"/ops/bin/cb-ctl --no-merge -a deploy-linkserver\"'"
+alias remote-deploy-linkservice="ssh cb@mcp2.caffeine.io -t -i ~/.ssh/cb.pem 'bash -c \"/ops/bin/cb-ctl --no-merge -a deploy -d linkserver\"'"
 
 #alias cd-cb="cd ~/dev/caffeine/server"
 alias cd-current="cd /var/www/server/current"
