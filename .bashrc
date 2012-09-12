@@ -157,11 +157,11 @@ alias paraglide-dev="export PARAGLIDE_ENVIRONMENT=dev"
 #alias remote-deploy-dev="ssh cap 'cd server && git pull && cap dev deploy'"
 #alias remote-deploy-queue="ssh cap 'cd server && git pull && cap queue deploy'"
 
-alias remote-deploy="ssh cb@mcp2.caffeine.io -t -i ~/.ssh/cb.pem 'bash -c \"/ops/bin/cb-ctl --no-merge -a deploy -d api\"'"
-alias remote-deploy-dashboard="ssh cb@mcp2.caffeine.io -t -i ~/.ssh/cb.pem 'bash -c \"/ops/bin/cb-ctl --no-merge -a deploy -d dashboard\"'"
-alias remote-deploy-cron="ssh cb@mcp2.caffeine.io -t -i ~/.ssh/cb.pem 'bash -c \"/ops/bin/cb-ctl --no-merge -a deploy -d cron\"'"
-alias remote-deploy-firehose="ssh cb@mcp2.caffeine.io -t -i ~/.ssh/cb.pem 'bash -c \"/ops/bin/cb-ctl --no-merge -a deploy-firehose\"'"
-alias remote-deploy-linkservice="ssh cb@mcp2.caffeine.io -t -i ~/.ssh/cb.pem 'bash -c \"/ops/bin/cb-ctl --no-merge -a deploy -d linkserver\"'"
+function remote-deploy {
+    dest=$1; shift
+    ssh cb@mcp2.caffeine.io -t -i ~/.ssh/cb.pem 'bash -c \"/ops/bin/cb-ctl -u '$USER' -a deploy -d '$dest' '$@'\"'
+}
+alias remote-deploy-firehose="ssh cb@mcp2.caffeine.io -t -i ~/.ssh/cb.pem 'bash -c \"/ops/bin/cb-ctl --no-merge -a deploy-firehose -u '$USER'\"'"
 
 #alias cd-cb="cd ~/dev/caffeine/server"
 alias cd-current="cd /var/www/server/current"
