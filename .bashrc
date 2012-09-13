@@ -20,7 +20,7 @@ export HISTSIZE=10000
 shopt -s histappend
 
 # path
-export PATH="/Users/kenneth/bin:$PATH"
+export PATH="$HOME/bin:$PATH"
 export PATH="/usr/class/cs143/cool/bin:$PATH"
 
 # -----------------------------------------------------------------
