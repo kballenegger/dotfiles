@@ -1,9 +1,5 @@
 
 
-# This file contains the BASH-specific settings, and
-# sources the common shell rc settings in .shellrc.
-
-source ~/.shellrc
 
 
 # Below are the oh-my-zsh specific configuration settings.
@@ -46,3 +42,12 @@ source $ZSH/oh-my-zsh.sh
 
 # Customize to your needs...
 #export PATH=/var/www/server/current/scripts/bin:/usr/local/bin:/opt/local/bin:/opt/local/sbin:/Users/kenneth/.rvm/gems/ruby-1.9.3-preview1/bin:/Users/kenneth/.rvm/gems/ruby-1.9.3-preview1@global/bin:/Users/kenneth/.rvm/rubies/ruby-1.9.3-preview1/bin:/Users/kenneth/.rvm/bin:/Users/kenneth/.gem/ruby/1.8/bin:/usr/local/php/bin:/opt/local/lib/mysql5/bin:/usr/local/sbin:/usr/local/mysql/bin:/opt/local/apache2/bin:/usr/class/cs143/cool/bin:/Users/kenneth/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/kenneth/.rvm/bin
+
+
+
+
+
+# This file contains the zsh settings, and
+# sources the common shell rc settings in .shellrc.
+
+source ~/.shellrc
