@@ -7,7 +7,7 @@ tmux has-session -t $pwd 2>/dev/null
 if [ "$?" -eq 1 ] ; then
     tmux new-session -d -s $pwd
      
-    tmux split-window -h -p 65 'vim'
+    tmux split-window -h -p 60 'vim'
     tmux set-option default-path $pwd >/dev/null
 fi
  
