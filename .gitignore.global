@@ -42,3 +42,7 @@ ehthumbs.db
 Icon?
 Thumbs.db
 
+# VIM #
+#######
+
+*.un~
