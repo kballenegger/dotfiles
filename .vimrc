@@ -1,6 +1,11 @@
 " kill vi compatibility
 set nocompatible
 
+" disable help mapping
+nnoremap <F1> <nop>
+inoremap <F1> <nop>
+vnoremap <F1> <nop>
+
 " TODO: organize these settings better!
 set encoding=utf-8
 set wildmenu
@@ -101,6 +106,9 @@ vnoremap / /\v
 set ignorecase
 set smartcase
 set gdefault
+
+nmap <leader>a :Ack<space>
+
 
 
 " vlj
