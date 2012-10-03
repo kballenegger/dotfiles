@@ -1,10 +1,22 @@
 " kill vi compatibility
 set nocompatible
 
+" TODO: organize these settings better!
+set encoding=utf-8
+set wildmenu
+set wildmode=list:longest
+set showcmd
+set hidden
+set undofile
+set ruler
+set cursorline
+set ttyfast
+
 
 
 set smartindent
-set number
+"set number
+set relativenumber
 set tabstop=4
 syntax on
 filetype plugin on
@@ -50,6 +62,9 @@ nnoremap <C-p> :set invpaste paste?<CR>
 set pastetoggle=<C-p>
 set showmode
 
+" reselect pasted text
+nnoremap <leader>v V`]
+
 " matching of brackets, if else, etc
 runtime macros/matchit.vim
 
@@ -79,9 +94,14 @@ nmap <C-l> :wincmd l<CR>
 " backspace bullshit
 set backspace=indent,eol,start
 
-" case search
+" better search
+
+nnoremap / /\v
+vnoremap / /\v
 set ignorecase
 set smartcase
+set gdefault
+
 
 " vlj
 let vimclojure#HighlightBuiltins=1
@@ -123,10 +143,6 @@ inoremap <Esc>D <nop>
 " copy to os x pasteboard
 
 vmap <C-c> :w !pbcopy<CR>
-
-" search with sane regexes
-nnoremap / /\v
-vnoremap / /\v
 
 
 " Make Vim to handle long lines nicely.
