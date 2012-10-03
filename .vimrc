@@ -107,7 +107,7 @@ set ignorecase
 set smartcase
 set gdefault
 
-nmap <leader>a :Ack<space>
+nmap <leader>s :Ack<space>
 
 
 
