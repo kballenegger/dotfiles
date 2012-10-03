@@ -1,3 +1,8 @@
+" kill vi compatibility
+set nocompatible
+
+
+
 set smartindent
 set number
 set tabstop=4
