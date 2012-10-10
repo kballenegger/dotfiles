@@ -50,6 +50,10 @@ alias cbsh="phpsh php/paraglide.php"
 # git
 export GIT_EDITOR="vim"
 
+# github credentials
+export GITHUB_USER=`security find-generic-password -D github | ruby -ne 'if (m = /"acct"\<blob\>\="([a-zA-Z0-9]+)"/.match($_)); print m[1]; end'`
+export GITHUB_PASSWORD=`security find-generic-password -D github -w`
+
 alias gco="git checkout"
 alias gps="git push"
 alias gpl="git pull"
