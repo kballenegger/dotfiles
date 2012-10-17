@@ -45,6 +45,8 @@ source $ZSH/oh-my-zsh.sh
 
 
 
+# Set interactive comments
+set -k
 
 
 # This file contains the zsh settings, and
