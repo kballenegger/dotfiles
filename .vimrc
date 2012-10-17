@@ -107,7 +107,9 @@ set ignorecase
 set smartcase
 set gdefault
 
+" ack \a
 nnoremap <leader>s :Ack<space>
+nmap <C-a> <Plug>ToggleAutoCloseMappings
 
 
 
