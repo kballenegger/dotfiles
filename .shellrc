@@ -3,7 +3,7 @@
 
 # ----------------------------------------------------------------- #
 #                                                                   #
-#           Kenneth Ballenegger's Awesome .bashrc                   #
+#           Kenneth Ballenegger's Awesome .shellrc                  #
 #                                                                   #
 # ----------------------------------------------------------------- #
 
@@ -20,6 +20,11 @@ export DISPLAY=:0.0
 # path
 export PATH="$HOME/bin:$PATH"
 export PATH="/usr/class/cs143/cool/bin:$PATH"
+
+# command_exists
+command_exists () {
+    type "$1" &> /dev/null ;
+}
 
 # -----------------------------------------------------------------
 # APACHE, MYSQL, VERTICA, PHP
@@ -51,8 +56,11 @@ alias cbsh="phpsh php/paraglide.php"
 export GIT_EDITOR="vim"
 
 # github credentials
-export GITHUB_USER=`security find-generic-password -D github | ruby -ne 'if (m = /"acct"\<blob\>\="([a-zA-Z0-9]+)"/.match($_)); print m[1]; end'`
-export GITHUB_PASSWORD=`security find-generic-password -D github -w`
+
+if command_exists security; then
+    export GITHUB_USER=`security find-generic-password -D github | ruby -ne 'if (m = /"acct"\<blob\>\="([a-zA-Z0-9]+)"/.match($_)); print m[1]; end'`
+    export GITHUB_PASSWORD=`security find-generic-password -D github -w`
+fi
 
 alias gco="git checkout"
 alias gps="git push"
@@ -74,17 +82,12 @@ export PATH="/Users/kenneth/.gem/ruby/1.8/bin:$PATH"
 alias bundle-install-ser="bundle install --gemfile=ruby/Gemfile"
 
 # rvm
-if [[ -s /Users/kenneth/.rvm/scripts/rvm ]] ; then
-    source /Users/kenneth/.rvm/scripts/rvm
-fi
-# rvm
-if [[ -s /home/kenneth/.rvm/scripts/rvm ]] ; then
-    source /home/kenneth/.rvm/scripts/rvm
+if [[ -s $HOME/.rvm/scripts/rvm ]] ; then
+    source $HOME/.rvm/scripts/rvm
 fi
 
 # note this needs to be after rvm, otherwise wrong ruby will be used
-which hub > /dev/null 2>&1
-if [ $? -eq 0 ]; then
+if command_exists hub; then
     eval "$(hub alias -s)"
 fi
 
@@ -123,13 +126,6 @@ export PATH="/var/www/server/current/scripts/bin:$PATH"
 # paraglide-live / dev
 alias paraglide-live="export PARAGLIDE_ENVIRONMENT=live"
 alias paraglide-dev="export PARAGLIDE_ENVIRONMENT=dev"
-
-# misc shortcuts
-#alias remote-deploy="ssh cap 'cd server && git pull && cap production deploy'"
-#alias remote-deploy-lb="ssh cap 'cd server && git pull && cap lb deploy'"
-#alias remote-deploy-stage="ssh cap 'cd server && git pull && cap stage deploy'"
-#alias remote-deploy-dev="ssh cap 'cd server && git pull && cap dev deploy'"
-#alias remote-deploy-queue="ssh cap 'cd server && git pull && cap queue deploy'"
 
 function remote-deploy {
     dest=$1; shift

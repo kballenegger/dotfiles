@@ -1,6 +1,9 @@
 
 
 
+# -----------------------------------------------------------------
+# OH-MY-ZSH CONFIGURATION
+# -----------------------------------------------------------------
 
 # Below are the oh-my-zsh specific configuration settings.
 
@@ -40,16 +43,33 @@ plugins=(git autojump osx ruby github lein brew gem rvm terminalapp)
 
 source $ZSH/oh-my-zsh.sh
 
-# Customize to your needs...
-#export PATH=/var/www/server/current/scripts/bin:/usr/local/bin:/opt/local/bin:/opt/local/sbin:/Users/kenneth/.rvm/gems/ruby-1.9.3-preview1/bin:/Users/kenneth/.rvm/gems/ruby-1.9.3-preview1@global/bin:/Users/kenneth/.rvm/rubies/ruby-1.9.3-preview1/bin:/Users/kenneth/.rvm/bin:/Users/kenneth/.gem/ruby/1.8/bin:/usr/local/php/bin:/opt/local/lib/mysql5/bin:/usr/local/sbin:/usr/local/mysql/bin:/opt/local/apache2/bin:/usr/class/cs143/cool/bin:/Users/kenneth/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/kenneth/.rvm/bin
 
 
+# -----------------------------------------------------------------
+# CUSTOM ZSH CONFIGURATION
+# -----------------------------------------------------------------
 
 # Set interactive comments
 set -k
 
 
-# This file contains the zsh settings, and
-# sources the common shell rc settings in .shellrc.
+# Source the common shell rc settings in .shellrc.
 
 source ~/.shellrc
+
+# -----------------------------------------------------------------
+# SOURCING LOCAL .ZSHRC
+# -----------------------------------------------------------------
+
+if [ -f ~/.bashrc.local ]; then
+    source ~/.bashrc.local
+fi
+
+
+
+
+
+
+
+# the end
+
