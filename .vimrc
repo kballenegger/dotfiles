@@ -20,8 +20,8 @@ set ttyfast
 
 
 set smartindent
-"set number
-set relativenumber
+set number
+"set relativenumber
 set tabstop=4
 syntax on
 filetype plugin on
