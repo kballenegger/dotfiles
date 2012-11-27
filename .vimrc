@@ -12,11 +12,11 @@ set wildmenu
 set wildmode=list:longest
 set showcmd
 set hidden
-set undofile
 set ruler
 set cursorline
 set ttyfast
 
+"set undofile
 
 
 set smartindent
