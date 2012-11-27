@@ -32,7 +32,9 @@ set expandtab
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip   " Linux/MacOSX
 
 " autoreload buffers
-set autoread
+let autoreadargs={'autoread':1,'quiet':1}
+au VimEnter * execute WatchForChanges("*",autoreadargs)
+
 
 " filetypes
 
@@ -168,4 +170,9 @@ colorscheme solarized
 " nmap <F8> :TagbarToggle<CR> 
 nnoremap <leader>t :TagbarToggle<CR> 
 "au BufNewFile,BufRead * TagbarToggle
+
+
+
+
+
 
