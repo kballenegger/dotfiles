@@ -55,6 +55,11 @@ set -k
 # Disable shared histories
 unsetopt share_history
 
+# Deal with slow git completion
+__git_files () { 
+    _wanted files expl 'local files' _files 
+}
+
 # Source the common shell rc settings in .shellrc.
 source ~/.shellrc
 
