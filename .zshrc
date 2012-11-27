@@ -52,9 +52,10 @@ source $ZSH/oh-my-zsh.sh
 # Set interactive comments
 set -k
 
+# Disable shared histories
+unsetopt share_history
 
 # Source the common shell rc settings in .shellrc.
-
 source ~/.shellrc
 
 # -----------------------------------------------------------------
