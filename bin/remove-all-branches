@@ -7,8 +7,8 @@ function remove_all_branches {
   fi
     echo "Fetching merged branches..."
   git remote prune origin
-  remote_branches=$(git branch -r --merged | grep -v '/master$' | grep -v "/$current_branch$")
-  local_branches=$(git branch --merged | grep -v 'master$' | grep -v "$current_branch$")
+  remote_branches=$(git branch -r --merged | grep -v '/master$' | grp -v 'production$' | grep -v "/$current_branch$")
+  local_branches=$(git branch --merged | grep -v 'master$' | grep -v 'production$' | grep -v "$current_branch$")
   if [ -z "$remote_branches" ] && [ -z "$local_branches" ]; then
     echo "No existing branches have been merged into $current_branch."
   else
