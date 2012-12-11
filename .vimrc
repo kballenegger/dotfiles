@@ -110,7 +110,7 @@ set smartcase
 set gdefault
 
 " ack \a
-nnoremap <leader>s :Ack<space>
+nnoremap <leader>a :Ack<space>
 nmap <C-a> <Plug>ToggleAutoCloseMappings
 
 
@@ -178,6 +178,7 @@ let g:gist_detect_filetype = 1
 let g:gist_show_privates = 1
 let g:gist_post_private = 1
 let g:gist_get_multiplefile = 1
+nnoremap <Leader>s :Gist<space>
 
 
 
