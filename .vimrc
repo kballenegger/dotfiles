@@ -130,10 +130,6 @@ nnoremap <up> <nop>
 nnoremap <down> <nop>
 nnoremap <left> <nop>
 nnoremap <right> <nop>
-"inoremap <up> <nop>
-"inoremap <down> <nop>
-"inoremap <left> <nop>
-"inoremap <right> <nop>
 nnoremap j gj
 nnoremap k gk
 
@@ -148,19 +144,9 @@ inoremap <Esc>A <nop>
 inoremap <Esc>B <nop>
 inoremap <Esc>C <nop>
 inoremap <Esc>D <nop>
-" nnoremap <Esc>A <up>
-" nnoremap <Esc>B <down>
-" nnoremap <Esc>C <right>
-" nnoremap <Esc>D <left>
-" inoremap <Esc>A <up>
-" inoremap <Esc>B <down>
-" inoremap <Esc>C <right>
-" inoremap <Esc>D <left>
 
 " copy to os x pasteboard
-
 vmap <C-c> :w !pbcopy<CR>
-
 
 " Make Vim to handle long lines nicely.
 set wrap
@@ -175,7 +161,6 @@ colorscheme solarized
 " nmap <F8> :TagbarToggle<CR> 
 nnoremap <leader>t :TagbarToggle<CR> 
 "au BufNewFile,BufRead * TagbarToggle
-
 
 " gist settings
 let g:gist_clip_command = 'pbcopy'
