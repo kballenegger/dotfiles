@@ -51,6 +51,17 @@ map <leader>[ :tabprev<CR>
 map <leader>] :tabnext<CR>
 map <leader>w :bd<CR>
 
+
+" splits
+
+nnoremap <leader><bar> :rightb vert new<CR>
+nnoremap <leader>_ :rightb new<CR>
+
+nnoremap <leader><up> <C-w>k
+nnoremap <leader><down> <C-w>j
+nnoremap <leader><left> <C-w>h
+nnoremap <leader><right> <C-w>l
+
 " ctrl-t
 
 let g:ctrlp_map = '<leader>p'
@@ -91,12 +102,6 @@ set directory=~/.vim-tmp,~/.tmp,~/tmp,/var/tmp,/tmp
 " scroll viewport faster
 nnoremap <C-e> 3<C-e>
 nnoremap <C-y> 3<C-y>
-
-" switching windows faster
-nmap <C-k> :wincmd k<CR>
-nmap <C-j> :wincmd j<CR>
-nmap <C-h> :wincmd h<CR>
-nmap <C-l> :wincmd l<CR>
 
 " backspace bullshit
 set backspace=indent,eol,start
