@@ -6,5 +6,5 @@ if exists("g:RIVimLoaded") || &cp || version < 700
   finish
 endif
 let g:ri_vim_tool = 'ri_vim '
-source /Users/kenneth/.rvm/gems/ruby-1.9.3-p327/gems/ri_vim-0.1.9/lib/ri.vim
+exe "source " . system("gem contents ri_vim | grep 'ri\\.vim$'")
 
