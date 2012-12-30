@@ -175,3 +175,6 @@ nnoremap <Leader>s :Gist<space>
 inoremap <m-u> <esc>viwUea
 
 
+" enable pathogen
+call pathogen#infect()
+
