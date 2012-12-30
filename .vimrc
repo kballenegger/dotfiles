@@ -171,7 +171,7 @@ let g:gist_get_multiplefile = 1
 nnoremap <Leader>s :Gist<space>
 
 
-
-
+" uppercase word in insert mode
+inoremap <m-u> <esc>viwUea
 
 
