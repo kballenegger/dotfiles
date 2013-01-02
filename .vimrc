@@ -71,8 +71,8 @@ let g:ctrlp_custom_ignore = '\.git$\|\.hg$\|\.svn$'
 
 " mapping enter and shift enter to newline without insert mode
 
-map <S-Enter> O<Esc>
-map <CR> o<Esc>
+nnoremap <S-CR> O<Esc>
+nnoremap <CR> o<Esc>
 
 " mapping to quick no indent
 
