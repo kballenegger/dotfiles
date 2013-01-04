@@ -51,6 +51,8 @@ map <leader>[ :tabprev<CR>
 map <leader>] :tabnext<CR>
 map <leader>w :bd<CR>
 
+set showtabline=2
+
 
 " splits
 
