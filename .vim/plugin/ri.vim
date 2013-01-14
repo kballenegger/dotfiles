@@ -4,7 +4,7 @@
 " License: MIT License (c) 2011 Daniel Choi
 
 let s:ri_vim_path = system("gem contents ri_vim | grep 'ri\\.vim$'")
-if !exists("s:ri_vim_path")
+if s:ri_vim_path == ""
   finish
 endif
 
