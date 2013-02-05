@@ -4,3 +4,6 @@
 [submodule ".vim/bundle/autoreadwatch"]
 	path = .vim/bundle/autoreadwatch
 	url = https://github.com/kballenegger/vim-autoreadwatch.git
+[submodule ".vim/bundle/syntastic"]
+	path = .vim/bundle/syntastic
+	url = https://github.com/scrooloose/syntastic.git
