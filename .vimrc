@@ -96,17 +96,17 @@ runtime macros/matchit.vim
 set hidden
 
 " better completion
-set wildmode=list:longest
-let g:SuperTabDefaultCompletionType = "context"
+"set wildmode=list:longest
+"let g:SuperTabDefaultCompletionType = "context"
 
 " snipmate
 let g:snips_author = 'Kenneth Ballenegger'
 
 " clang osx
-let sdk_path = 'echo -n `ls /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs | head -1`'
-let g:clang_complete_copen = 1
-autocmd FileType objc let g:clang_use_library=1
-autocmd FileType objc let g:clang_user_options = '-fblocks -isysroot ' . sdk_path . ' -D__IPHONE_OS_VERSION_MIN_REQUIRED=40300'
+"let sdk_path = 'echo -n `ls /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs | head -1`'
+"let g:clang_complete_copen = 1
+"autocmd FileType objc let g:clang_use_library=1
+"autocmd FileType objc let g:clang_user_options = '-fblocks -isysroot ' . sdk_path . ' -D__IPHONE_OS_VERSION_MIN_REQUIRED=40300'
 
 
 " scroll by three lines when cursor moves off screen
