@@ -1,6 +1,10 @@
 " kill vi compatibility
 set nocompatible
 
+" enable pathogen
+call pathogen#infect()
+
+
 " disable help mapping
 nnoremap <F1> <nop>
 inoremap <F1> <nop>
@@ -186,8 +190,4 @@ nnoremap <Leader>s :Gist<space>
 
 " uppercase word in insert mode
 inoremap <m-u> <esc>viwUea
-
-
-" enable pathogen
-call pathogen#infect()
 
