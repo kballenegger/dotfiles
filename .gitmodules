@@ -22,3 +22,6 @@
 [submodule ".oh-my-zsh"]
 	path = .oh-my-zsh
 	url = https://github.com/robbyrussell/oh-my-zsh.git
+[submodule ".vim/bundle/you-complete-me"]
+	path = .vim/bundle/you-complete-me
+	url = https://github.com/Valloric/YouCompleteMe.git
