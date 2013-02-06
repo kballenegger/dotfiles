@@ -9,6 +9,30 @@ syntax on
 filetype plugin on
 filetype indent on
 
+" color scheme
+let g:solarized_termcolors=256
+set background=dark
+colorscheme solarized
+
+" show line numbers
+set number
+
+" basic editor things
+set encoding=utf-8
+set ttyfast
+
+" indentation
+set smartindent
+set tabstop=4
+set shiftwidth=4
+set expandtab
+
+" tabs & buffers
+map <leader>o :tabnew<CR>
+map <leader>[ :tabprev<CR>
+map <leader>] :tabnext<CR>
+map <leader>w :bd<CR>
+set showtabline=2
 
 "" disable help mapping
 "nnoremap <F1> <nop>
@@ -16,24 +40,17 @@ filetype indent on
 "vnoremap <F1> <nop>
 
 "" TODO: organize these settings better!
-"set encoding=utf-8
 "set wildmenu
 "set wildmode=list:longest
 "set showcmd
 "set hidden
 "set ruler
 "set cursorline
-"set ttyfast
 
 ""set undofile
 
 
-"set smartindent
-"set number
 ""set relativenumber
-"set tabstop=4
-"set shiftwidth=4
-"set expandtab
 
 "set wildignore+=*/tmp/*,*.so,*.swp,*.zip   " Linux/MacOSX
 
@@ -50,14 +67,6 @@ filetype indent on
 
 "autocmd Filetype ruby setlocal ts=2 sw=2 expandtab
 
-"" tabs & buffers
-
-"map <leader>o :tabnew<CR>
-"map <leader>[ :tabprev<CR>
-"map <leader>] :tabnext<CR>
-"map <leader>w :bd<CR>
-
-"set showtabline=2
 
 
 "" splits
@@ -172,10 +181,6 @@ filetype indent on
 "set textwidth=79
 "set formatoptions=qrn1
 
-"" color scheme
-"let g:solarized_termcolors=256
-"set background=dark
-"colorscheme solarized
 
 "" nmap <F8> :TagbarToggle<CR> 
 "nnoremap <leader>t :TagbarToggle<CR> 
