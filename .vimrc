@@ -112,7 +112,6 @@ nnoremap <CR> o<Esc>
 
 " paste mode
 nnoremap <C-p> :set invpaste paste?<CR>
-set pastetoggle=<C-p>
 
 " uppercase word in insert mode
 inoremap <m-u> <esc>viwUea
@@ -173,6 +172,7 @@ let g:ctrlp_custom_ignore = '\.git$\|\.hg$\|\.svn$'
 
 
 
+"set pastetoggle=<C-p>
 
 "" matching of brackets, if else, etc
 "runtime macros/matchit.vim
