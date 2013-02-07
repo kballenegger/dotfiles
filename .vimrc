@@ -1,3 +1,7 @@
+" ==============================
+"              VIM
+" ==============================
+
 " kill vi compatibility
 set nocompatible
 
@@ -28,16 +32,82 @@ set shiftwidth=4
 set expandtab
 
 " tabs & buffers
+set showtabline=2
+
+
+" ==============================
+"           MAPPINGS
+" ==============================
+
+" tabs & buffers
 map <leader>o :tabnew<CR>
 map <leader>[ :tabprev<CR>
 map <leader>] :tabnext<CR>
 map <leader>w :bd<CR>
-set showtabline=2
 
-"" disable help mapping
-"nnoremap <F1> <nop>
-"inoremap <F1> <nop>
-"vnoremap <F1> <nop>
+" disable help mapping
+nnoremap <F1> <nop>
+inoremap <F1> <nop>
+vnoremap <F1> <nop>
+
+" reselect pasted text
+nnoremap <leader>v V`]
+
+" disable arrow keys
+nnoremap <up> <nop>
+nnoremap <down> <nop>
+nnoremap <left> <nop>
+nnoremap <right> <nop>
+nnoremap j gj
+nnoremap k gk
+
+" fix arrow keys in tmux
+nnoremap <Esc>A <nop>
+nnoremap <Esc>B <nop>
+nnoremap <Esc>C <nop>
+nnoremap <Esc>D <nop>
+inoremap <Esc>A <nop>
+inoremap <Esc>B <nop>
+inoremap <Esc>C <nop>
+inoremap <Esc>D <nop>
+
+" splits
+nnoremap <leader><bar> :rightb vert new<CR>
+nnoremap <leader>_ :rightb new<CR>
+nnoremap <leader><up> <C-w>k
+nnoremap <leader><down> <C-w>j
+nnoremap <leader><left> <C-w>h
+nnoremap <leader><right> <C-w>l
+
+
+" ==============================
+"           FILETYPES
+" ==============================
+
+" ruby
+autocmd Filetype ruby setlocal ts=2 sw=2 expandtab
+
+" extension mappings
+au BufNewFile,BufRead *.cljs setfiletype clojure
+au BufNewFile,BufRead *.md setfiletype markdown
+au BufNewFile,BufRead *.less setfiletype css
+
+
+" ==============================
+"            PLUGINS
+" ==============================
+
+" autoreload buffers
+let autoreadargs={'autoread':1,'quiet':1}
+au VimEnter * execute WatchForChanges("*",autoreadargs)
+
+
+
+
+
+
+" misc
+
 
 "" TODO: organize these settings better!
 "set wildmenu
@@ -54,30 +124,14 @@ set showtabline=2
 
 "set wildignore+=*/tmp/*,*.so,*.swp,*.zip   " Linux/MacOSX
 
-"" autoreload buffers
-"let autoreadargs={'autoread':1,'quiet':1}
-"au VimEnter * execute WatchForChanges("*",autoreadargs)
 
 
 "" filetypes
 
-"au BufNewFile,BufRead *.cljs setfiletype clojure
-"au BufNewFile,BufRead *.md setfiletype markdown
-"au BufNewFile,BufRead *.less setfiletype css
-
-"autocmd Filetype ruby setlocal ts=2 sw=2 expandtab
 
 
 
-"" splits
 
-"nnoremap <leader><bar> :rightb vert new<CR>
-"nnoremap <leader>_ :rightb new<CR>
-
-"nnoremap <leader><up> <C-w>k
-"nnoremap <leader><down> <C-w>j
-"nnoremap <leader><left> <C-w>h
-"nnoremap <leader><right> <C-w>l
 
 "" ctrl-t
 
@@ -97,8 +151,6 @@ set showtabline=2
 "set pastetoggle=<C-p>
 "set showmode
 
-"" reselect pasted text
-"nnoremap <leader>v V`]
 
 "" matching of brackets, if else, etc
 "runtime macros/matchit.vim
@@ -152,26 +204,6 @@ set showtabline=2
 "let vimclojure#HighlightBuiltins=1
 "let vimclojure#ParenRainbow=1
 
-"" disable arrow keys
-
-"nnoremap <up> <nop>
-"nnoremap <down> <nop>
-"nnoremap <left> <nop>
-"nnoremap <right> <nop>
-"nnoremap j gj
-"nnoremap k gk
-
-
-"" fix arrow keys in tmux
-
-"nnoremap <Esc>A <nop>
-"nnoremap <Esc>B <nop>
-"nnoremap <Esc>C <nop>
-"nnoremap <Esc>D <nop>
-"inoremap <Esc>A <nop>
-"inoremap <Esc>B <nop>
-"inoremap <Esc>C <nop>
-"inoremap <Esc>D <nop>
 
 "" copy to os x pasteboard
 "vmap <C-c> :w !pbcopy<CR>
