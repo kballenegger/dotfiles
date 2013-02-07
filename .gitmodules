@@ -25,3 +25,6 @@
 [submodule ".vim/bundle/you-complete-me"]
 	path = .vim/bundle/you-complete-me
 	url = https://github.com/Valloric/YouCompleteMe.git
+[submodule ".vim/bundle/autoclose"]
+	path = .vim/bundle/autoclose
+	url = https://github.com/Townk/vim-autoclose.git
