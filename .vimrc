@@ -24,6 +24,14 @@ set number
 " basic editor things
 set encoding=utf-8
 set ttyfast
+set showmode
+set showcmd
+set hidden
+set ruler
+set cursorline
+
+" scroll by three lines when cursor moves off screen
+set scrolloff=7
 
 " indentation
 set smartindent
@@ -33,6 +41,25 @@ set expandtab
 
 " tabs & buffers
 set showtabline=2
+
+" search
+nnoremap / /\v
+vnoremap / /\v
+set ignorecase
+set smartcase
+set gdefault
+
+" swap files location
+set backupdir=~/.vim-tmp,~/.tmp,~/tmp,/var/tmp,/tmp
+set directory=~/.vim-tmp,~/.tmp,~/tmp,/var/tmp,/tmp
+
+" wrapping
+set wrap
+set textwidth=79
+set formatoptions=qrn1
+
+" backspace bullshit
+set backspace=indent,eol,start
 
 
 " ==============================
@@ -79,6 +106,21 @@ nnoremap <leader><down> <C-w>j
 nnoremap <leader><left> <C-w>h
 nnoremap <leader><right> <C-w>l
 
+" mapping enter and shift enter to newline without insert mode
+nnoremap <S-CR> O<Esc>
+nnoremap <CR> o<Esc>
+
+" paste mode
+nnoremap <C-p> :set invpaste paste?<CR>
+set pastetoggle=<C-p>
+
+" uppercase word in insert mode
+inoremap <m-u> <esc>viwUea
+
+" scroll viewport faster
+nnoremap <C-e> 7<C-e>
+nnoremap <C-y> 7<C-y>
+
 
 " ==============================
 "           FILETYPES
@@ -101,6 +143,11 @@ au BufNewFile,BufRead *.less setfiletype css
 let autoreadargs={'autoread':1,'quiet':1}
 au VimEnter * execute WatchForChanges("*",autoreadargs)
 
+" ctrl-p
+let g:ctrlp_map = '<leader>p'
+let g:ctrlp_cmd = 'CtrlP'
+let g:ctrlp_working_path_mode = 2
+let g:ctrlp_custom_ignore = '\.git$\|\.hg$\|\.svn$'
 
 
 
@@ -110,58 +157,31 @@ au VimEnter * execute WatchForChanges("*",autoreadargs)
 
 
 "" TODO: organize these settings better!
+" omni completion stuff i think
 "set wildmenu
 "set wildmode=list:longest
-"set showcmd
-"set hidden
-"set ruler
-"set cursorline
-
-""set undofile
-
-
-""set relativenumber
-
 "set wildignore+=*/tmp/*,*.so,*.swp,*.zip   " Linux/MacOSX
 
-
-
-"" filetypes
-
-
+""set undofile
+""set relativenumber
 
 
 
 
-"" ctrl-t
 
-"let g:ctrlp_map = '<leader>p'
-"let g:ctrlp_cmd = 'CtrlP'
-"let g:ctrlp_working_path_mode = 2
-"let g:ctrlp_custom_ignore = '\.git$\|\.hg$\|\.svn$'
 
-"" mapping enter and shift enter to newline without insert mode
 
-"nnoremap <S-CR> O<Esc>
-"nnoremap <CR> o<Esc>
 
-"" mapping to quick no indent
-
-"nnoremap <C-p> :set invpaste paste?<CR>
-"set pastetoggle=<C-p>
-"set showmode
 
 
 "" matching of brackets, if else, etc
 "runtime macros/matchit.vim
 
-"" better buffers
-"set hidden
-
+" super tab disabled in favor of YCM
 "" better completion
-""set wildmode=list:longest
 ""let g:SuperTabDefaultCompletionType = "context"
 
+" snipmate disabled
 "" snipmate
 "let g:snips_author = 'Kenneth Ballenegger'
 
@@ -172,27 +192,7 @@ au VimEnter * execute WatchForChanges("*",autoreadargs)
 ""autocmd FileType objc let g:clang_user_options = '-fblocks -isysroot ' . sdk_path . ' -D__IPHONE_OS_VERSION_MIN_REQUIRED=40300'
 
 
-"" scroll by three lines when cursor moves off screen
-"set scrolloff=3
 
-"" swap files location
-"set backupdir=~/.vim-tmp,~/.tmp,~/tmp,/var/tmp,/tmp
-"set directory=~/.vim-tmp,~/.tmp,~/tmp,/var/tmp,/tmp
-
-"" scroll viewport faster
-"nnoremap <C-e> 3<C-e>
-"nnoremap <C-y> 3<C-y>
-
-"" backspace bullshit
-"set backspace=indent,eol,start
-
-"" better search
-
-"nnoremap / /\v
-"vnoremap / /\v
-"set ignorecase
-"set smartcase
-"set gdefault
 
 "" ack \a
 "nnoremap <leader>a :Ack<space>
@@ -208,10 +208,6 @@ au VimEnter * execute WatchForChanges("*",autoreadargs)
 "" copy to os x pasteboard
 "vmap <C-c> :w !pbcopy<CR>
 
-"" Make Vim to handle long lines nicely.
-"set wrap
-"set textwidth=79
-"set formatoptions=qrn1
 
 
 "" nmap <F8> :TagbarToggle<CR> 
@@ -227,6 +223,4 @@ au VimEnter * execute WatchForChanges("*",autoreadargs)
 "nnoremap <Leader>s :Gist<space>
 
 
-"" uppercase word in insert mode
-"inoremap <m-u> <esc>viwUea
 
