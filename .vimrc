@@ -151,6 +151,8 @@ let g:ctrlp_custom_ignore = '\.git$\|\.hg$\|\.svn$'
 " you complete me
 let g:ycm_add_preview_to_completeopt = 0
 
+" tagbar
+nnoremap <leader>t :TagbarToggle<CR> 
 
 
 " misc
@@ -212,7 +214,6 @@ let g:ycm_add_preview_to_completeopt = 0
 
 
 "" nmap <F8> :TagbarToggle<CR> 
-"nnoremap <leader>t :TagbarToggle<CR> 
 ""au BufNewFile,BufRead * TagbarToggle
 
 "" gist settings
