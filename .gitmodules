@@ -31,3 +31,6 @@
 [submodule ".vim/bundle/delimit-mate"]
 	path = .vim/bundle/delimit-mate
 	url = https://github.com/Raimondi/delimitMate.git
+[submodule ".vim/bundle/tagbar"]
+	path = .vim/bundle/tagbar
+	url = https://github.com/majutsushi/tagbar.git
