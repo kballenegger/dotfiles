@@ -109,6 +109,7 @@ nnoremap <leader><right> <C-w>l
 " mapping enter and shift enter to newline without insert mode
 nnoremap <S-CR> O<Esc>
 nnoremap <CR> o<Esc>
+autocmd CmdwinEnter * unmap <buffer> <CR>
 
 " paste mode
 nnoremap <C-p> :set invpaste paste?<CR>
