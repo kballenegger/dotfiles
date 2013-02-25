@@ -126,14 +126,17 @@ nnoremap <C-y> 7<C-y>
 "           FILETYPES
 " ==============================
 
-" ruby
-autocmd Filetype ruby setlocal ts=2 sw=2 expandtab
-au BufNewFile,BufRead *.ru setfiletype ruby
-
 " extension mappings
 au BufNewFile,BufRead *.cljs setfiletype clojure
-au BufNewFile,BufRead *.md setfiletype markdown
+au BufNewFile,BufRead *.md setlocal ft=markdown
 au BufNewFile,BufRead *.less setfiletype css
+
+" ruby
+au BufNewFile,BufRead *.ru setfiletype ruby
+autocmd Filetype ruby setlocal ts=2 sw=2 expandtab
+
+" markdown
+autocmd Filetype markdown setlocal foldmethod=manual
 
 
 " ==============================
