@@ -128,6 +128,7 @@ nnoremap <C-y> 7<C-y>
 
 " ruby
 autocmd Filetype ruby setlocal ts=2 sw=2 expandtab
+au BufNewFile,BufRead *.ru setfiletype ruby
 
 " extension mappings
 au BufNewFile,BufRead *.cljs setfiletype clojure
