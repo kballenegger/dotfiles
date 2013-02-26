@@ -121,6 +121,12 @@ inoremap <m-u> <esc>viwUea
 nnoremap <C-e> 7<C-e>
 nnoremap <C-y> 7<C-y>
 
+" statusline
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
+
+
 
 " ==============================
 "           FILETYPES
@@ -155,6 +161,14 @@ let g:ctrlp_custom_ignore = '\.git$\|\.hg$\|\.svn$'
 
 " you complete me
 let g:ycm_add_preview_to_completeopt = 0
+
+" syntastic
+let g:syntastic_objc_checkers = ['ycm']
+let g:syntastic_c_checkers = ['ycm']
+let g:syntastic_cpp_checkers = ['ycm']
+let g:syntastic_error_symbol='✗'
+let g:syntastic_warning_symbol='!'
+let g:syntastic_quiet_warnings=0
 
 " tagbar
 nnoremap <leader>t :TagbarToggle<CR> 
