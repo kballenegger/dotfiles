@@ -37,3 +37,6 @@
 [submodule ".vim/bundle/powerline"]
 	path = .vim/bundle/powerline
 	url = https://github.com/Lokaltog/vim-powerline
+[submodule ".vim/bundle/closetags"]
+	path = .vim/bundle/closetags
+	url = https://github.com/vim-scripts/closetag.vim.git
