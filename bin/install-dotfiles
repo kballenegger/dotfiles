@@ -14,6 +14,8 @@ echo "What is your email?"
 echo -n "> "
 read email
 
+echo "---"; echo
+
 
 
 # clone repo
@@ -52,6 +54,7 @@ git commit -m "Updating .gitconfig for $USER""..."
 
 
 
+echo; echo; echo "---"; echo
 
 echo "All done... Enjoy!"
 
