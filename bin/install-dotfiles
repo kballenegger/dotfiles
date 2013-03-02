@@ -51,7 +51,9 @@ git commit -m "Updating .gitconfig for $USER""..."
 
 
 
-
+chsh -s /bin/zsh
 
 
 echo "All done... Enjoy!"
+
+login
