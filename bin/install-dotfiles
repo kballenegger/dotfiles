@@ -51,9 +51,11 @@ git commit -m "Updating .gitconfig for $USER""..."
 
 
 
-chsh -s /bin/zsh
 
 
 echo "All done... Enjoy!"
 
-login
+echo "It is recommended that you change your shell to zsh for extra awesomeness:"
+echo "    chsh -s /bin/zsh"
+echo "Also, please login again for changes to take effect."
+
