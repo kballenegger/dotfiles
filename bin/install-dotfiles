@@ -1,0 +1,36 @@
+#!/bin/bash
+
+echo "Setting up your dotfiles..."
+echo "---"; echo
+echo "You are: $USER"; echo
+
+#echo "Where is the root of the git repo? [defaults to ~]"
+#echo -n "> "
+#read root
+
+echo "What is your full name?"
+echo -n "> "
+read name
+echo "What is your email?"
+echo -n "> "
+read email
+
+#cwd=`pwd`
+#cd root
+
+# create a new branch
+git checkout -b "dotfiles-$USER"
+
+# replace gitconfig
+mv ~/.gitconfig ~/.gitconfig~
+cp ~/.gitconfig.generic ~/.gitconfig
+sed -i '' "s/New User/$name/" ~/.gitconfig
+sed -i '' "s/email/$email/" ~/.gitconfig
+
+git add ~/.gitconfig
+git commit -m "Updating .gitconfig for $USER""..."
+
+
+
+#cd $cwd
+
