@@ -4,9 +4,8 @@ echo "Setting up your dotfiles..."
 echo "---"; echo
 echo "You are: $USER"; echo
 
-#echo "Where is the root of the git repo? [defaults to ~]"
-#echo -n "> "
-#read root
+cd ~
+
 
 echo "What is your full name?"
 echo -n "> "
@@ -15,8 +14,24 @@ echo "What is your email?"
 echo -n "> "
 read email
 
-#cwd=`pwd`
-#cd root
+
+
+# clone repo
+[ -d dotfiles ] && mv dotfiles dotfiles~
+git clone https://github.com/kballenegger/dotfiles.git
+
+# move files in place
+for e in `ls dotfiles` ; do
+    if [ "$e" != '.' -a "$e" != '..' ]; then
+        [ -e "$e" ] && mv "$e" "$e~"
+        mv "dotfiles/$e" "$e"
+    fi
+done
+rm -rf dotfiles
+
+
+# everything has been moved, ~ is now a git repo :)
+
 
 # get submodules
 git submodule init
@@ -37,7 +52,6 @@ git commit -m "Updating .gitconfig for $USER""..."
 
 
 
-#cd $cwd
 
 
 echo "All done... Enjoy!"
