@@ -23,7 +23,7 @@ echo "---"; echo
 git clone https://github.com/kballenegger/dotfiles.git
 
 # move files in place
-for e in `ls dotfiles` ; do
+for e in `ls -a dotfiles` ; do
     if [ "$e" != '.' -a "$e" != '..' ]; then
         [ -e "$e" ] && mv "$e" "$e~"
         mv "dotfiles/$e" "$e"
