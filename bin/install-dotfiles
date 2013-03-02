@@ -18,6 +18,10 @@ read email
 #cwd=`pwd`
 #cd root
 
+# get submodules
+git submodule init
+git submodule update
+
 # create a new branch
 git checkout -b "dotfiles-$USER"
 
@@ -32,5 +36,8 @@ git commit -m "Updating .gitconfig for $USER""..."
 
 
 
+
 #cd $cwd
 
+
+echo "All done... Enjoy!"
