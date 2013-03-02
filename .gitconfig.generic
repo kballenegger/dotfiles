@@ -1,6 +1,6 @@
 [user]
 	name = New User
-	email = email
+	email = email@domain.com
 [color]
 	diff = auto
 	ui = auto

@@ -29,7 +29,7 @@ git checkout -b "dotfiles-$USER"
 mv ~/.gitconfig ~/.gitconfig~
 cp ~/.gitconfig.generic ~/.gitconfig
 sed -i '' "s/New User/$name/" ~/.gitconfig
-sed -i '' "s/email/$email/" ~/.gitconfig
+sed -i '' "s/email@domain.com/$email/" ~/.gitconfig
 
 git add ~/.gitconfig
 git commit -m "Updating .gitconfig for $USER""..."
