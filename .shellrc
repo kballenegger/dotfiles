@@ -58,8 +58,8 @@ export GIT_EDITOR="vim"
 # github credentials
 
 if command_exists security; then
-    export GITHUB_USER=`security find-generic-password -D github | ruby -ne 'if (m = /"acct"\<blob\>\="([a-zA-Z0-9]+)"/.match($_)); print m[1]; end'`
-    export GITHUB_PASSWORD=`security find-generic-password -D github -w`
+    export GITHUB_USER=`security find-generic-password -D github | ruby -ne 'if (m = /"acct"\<blob\>\="([a-zA-Z0-9]+)"/.match($_)); print m[1]; end'` 2>/dev/null
+    export GITHUB_PASSWORD=`security find-generic-password -D github -w` 2>/dev/null
 fi
 
 alias gco="git checkout"
