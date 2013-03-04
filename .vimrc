@@ -1,12 +1,24 @@
-" ==============================
-"              VIM
-" ==============================
-
 " kill vi compatibility
 set nocompatible
 
+" ==============================
+"           PATHOGEN
+" ==============================
+
+" use YCM if possible, otherwise use supertab
+if filereadable($HOME . "/.vim/bundle/you-complete-me/python/ycm_core.so")
+    let g:pathogen_disabled = ['supertab']
+else
+    let g:pathogen_disabled = ['you-complete-me']
+endif
+
 " enable pathogen
 call pathogen#infect()
+
+
+" ==============================
+"              VIM
+" ==============================
 
 " enable file types and syntax highlighing
 syntax on
@@ -173,6 +185,22 @@ let g:syntastic_quiet_warnings=0
 
 " tagbar
 nnoremap <leader>t :TagbarToggle<CR> 
+
+
+
+" ==============================
+" =        END OF VIMRC        =
+" ==============================
+
+
+
+
+
+
+
+
+
+
 
 
 " misc
