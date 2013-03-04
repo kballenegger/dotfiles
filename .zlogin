@@ -1,2 +1,2 @@
 # Source .login
-source ~/.zlogin
+source ~/.login
