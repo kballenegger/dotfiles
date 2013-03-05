@@ -136,6 +136,7 @@ nnoremap <C-e> 7<C-e>
 nnoremap <C-y> 7<C-y>
 
 " statusline
+set laststatus=2
 set statusline+=%#warningmsg#
 set statusline+=%{SyntasticStatuslineFlag()}
 set statusline+=%*
