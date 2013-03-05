@@ -43,3 +43,6 @@
 [submodule ".vim/bundle/supertab"]
 	path = .vim/bundle/supertab
 	url = https://github.com/ervandew/supertab.git
+[submodule ".vim/bundle/git-gutter"]
+	path = .vim/bundle/git-gutter
+	url = https://github.com/airblade/vim-gitgutter
