@@ -176,8 +176,21 @@ function cb-ssh {
 }
 
 # spin up client builds
-alias client-build-qa="ssh scd-internal 'cd /build/client && git pull && ./package build-ul'"
-alias client-build-release="ssh scd-internal 'cd /build/client && git pull && ./package ul'"
+export scd_host=scd-internal
+export scd_branch=master
+export scd_cmd=build-ul
+function client-build {
+    ssh $scd_host <<CMD
+        cd /build/client
+        git fetch
+        git checkout $scd_branch
+        git merge origin/$scd_branch
+        ./package $scd_cmd
+        git checkout master
+CMD
+}
+alias client-build-qa="client-build"
+alias client-build-release="scd_cmd=ul client-build"
 
 # -----------------------------------------------------------------
 # ALIASES
