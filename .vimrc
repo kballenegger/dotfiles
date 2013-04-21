@@ -20,6 +20,9 @@ call pathogen#infect()
 "              VIM
 " ==============================
 
+" go-lang (this must come before syntax on, for some reason...)
+set rtp+=$GOROOT/misc/vim
+
 " enable file types and syntax highlighing
 syntax on
 filetype plugin on
