@@ -114,7 +114,7 @@ export NODE_PATH="/usr/local/lib/node"
 alias less-watch="coffee ~/lib/lessc-watch/src/lessc-watch.coffee . ."
 
 # go
-which brew >/dev/null && brew ls go | grep vim >/dev/null && \
+command_exists brew && brew ls go | grep vim >/dev/null && \
    export GOROOT=`brew ls go | grep vim | head -n 1 | ruby -ne 'Process.exit(1) unless $_ =~ /^(.+)\/misc\/vim/; puts $1'`
 
 # -----------------------------------------------------------------
