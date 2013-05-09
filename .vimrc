@@ -179,6 +179,7 @@ let g:ctrlp_custom_ignore = '\.git$\|\.hg$\|\.svn$'
 
 " you complete me
 let g:ycm_add_preview_to_completeopt = 0
+let g:ycm_confirm_extra_conf = 0
 
 " you complete me + utilsnips integration
 function! g:UltiSnips_Complete()
