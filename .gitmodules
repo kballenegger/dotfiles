@@ -48,4 +48,4 @@
 	url = https://github.com/airblade/vim-gitgutter
 [submodule ".vim/bundle/utilsnips"]
 	path = .vim/bundle/utilsnips
-	url = https://github.com/vim-scripts/UltiSnips.git
+	url = https://github.com/SirVer/ultisnips.git
