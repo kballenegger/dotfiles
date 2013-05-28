@@ -3,5 +3,4 @@
 cd ~
 git fetch
 git merge origin/dotfiles
-git submodule init
-git submodule update
+git submodule update --init --recursive
