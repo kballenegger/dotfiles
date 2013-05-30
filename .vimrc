@@ -208,6 +208,9 @@ endif
 nnoremap <leader>j :Tabularize<space>
 vnoremap <leader>j :Tabularize<space>
 
+" ack
+nnoremap <leader>a :Ack<space>
+
 " syntastic
 let g:syntastic_objc_checkers = ['ycm']
 let g:syntastic_c_checkers = ['ycm']
