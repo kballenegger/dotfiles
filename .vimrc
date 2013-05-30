@@ -202,7 +202,9 @@ if filereadable($HOME . "/.vim/bundle/you-complete-me/python/ycm_core.so")
     let g:UltiSnipsJumpForwardTrigger="<tab>"
 endif
 
-
+" tabularize
+nnoremap <leader>j :Tabularize<space>
+vnoremap <leader>j :Tabularize<space>
 
 " syntastic
 let g:syntastic_objc_checkers = ['ycm']
