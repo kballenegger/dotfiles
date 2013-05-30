@@ -61,6 +61,8 @@ set showtabline=2
 " search
 nnoremap / /\v
 vnoremap / /\v
+nnoremap ? ?\v
+vnoremap ? ?\v
 set ignorecase
 set smartcase
 set gdefault
