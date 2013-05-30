@@ -49,3 +49,6 @@
 [submodule ".vim/bundle/utilsnips"]
 	path = .vim/bundle/utilsnips
 	url = https://github.com/SirVer/ultisnips.git
+[submodule ".vim/bundle/ack"]
+	path = .vim/bundle/ack
+	url = https://github.com/mileszs/ack.vim
