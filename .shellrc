@@ -208,6 +208,9 @@ alias flushdns='dscacheutil -flushcache'
 # keep environment when doing sudo su
 alias ssu='sudo su -m'
 
+# figure out what the ips are
+alias ip10="ifconfig | grep '10\\.'"
+
 function fgr {
     fgrep -r -n $@ .
 }
