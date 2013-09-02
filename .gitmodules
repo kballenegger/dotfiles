@@ -46,8 +46,8 @@
 [submodule ".vim/bundle/git-gutter"]
 	path = .vim/bundle/git-gutter
 	url = https://github.com/airblade/vim-gitgutter
-[submodule ".vim/bundle/utilsnips"]
-	path = .vim/bundle/utilsnips
+[submodule ".vim/bundle/ultisnips"]
+	path = .vim/bundle/ultisnips
 	url = https://github.com/SirVer/ultisnips.git
 [submodule ".vim/bundle/ack"]
 	path = .vim/bundle/ack
