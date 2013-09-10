@@ -286,3 +286,15 @@ export EC2_CERT="/var/www/server/current/config/amazon.cert.pem"
 # misc
 PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
 
+
+
+
+# -----------------------------------------------------------------
+# SOURCING LOCAL .SHELLRC
+# -----------------------------------------------------------------
+
+if [ -f ~/.shellrc.local ]; then
+    source ~/.shellrc.local
+fi
+
+
