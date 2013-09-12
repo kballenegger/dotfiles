@@ -205,6 +205,7 @@ if filereadable($HOME . "/.vim/bundle/you-complete-me/python/ycm_core.so")
     endfunction
 
     au BufEnter * exec "inoremap <silent> " . g:UltiSnipsExpandTrigger . " <C-R>=g:UltiSnips_Complete()<cr>"
+    let g:UltiSnipsExpandTrigger="<leader><tab>"
     let g:UltiSnipsJumpForwardTrigger="<tab>"
 endif
 
