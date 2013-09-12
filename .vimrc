@@ -146,6 +146,10 @@ set statusline+=%#warningmsg#
 set statusline+=%{SyntasticStatuslineFlag()}
 set statusline+=%*
 
+" visual indent
+vnoremap > >gv
+vnoremap < <gv
+
 
 
 " ==============================
