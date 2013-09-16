@@ -182,6 +182,7 @@ let g:ctrlp_map = '<leader>p'
 let g:ctrlp_cmd = 'CtrlP'
 let g:ctrlp_working_path_mode = 2
 let g:ctrlp_custom_ignore = '\.git$\|\.hg$\|\.svn$'
+nnoremap <leader>b :CtrlPBuffer<CR>
 
 " you complete me
 let g:ycm_add_preview_to_completeopt = 0
