@@ -167,6 +167,15 @@ autocmd Filetype ruby setlocal ts=2 sw=2 expandtab
 
 " markdown
 autocmd Filetype markdown setlocal foldmethod=manual
+let g:markdown_fenced_languages = [
+            \   'sh',
+            \   'ruby',
+            \   'python',
+            \   'c',
+            \   'javascript',
+            \   'objc',
+            \   'java'
+            \ ]
 
 
 " ==============================
