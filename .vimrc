@@ -182,6 +182,10 @@ let g:ctrlp_map = '<leader>p'
 let g:ctrlp_cmd = 'CtrlP'
 let g:ctrlp_working_path_mode = 2
 let g:ctrlp_custom_ignore = '\.git$\|\.hg$\|\.svn$'
+let g:ctrlp_prompt_mappings = {
+            \ 'PrtClearCache()':      ['<C-r>'],
+            \ 'ToggleRegex()':        ['<S-C-r>'],
+            \ }
 nnoremap <leader>b :CtrlPBuffer<CR>
 
 " you complete me
