@@ -1,5 +1,5 @@
 
-ruby <<-EOC
+which ruby 2>&1 >/dev/null && ruby <<-EOC
     path = File.expand_path('~/.dotfiles-last-update')
     exit(0) unless File.exists?(path)
     time = File.mtime(path)
