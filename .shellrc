@@ -86,6 +86,9 @@ alias ga="git add"
 alias gmv="git mv"
 alias grm="git rm"
 
+# make diff work like git-diff
+alias diffg="git diff --no-index --"
+
 # rubygems
 export PATH="/Users/kenneth/.gem/ruby/1.8/bin:$PATH"
 
