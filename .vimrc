@@ -237,9 +237,10 @@ nnoremap <leader>a :Ack<space>
 let g:syntastic_objc_checkers = ['ycm']
 let g:syntastic_c_checkers = ['ycm']
 let g:syntastic_cpp_checkers = ['ycm']
-let g:syntastic_error_symbol='✗'
-let g:syntastic_warning_symbol='!'
-let g:syntastic_quiet_warnings=0
+let g:syntastic_error_symbol = '✗'
+let g:syntastic_warning_symbol = '!'
+let g:syntastic_quiet_warnings = 0
+let g:syntastic_ruby_checkers = ['mri', 'rubocop']
 
 " tagbar
 nnoremap <leader>t :TagbarToggle<CR> 
