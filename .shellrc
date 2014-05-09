@@ -124,9 +124,7 @@ command_exists brew && brew ls go | grep vim >/dev/null && \
 # DOCKER
 # -----------------------------------------------------------------
 
-if [ -f ~/bin/boot2docker ]; then
-    export DOCKER_HOST=tcp://
-fi
+export DOCKER_HOST=tcp://127.0.0.1:4234
 
 
 # -----------------------------------------------------------------
