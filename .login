@@ -1,4 +1,7 @@
 
+if [ -f /tmp/dotfiles-update-lock ]; then exit; fi
+touch /tmp/dotfiles-update-lock
+
 which ruby 2>&1 >/dev/null && ruby <<-EOC
     path = File.expand_path('~/.dotfiles-last-update')
     exit(0) unless File.exists?(path)
@@ -16,3 +19,5 @@ if [ $? -eq 0 ]; then
         echo "Something went wrong updating the dotfiles. Please check the log (~/.dotfiles-last-update.log)."
     fi
 fi
+
+rm /tmp/dotfiles-update-lock
