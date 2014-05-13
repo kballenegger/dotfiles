@@ -1,0 +1,28 @@
+# vim: set ft=ruby
+
+Vagrant.configure('2') do |config|
+  config.vm.box = 'mitchellh/boot2docker'
+
+  config.vm.provider 'virtualbox' do |v|
+    # On VirtualBox, we don't have guest additions or a functional vboxsf
+    # in TinyCore Linux, so tell Vagrant that so it can be smarter.
+    v.check_guest_additions = false
+    v.functional_vboxsf     = false
+    v.customize ['modifyvm', :id, '--natdnshostresolver1', 'on']
+    v.customize ['modifyvm', :id, '--natdnsproxy1', 'on']
+    v.name 'vagrant-docker-hostvm'
+  end
+
+  config.vm.provision 'shell' do |s|
+    f = File.read(File.expand_path('~/.dockercfg')).gsub("'", "'\\''")
+    s.inline = <<-EOS
+      # add docker config
+      echo -n '#{f}' > /home/docker/.dockercfg
+    EOS
+  end
+  
+  config.vm.network 'forwarded_port', guest: 9977, host: 9977, auto_correct: true
+
+  # b2d doesn't support NFS
+  config.nfs.functional = false
+end
