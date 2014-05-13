@@ -10,7 +10,7 @@ Vagrant.configure('2') do |config|
     v.functional_vboxsf     = false
     v.customize ['modifyvm', :id, '--natdnshostresolver1', 'on']
     v.customize ['modifyvm', :id, '--natdnsproxy1', 'on']
-    v.name 'vagrant-docker-hostvm'
+    v.name = 'vagrant-docker-hostvm'
   end
 
   config.vm.provision 'shell' do |s|
