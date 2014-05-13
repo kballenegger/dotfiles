@@ -39,7 +39,7 @@ COMPLETION_WAITING_DOTS="true"
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
-plugins=(git autojump osx ruby github lein brew gem rvm terminalapp)
+plugins=(git autojump osx ruby brew gem rvm terminalapp)
 
 if [ -f ~/.omz.local ]; then
     source ~/.omz.local
