@@ -79,6 +79,11 @@ set formatoptions=qrn1
 " backspace bullshit
 set backspace=indent,eol,start
 
+" mouse
+if has("mouse")
+    set mouse=a
+endif
+
 
 " ==============================
 "           MAPPINGS
