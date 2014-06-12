@@ -158,6 +158,8 @@ vnoremap < <gv
 " w!!
 cmap w!! %!sudo tee > /dev/null %
 
+" use system clipboard
+set clipboard=unnamed
 
 
 " ==============================
