@@ -84,6 +84,9 @@ if has("mouse")
     set mouse=a
 endif
 
+" use system clipboard
+set clipboard=unnamed
+
 
 " ==============================
 "           MAPPINGS
@@ -158,8 +161,25 @@ vnoremap < <gv
 " w!!
 cmap w!! %!sudo tee > /dev/null %
 
-" use system clipboard
-set clipboard=unnamed
+" beg / end of line, easier mappings
+noremap H ^
+noremap L $
+
+"escape is hard to reach so map kj to <ESC>
+inoremap kj <ESC>l
+" nnoremap kj <ESC>
+vnoremap kj <ESC>
+
+" scroll up and down faster
+noremap K 5k
+noremap J 5j
+
+" sudo write
+cnoremap w!! w !sudo tee % >/dev/null
+
+" keep search matches in the middle of the window
+nnoremap n nzzzv
+nnoremap N Nzzzv
 
 
 " ==============================
