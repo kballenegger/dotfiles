@@ -133,10 +133,6 @@ export DOCKER_HOST=tcp://127.0.0.1:4234
 
 export PATH="/opt/local/bin:/opt/local/sbin:$PATH"
 
-if [ -f /opt/local/etc/bash_completion ]; then
-    . /opt/local/etc/bash_completion
-fi
-
 export PATH="/usr/local/bin:$PATH"
 
 

@@ -10,10 +10,10 @@ zstyle ':prezto:load' pmodule \
   'directory' \
   'spectrum' \
   'utility' \
-  'completion' \
   'fasd' \
   'osx' \
   'git' \
+  'completion' \
   'syntax-highlighting' \
   'prompt'
 

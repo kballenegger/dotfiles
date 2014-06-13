@@ -173,6 +173,8 @@ vnoremap kj <ESC>
 " scroll up and down faster
 noremap K 5k
 noremap J 5j
+noremap <C-j> J
+
 
 " sudo write
 cnoremap w!! w !sudo tee % >/dev/null
