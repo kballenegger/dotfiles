@@ -20,6 +20,10 @@ source "$HOME/.zprezto/init.zsh"
 # CUSTOM ZSH CONFIGURATION
 # -----------------------------------------------------------------
 
+
+# Exists function
+function exists { which $1 &> /dev/null }
+
 # Set interactive comments
 set -k
 
@@ -45,6 +49,25 @@ bindkey '\eOA' up-line-or-beginning-search
 bindkey '\e[A' up-line-or-beginning-search
 bindkey '\eOB' down-line-or-beginning-search
 bindkey '\e[B' down-line-or-beginning-search
+
+
+
+# -----------------------------------------------------------------
+# SOURCING LOCAL .ZSHRC
+# -----------------------------------------------------------------
+
+if exists percol; then
+    function percol_select_history() {
+        local tac
+        exists gtac && tac="gtac" || { exists tac && tac="tac" || { tac="tail -r" } }
+        BUFFER=$(fc -l -n 1 | eval $tac | percol --query "$LBUFFER")
+        CURSOR=$#BUFFER         # move cursor
+        zle -R -c               # refresh
+    }
+
+    zle -N percol_select_history
+    bindkey '^R' percol_select_history
+fi
 
 
 # -----------------------------------------------------------------

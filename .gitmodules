@@ -61,3 +61,6 @@
 [submodule ".zprezto"]
 	path = .zprezto
 	url = https://github.com/sorin-ionescu/prezto.git
+[submodule ".vim/bundle/jsx"]
+	path = .vim/bundle/jsx
+	url = https://github.com/mxw/vim-jsx
