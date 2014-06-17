@@ -190,6 +190,7 @@ nnoremap N Nzzzv
 
 " extension mappings
 au BufNewFile,BufRead *.cljs setfiletype clojure
+au BufNewFile,BufRead *.wisp setfiletype clojure
 au BufNewFile,BufRead *.md setlocal ft=markdown
 au BufNewFile,BufRead *.less setfiletype css
 
