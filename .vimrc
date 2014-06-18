@@ -213,6 +213,10 @@ let g:markdown_fenced_languages = [
 "            PLUGINS
 " ==============================
 
+
+" source powerline, which is not a pathogen plugin
+set rtp+=~/.powerline/powerline/bindings/vim
+
 " autoreload buffers
 let autoreadargs={'autoread':1,'quiet':1}
 au VimEnter * execute WatchForChanges("*",autoreadargs)

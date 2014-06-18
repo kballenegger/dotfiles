@@ -70,3 +70,6 @@
 [submodule ".vim/bundle/niji"]
 	path = .vim/bundle/niji
 	url = https://github.com/amdt/vim-niji
+[submodule ".powerline"]
+	path = .powerline
+	url = https://github.com/Lokaltog/powerline
