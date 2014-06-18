@@ -166,9 +166,7 @@ noremap H ^
 noremap L $
 
 "escape is hard to reach so map kj to <ESC>
-inoremap kj <ESC>l
-" nnoremap kj <ESC>
-vnoremap kj <ESC>
+inoremap kj <Esc>l
 
 " scroll up and down faster
 noremap K 5k
