@@ -9,23 +9,6 @@
 		}
 	},
 	"segments": {
-        "left": [
-            {
-                "name": "external_ip",
-                "args": {
-                    "query_url": "http://ipv4.icanhazip.com/"
-                },
-                "before": "IP "
-            },
-            {
-                "name": "system_load",
-                "priority": 50
-            },
-            {
-                "name": "uptime",
-                "priority": 50
-            }
-        ],
 		"right": [
             {
                 "name": "battery",
