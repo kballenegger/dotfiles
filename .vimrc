@@ -232,7 +232,7 @@ let g:ctrlp_prompt_mappings = {
             \ }
 let g:ctrlp_open_multiple_files = 'tjr'
 let g:ctrlp_open_new_file = 'r'
-let g:ctrlp_custom_ignore = '\v([\/]\.(git|hg|svn)|build|dist)$'
+let g:ctrlp_custom_ignore = '\v([\/]\.(git|hg|svn)|build|dist|vendor)$'
 nnoremap <leader>b :CtrlPBuffer<CR>
 
 " you complete me
