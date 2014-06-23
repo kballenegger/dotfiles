@@ -79,3 +79,6 @@
 [submodule ".vim/bundle/indent-line"]
 	path = .vim/bundle/indent-line
 	url = https://github.com/Yggdroot/indentLine
+[submodule ".vim/bundle/abolish"]
+	path = .vim/bundle/abolish
+	url = https://github.com/tpope/vim-abolish
