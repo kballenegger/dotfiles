@@ -281,12 +281,6 @@ let g:syntastic_ruby_checkers = ['mri', 'rubocop']
 " tagbar
 nnoremap <leader>t :TagbarToggle<CR> 
 
-" indentLine
-let g:indentLine_char = '│'
-let g:indentLine_noConcealCursor=''
-let g:indentLine_color_term  = 235
-let g:indentLine_faster = 1
-
 " json
 autocmd InsertEnter *.json setlocal conceallevel=0
 autocmd InsertLeave *.json setlocal conceallevel=2
