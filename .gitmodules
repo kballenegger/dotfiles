@@ -88,3 +88,6 @@
 [submodule ".vim/bundle/showmarks"]
 	path = .vim/bundle/showmarks
 	url = https://github.com/vim-scripts/ShowMarks
+[submodule ".vim/bundle/matchit"]
+	path = .vim/bundle/matchit
+	url = https://github.com/tmhedberg/matchit
