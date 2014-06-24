@@ -285,6 +285,7 @@ nnoremap <leader>t :TagbarToggle<CR>
 let g:indentLine_char = '│'
 let g:indentLine_noConcealCursor=''
 let g:indentLine_color_term  = 235
+let g:indentLine_faster = 1
 
 " json
 autocmd InsertEnter *.json setlocal conceallevel=0
