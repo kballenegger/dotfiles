@@ -232,7 +232,7 @@ let g:ctrlp_prompt_mappings = {
             \ }
 let g:ctrlp_open_multiple_files = 'tjr'
 let g:ctrlp_open_new_file = 'r'
-let g:ctrlp_custom_ignore = '\v([\/]\.(git|hg|svn)|build|dist|vendor|node_modules)$'
+let g:ctrlp_custom_ignore = '\v([\/]\.(git|hg|svn)|_build|_dist|_dev|vendor|node_modules)$'
 nnoremap <leader>b :CtrlPBuffer<CR>
 
 " you complete me
@@ -284,6 +284,39 @@ nnoremap <leader>t :TagbarToggle<CR>
 " json
 autocmd InsertEnter *.json setlocal conceallevel=0
 autocmd InsertLeave *.json setlocal conceallevel=2
+
+" pencil
+let g:pencil#wrapModeDefault = 'hard'   " or 'soft'
+
+augroup pencil
+  autocmd!
+  autocmd FileType markdown,mkd,md call pencil#init()
+  autocmd FileType textile call pencil#init()
+  autocmd FileType text call pencil#init()
+augroup END
+
+" lexical
+augroup lexical
+  autocmd!
+  autocmd FileType markdown call lexical#init()
+  autocmd FileType textile call lexical#init()
+  autocmd FileType text call lexical#init()
+augroup END
+
+" smart quotes
+augroup textobj_quote
+  autocmd!
+  autocmd FileType markdown call textobj#quote#init()
+  autocmd FileType textile call textobj#quote#init()
+  autocmd FileType text call textobj#quote#init({'educate': 0})
+augroup END
+
+" sentence selection
+augroup textobj_sentence
+  autocmd!
+  autocmd FileType markdown call textobj#sentence#init()
+  autocmd FileType textile call textobj#sentence#init()
+augroup END
 
 
 " ==============================
