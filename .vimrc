@@ -56,7 +56,8 @@ set shiftwidth=4
 set expandtab
 
 " tabs & buffers
-set showtabline=2
+"set showtabline=2
+set showtabline=1
 
 " search
 nnoremap / /\v
@@ -93,10 +94,17 @@ set clipboard=unnamed
 " ==============================
 
 " tabs & buffers
-map <leader>o :tabnew<CR>
-map <leader>[ :tabprev<CR>
-map <leader>] :tabnext<CR>
-map <leader>w :bd<CR>
+nnoremap <leader>[ :bn<CR>
+nnoremap <leader>] :bp<CR>
+" delete buffer without closing splits
+nnoremap <leader>w :enew\|bd<space>#<CR>
+" loads an empty buffer
+nnoremap <leader>o :enew<CR>
+
+" tabs are 'layouts'
+nnoremap <leader>l :tabnew<CR>
+nnoremap <leader>{ :tabprev<CR>
+nnoremap <leader>} :tabnext<CR>
 
 " disable help mapping
 nnoremap <F1> <nop>
@@ -126,12 +134,25 @@ inoremap <Esc>C <nop>
 inoremap <Esc>D <nop>
 
 " splits
+nnoremap <leader>q :enew\|bd<CR>
 nnoremap <leader><bar> :rightb vert new<CR>
 nnoremap <leader>_ :rightb new<CR>
+" using leader arrows
 nnoremap <leader><up> <C-w>k
 nnoremap <leader><down> <C-w>j
 nnoremap <leader><left> <C-w>h
 nnoremap <leader><right> <C-w>l
+" more advanced splits
+" window
+nnoremap <leader>sw<left>  :topleft  vnew<CR>
+nnoremap <leader>sw<right> :botright vnew<CR>
+nnoremap <leader>sw<up>    :topleft  new<CR>
+nnoremap <leader>sw<down>  :botright new<CR>
+" buffer
+nnoremap <leader>s<left>   :leftabove  vnew<CR>
+nnoremap <leader>s<right>  :rightbelow vnew<CR>
+nnoremap <leader>s<up>     :leftabove  new<CR>
+nnoremap <leader>s<down>   :rightbelow new<CR>
 
 " mapping enter and shift enter to newline without insert mode
 nnoremap <S-CR> O<Esc>
