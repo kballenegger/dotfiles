@@ -74,8 +74,14 @@ set directory=~/.vim-tmp,~/.tmp,~/tmp,/var/tmp,/tmp
 
 " wrapping
 set wrap
-set textwidth=79
+set textwidth=80
 set formatoptions=qrn1
+
+" over 80-char width
+set colorcolumn=+1
+highlight OverLength ctermbg=233 ctermfg=124
+match OverLength /\%81v.\+/
+
 
 " backspace bullshit
 set backspace=indent,eol,start
