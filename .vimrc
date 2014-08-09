@@ -82,6 +82,10 @@ set colorcolumn=+1
 highlight OverLength ctermbg=233 ctermfg=124
 match OverLength /\%81v.\+/
 
+" trailing whitespace highlight
+highlight ExtraWhitespace ctermbg=238
+au InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
+au InsertLeave * match ExtraWhitespace /\s\+$/
 
 " backspace bullshit
 set backspace=indent,eol,start
