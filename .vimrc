@@ -98,6 +98,10 @@ endif
 " use system clipboard
 set clipboard=unnamed
 
+" execute local .vimrcs, disallowing certain commands
+set exrc
+set secure
+
 
 " ==============================
 "           MAPPINGS
