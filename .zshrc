@@ -50,6 +50,9 @@ bindkey '\e[A' up-line-or-beginning-search
 bindkey '\eOB' down-line-or-beginning-search
 bindkey '\e[B' down-line-or-beginning-search
 
+# Alt-left right supports new mappings of arrow keys
+bindkey '\eml' emacs-backward-word
+bindkey '\emr' emacs-forward-word
 
 
 # -----------------------------------------------------------------

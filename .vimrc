@@ -156,6 +156,11 @@ nnoremap <leader><up> <C-w>k
 nnoremap <leader><down> <C-w>j
 nnoremap <leader><left> <C-w>h
 nnoremap <leader><right> <C-w>l
+" using escape sequences, aka alt
+nnoremap <esc>mu <C-w>k
+nnoremap <esc>md <C-w>j
+nnoremap <esc>ml <C-w>h
+nnoremap <esc>mr <C-w>l
 " more advanced splits
 " window
 nnoremap <leader>sw<left>  :topleft  vnew<CR>
@@ -175,9 +180,6 @@ autocmd CmdwinEnter * unmap <buffer> <CR>
 
 " paste mode
 nnoremap <C-p> :set invpaste paste?<CR>
-
-" uppercase word in insert mode
-inoremap <m-u> <esc>viwUea
 
 " scroll viewport faster
 nnoremap <C-e> 7<C-e>
@@ -262,7 +264,7 @@ let g:ctrlp_cmd = 'CtrlP'
 let g:ctrlp_working_path_mode = 2
 let g:ctrlp_prompt_mappings = {
             \ 'PrtClearCache()':      ['<C-r>'],
-            \ 'ToggleRegex()':        ['<C-/>'],
+            \ 'ToggleRegex()':        ['<esc>r'],
             \ }
 let g:ctrlp_arg_map = 1
 let g:ctrlp_open_new_file = 'r'
