@@ -260,14 +260,13 @@ au VimEnter * execute WatchForChanges("*",autoreadargs)
 let g:ctrlp_map = '<leader>p'
 let g:ctrlp_cmd = 'CtrlP'
 let g:ctrlp_working_path_mode = 2
-let g:ctrlp_custom_ignore = '\.git$\|\.hg$\|\.svn$'
 let g:ctrlp_prompt_mappings = {
             \ 'PrtClearCache()':      ['<C-r>'],
             \ 'ToggleRegex()':        ['<C-/>'],
             \ }
-let g:ctrlp_open_multiple_files = 'tjr'
+let g:ctrlp_arg_map = 1
 let g:ctrlp_open_new_file = 'r'
-let g:ctrlp_custom_ignore = '\v([\/]\.(git|hg|svn)|_build|_dist|_dev|vendor|node_modules)$'
+let g:ctrlp_user_command = ['.git/', 'git --git-dir=%s/.git ls-files -oc --exclude-standard']
 nnoremap <leader>b :CtrlPBuffer<CR>
 
 " you complete me
