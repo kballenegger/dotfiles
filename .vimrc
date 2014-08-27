@@ -157,10 +157,14 @@ nnoremap <leader><down> <C-w>j
 nnoremap <leader><left> <C-w>h
 nnoremap <leader><right> <C-w>l
 " using escape sequences, aka alt
-nnoremap <esc>mu <C-w>k
-nnoremap <esc>md <C-w>j
-nnoremap <esc>ml <C-w>h
-nnoremap <esc>mr <C-w>l
+noremap <esc>mu <C-w>k
+noremap <esc>md <C-w>j
+noremap <esc>ml <C-w>h
+noremap <esc>mr <C-w>l
+inoremap <esc>mu <esc><C-w>k
+inoremap <esc>md <esc><C-w>j
+inoremap <esc>ml <esc><C-w>h
+inoremap <esc>mr <esc><C-w>l
 " more advanced splits
 " window
 nnoremap <leader>sw<left>  :topleft  vnew<CR>
