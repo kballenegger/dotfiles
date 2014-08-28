@@ -40,7 +40,6 @@ set number
 " basic editor things
 set encoding=utf-8
 set ttyfast
-set showmode
 set showcmd
 set hidden
 set ruler
@@ -56,7 +55,6 @@ set shiftwidth=4
 set expandtab
 
 " tabs & buffers
-"set showtabline=2
 set showtabline=1
 
 " search
@@ -149,13 +147,6 @@ inoremap <Esc>D <nop>
 
 " splits
 nnoremap <leader>q :enew\|bd<CR>
-nnoremap <leader><bar> :rightb vert new<CR>
-nnoremap <leader>_ :rightb new<CR>
-" using leader arrows
-nnoremap <leader><up> <C-w>k
-nnoremap <leader><down> <C-w>j
-nnoremap <leader><left> <C-w>h
-nnoremap <leader><right> <C-w>l
 " using escape sequences, aka alt
 noremap <esc>mu <C-w>k
 noremap <esc>md <C-w>j
