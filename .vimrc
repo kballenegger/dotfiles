@@ -168,6 +168,21 @@ nnoremap <leader>s<right>  :rightbelow vnew<CR>
 nnoremap <leader>s<up>     :leftabove  new<CR>
 nnoremap <leader>s<down>   :rightbelow new<CR>
 
+" resize splits
+nnoremap <c-right> 5<c-w>>
+nnoremap <c-left> 5<c-w><
+nnoremap <c-up> 5<c-w>+
+nnoremap <c-down> 5<c-w>-
+" stupid terminal key ququence for this
+noremap <esc>cr 5<c-w>>
+noremap <esc>cl 5<c-w><
+noremap <esc>cu 5<c-w>+
+noremap <esc>cd 5<c-w>-
+inoremap <esc>cr <esc>5<c-w>>a
+inoremap <esc>cl <esc>5<c-w><a
+inoremap <esc>cu <esc>5<c-w>+a
+inoremap <esc>cd <esc>5<c-w>-a
+
 " mapping enter and shift enter to newline without insert mode
 nnoremap <S-CR> O<Esc>
 nnoremap <CR> o<Esc>
