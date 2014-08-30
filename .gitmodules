@@ -115,3 +115,6 @@
 [submodule "/Users/kenneth/.tmux/plugins/tpm"]
 	path = /Users/kenneth/.tmux/plugins/tpm
 	url = https://github.com/tmux-plugins/tpm
+[submodule "/Users/kenneth/vim/bundle/obsession"]
+	path = /Users/kenneth/vim/bundle/obsession
+	url = https://github.com/tpope/vim-obsession.git
