@@ -118,3 +118,6 @@
 [submodule "/Users/kenneth/vim/bundle/obsession"]
 	path = /Users/kenneth/vim/bundle/obsession
 	url = https://github.com/tpope/vim-obsession.git
+[submodule "/Users/kenneth/.vim/bundle/obsession"]
+	path = /Users/kenneth/.vim/bundle/obsession
+	url = https://github.com/tpope/vim-obsession.git
