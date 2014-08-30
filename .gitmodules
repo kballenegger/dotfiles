@@ -112,3 +112,6 @@
 [submodule ".vim/bundle/textobj-sentence"]
 	path = .vim/bundle/textobj-sentence
 	url = https://github.com/reedes/vim-textobj-sentence
+[submodule "/Users/kenneth/.tmux/plugins/tpm"]
+	path = /Users/kenneth/.tmux/plugins/tpm
+	url = https://github.com/tmux-plugins/tpm
