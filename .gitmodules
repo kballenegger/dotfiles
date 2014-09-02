@@ -112,12 +112,9 @@
 [submodule ".vim/bundle/textobj-sentence"]
 	path = .vim/bundle/textobj-sentence
 	url = https://github.com/reedes/vim-textobj-sentence
-[submodule "/Users/kenneth/.tmux/plugins/tpm"]
-	path = /Users/kenneth/.tmux/plugins/tpm
+[submodule ".tmux/plugins/tpm"]
+	path = .tmux/plugins/tpm
 	url = https://github.com/tmux-plugins/tpm
-[submodule "/Users/kenneth/vim/bundle/obsession"]
-	path = /Users/kenneth/vim/bundle/obsession
-	url = https://github.com/tpope/vim-obsession.git
-[submodule "/Users/kenneth/.vim/bundle/obsession"]
-	path = /Users/kenneth/.vim/bundle/obsession
+[submodule ".vim/bundle/obsession"]
+	path = .vim/bundle/obsession
 	url = https://github.com/tpope/vim-obsession.git
