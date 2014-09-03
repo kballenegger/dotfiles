@@ -49,9 +49,6 @@
 [submodule ".vim/bundle/ack"]
 	path = .vim/bundle/ack
 	url = https://github.com/mileszs/ack.vim
-[submodule ".vim/bundle/tabular"]
-	path = .vim/bundle/tabular
-	url = https://github.com/godlygeek/tabular
 [submodule ".vim/bundle/pasta"]
 	path = .vim/bundle/pasta
 	url = git://github.com/sickill/vim-pasta.git
@@ -118,3 +115,6 @@
 [submodule ".vim/bundle/obsession"]
 	path = .vim/bundle/obsession
 	url = https://github.com/tpope/vim-obsession.git
+[submodule ".vim/bundle/easy-align"]
+	path = .vim/bundle/easy-align
+	url = https://github.com/junegunn/vim-easy-align

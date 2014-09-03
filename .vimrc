@@ -96,6 +96,9 @@ endif
 " use system clipboard
 set clipboard=unnamed
 
+" map . in visual mode to repeat on each line
+vnoremap . :normal .<CR>
+
 " execute local .vimrcs, disallowing certain commands
 set exrc
 set secure
@@ -307,12 +310,12 @@ if filereadable($HOME . "/.vim/bundle/you-complete-me/python/ycm_core.so")
     let g:UltiSnipsJumpForwardTrigger="<tab>"
 endif
 
-" tabularize
-nnoremap <leader>j :Tabularize<space>
-vnoremap <leader>j :Tabularize<space>
+" easy-align
+vnoremap a :LiveEasyAlign<cr>
+vnoremap <leader>a vip:LiveEasyAlign<cr>
 
 " ack
-nnoremap <leader>a :Ack<space>
+nnoremap <leader>/ :Ack<space>
 
 " syntastic
 let g:syntastic_objc_checkers = ['ycm']
