@@ -6,7 +6,7 @@ set nocompatible
 " ==============================
 
 " use YCM if possible, otherwise use supertab
-if filereadable($HOME . "/.vim/bundle/you-complete-me/python/ycm_core.so")
+if filereadable($HOME . "/.vim/bundle/you-complete-me/third_party/ycmd/ycm_core.so")
     let g:pathogen_disabled = ['supertab']
 else
     let g:pathogen_disabled = ['you-complete-me']
@@ -328,7 +328,7 @@ let g:syntastic_aggregate_errors = 1
 let g:syntastic_ruby_checkers = ['mri', 'rubocop']
 
 " tagbar
-nnoremap <leader>t :TagbarToggle<CR> 
+nnoremap <leader>t :TagbarToggle<CR>
 
 " json
 autocmd InsertEnter *.json setlocal conceallevel=0
