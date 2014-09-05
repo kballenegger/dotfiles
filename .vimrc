@@ -316,10 +316,11 @@ nnoremap <leader>a vip:LiveEasyAlign<cr>
 
 " ack
 nnoremap <leader>/ :Ack!<space>
-let g:ackprg = "ack-git-ls-files -s -H --nocolor --nogroup --column --smart-case"
-let g:ack_autofold_results = 1
+let g:ackprg = "ack-git-ls-files"
 let g:ack_use_dispatch = 1
 let g:ack_mappings = { "<CR>": "<CR>zz" }
+let g:ack_default_options =
+            \ " -s -H --nocolor --nogroup --column --smart-case"
 
 " syntastic
 let g:syntastic_objc_checkers = ['ycm']
