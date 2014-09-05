@@ -1,0 +1,21 @@
+#!/bin/bash
+
+function realpath { echo $(cd "$(dirname $1)"; pwd)/"$(basename $1)"; }
+
+args=( "$@" )
+
+if git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
+    # unset last arg, if it's a directory
+    #last="$args[${#args[@]}-1]"
+    #if [ -d $last ]; then
+        #unset args[${#args[@]}-1]
+    #fi
+    # cd into root dir
+    cd "$(git rev-parse --git-dir)"; cd ..
+    # build new args with file list
+    new_args=("${args[@]}" "$(git ls-files -oc --exclude-standard)")
+    # execute
+    ack ${new_args[@]}
+else
+    ack $@
+fi

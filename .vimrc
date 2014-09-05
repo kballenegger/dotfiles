@@ -289,7 +289,7 @@ let g:ycm_add_preview_to_completeopt = 0
 let g:ycm_confirm_extra_conf = 0
 
 " you complete me + utilsnips integration
-if filereadable($HOME . "/.vim/bundle/you-complete-me/python/ycm_core.so")
+if filereadable($HOME . "/.vim/bundle/you-complete-me/third_party/ycmd/ycm_core.so")
     function! g:UltiSnips_Complete()
         call UltiSnips_ExpandSnippet()
         if g:ulti_expand_res == 0
@@ -315,7 +315,11 @@ vnoremap a :LiveEasyAlign<cr>
 nnoremap <leader>a vip:LiveEasyAlign<cr>
 
 " ack
-nnoremap <leader>/ :Ack<space>
+nnoremap <leader>/ :Ack!<space>
+let g:ackprg = "ack-git-ls-files -s -H --nocolor --nogroup --column --smart-case"
+let g:ack_autofold_results = 1
+let g:ack_use_dispatch = 1
+let g:ack_mappings = { "<CR>": "<CR>zz" }
 
 " syntastic
 let g:syntastic_objc_checkers = ['ycm']
