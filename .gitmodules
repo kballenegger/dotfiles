@@ -118,3 +118,6 @@
 [submodule ".vim/bundle/easy-align"]
 	path = .vim/bundle/easy-align
 	url = https://github.com/junegunn/vim-easy-align
+[submodule ".vim/bundle/dispatch"]
+	path = .vim/bundle/dispatch
+	url = https://github.com/tpope/vim-dispatch
