@@ -311,7 +311,7 @@ if filereadable($HOME . "/.vim/bundle/you-complete-me/third_party/ycmd/ycm_core.
 endif
 
 " easy-align
-vnoremap a :LiveEasyAlign<cr>
+vnoremap <leader>a :LiveEasyAlign<cr>
 nnoremap <leader>a vip:LiveEasyAlign<cr>
 
 " ack
