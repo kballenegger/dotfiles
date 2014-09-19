@@ -208,9 +208,6 @@ set statusline+=%*
 vnoremap > >gv
 vnoremap < <gv
 
-" w!!
-cmap w!! %!sudo tee > /dev/null %
-
 " beg / end of line, easier mappings
 noremap H ^
 noremap L $
@@ -230,6 +227,9 @@ cnoremap w!! w !sudo tee % >/dev/null
 " keep search matches in the middle of the window
 nnoremap n nzzzv
 nnoremap N Nzzzv
+
+" disable ex-mode and let Q be @q
+nnoremap Q @q
 
 
 " ==============================
