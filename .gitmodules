@@ -121,3 +121,6 @@
 [submodule ".vim/bundle/dispatch"]
 	path = .vim/bundle/dispatch
 	url = https://github.com/tpope/vim-dispatch
+[submodule ".vim/bundle/tmux-navigator"]
+	path = .vim/bundle/tmux-navigator
+	url = https://github.com/christoomey/vim-tmux-navigator
