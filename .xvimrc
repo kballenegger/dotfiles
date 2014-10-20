@@ -1,4 +1,6 @@
 nmap \p :xccmd openQuickly<CR>
 nmap J 5j
 nmap K 5k
+nmap L $
+nmap H ^
 nmap <C-J> J
