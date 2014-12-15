@@ -136,3 +136,9 @@
 [submodule ".vim/bundle/easy-motion"]
 	path = .vim/bundle/easy-motion
 	url = https://github.com/Lokaltog/vim-easymotion
+[submodule "/Users/kenneth/.vim/bundle/coffee-script"]
+	path = /Users/kenneth/.vim/bundle/coffee-script
+	url = https://github.com/kchmck/vim-coffee-script.git
+[submodule ".vim/bundle/ctrlp-matcher"]
+	path = .vim/bundle/ctrlp-matcher
+	url = https://github.com/kballenegger/ctrlp-matcher.git

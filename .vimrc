@@ -244,7 +244,6 @@ noremap K 5k
 noremap J 5j
 noremap <C-j> J
 
-
 " sudo write
 cnoremap w!! w !sudo tee % >/dev/null
 
@@ -254,6 +253,9 @@ nnoremap N Nzzzv
 
 " disable ex-mode and let Q be @q
 nnoremap Q @q
+
+" \c compiles coffeescript
+autocmd FileType coffeescript map <buffer> <leader>c :CoffeeCompile<CR>
 
 
 " ==============================
@@ -269,6 +271,7 @@ au BufNewFile,BufRead *.less setfiletype css
 " ruby
 au BufNewFile,BufRead *.ru setfiletype ruby
 autocmd Filetype ruby setlocal ts=2 sw=2 expandtab
+autocmd Filetype coffee setlocal ts=2 sw=2 expandtab
 
 " markdown
 autocmd Filetype markdown setlocal foldmethod=manual
