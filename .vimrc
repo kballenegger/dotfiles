@@ -272,6 +272,7 @@ au BufNewFile,BufRead *.less setfiletype css
 au BufNewFile,BufRead *.ru setfiletype ruby
 autocmd Filetype ruby setlocal ts=2 sw=2 expandtab
 autocmd Filetype coffee setlocal ts=2 sw=2 expandtab
+autocmd Filetype sass setlocal ts=2 sw=2 expandtab
 
 " markdown
 autocmd Filetype markdown setlocal foldmethod=manual
