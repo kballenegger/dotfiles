@@ -117,7 +117,7 @@ export NODE_PATH="/usr/local/lib/node"
 alias less-watch="coffee ~/lib/lessc-watch/src/lessc-watch.coffee . ."
 
 # go
-command_exists brew && brew ls go | grep vim >/dev/null && \
+command_exists brew && brew ls go >/dev/null 2>%1 | grep vim >/dev/null && \
    export GOROOT=`brew ls go | grep vim | head -n 1 | ruby -ne 'Process.exit(1) unless $_ =~ /^(.+)\/misc\/vim/; puts $1'`
 
 # -----------------------------------------------------------------
@@ -125,7 +125,7 @@ command_exists brew && brew ls go | grep vim >/dev/null && \
 # -----------------------------------------------------------------
 
 if command_exists boot2docker; then
-    [[ "$(boot2docker status)" == "running" ]] && $(boot2docker shellinit)
+    [[ "$(boot2docker status 2>/dev/null)" == "running" ]] && $(boot2docker shellinit)
 fi
 
 export VAGRANT_DEFAULT_PROVIDER="vmware_fusion"
