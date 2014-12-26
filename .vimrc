@@ -333,6 +333,7 @@ let g:ctrlp_prompt_mappings = {
 let g:ctrlp_arg_map = 1
 let g:ctrlp_open_new_file = 'r'
 let g:ctrlp_user_command = ['.git/', 'git --git-dir=%s/.git ls-files -oc --exclude-standard']
+let g:ctrlp_dotfiles = 1
 nnoremap <leader>b :CtrlPBuffer<CR>
 
 " you complete me
