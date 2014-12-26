@@ -50,8 +50,8 @@ set scrolloff=7
 
 " indentation
 set smartindent
-set tabstop=4
-set shiftwidth=4
+set tabstop=2
+set shiftwidth=2
 set expandtab
 
 " tabs & buffers
@@ -270,9 +270,10 @@ au BufNewFile,BufRead *.less setfiletype css
 
 " ruby
 au BufNewFile,BufRead *.ru setfiletype ruby
-autocmd Filetype ruby setlocal ts=2 sw=2 expandtab
-autocmd Filetype coffee setlocal ts=2 sw=2 expandtab
-autocmd Filetype sass setlocal ts=2 sw=2 expandtab
+
+" set 4-space indented languages
+autocmd Filetype php setlocal ts=4 sw=4 expandtab
+autocmd Filetype c setlocal ts=4 sw=4 expandtab
 
 " markdown
 autocmd Filetype markdown setlocal foldmethod=manual
