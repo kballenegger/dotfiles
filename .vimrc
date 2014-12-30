@@ -391,16 +391,6 @@ nnoremap <leader>t :TagbarToggle<CR>
 autocmd InsertEnter *.json setlocal conceallevel=0
 autocmd InsertLeave *.json setlocal conceallevel=2
 
-" pencil
-let g:pencil#wrapModeDefault = 'hard'   " or 'soft'
-
-augroup pencil
-  autocmd!
-  autocmd FileType markdown,mkd,md call pencil#init()
-  autocmd FileType textile call pencil#init()
-  autocmd FileType text call pencil#init()
-augroup END
-
 " lexical
 augroup lexical
   autocmd!

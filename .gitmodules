@@ -94,9 +94,6 @@
 [submodule ".vim/bundle/lexical"]
 	path = .vim/bundle/lexical
 	url = https://github.com/reedes/vim-lexical
-[submodule ".vim/bundle/pencil"]
-	path = .vim/bundle/pencil
-	url = https://github.com/reedes/vim-pencil
 [submodule ".vim/bundle/wordy"]
 	path = .vim/bundle/wordy
 	url = https://github.com/reedes/vim-wordy
