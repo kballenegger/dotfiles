@@ -258,9 +258,6 @@ vnoremap < <gv
 noremap H ^
 noremap L $
 
-"escape is hard to reach so map kj to <ESC>
-inoremap kj <Esc>l
-
 " scroll up and down faster
 noremap K 5k
 noremap J 5j
