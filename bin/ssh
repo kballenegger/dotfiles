@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# taken from http://www.linuxsysadmintutorials.com/multiple-ssh-client-configuration-files/
+
+ssh() {
+    TMPDIR=/tmp
+    case "$(uname -s)" in
+        Linux)
+            tmp_fifo=$(mktemp -u --suffix=._ssh_fifo)
+            ;;
+        Darwin)
+            tmp_fifo=$(mktemp -u -t ._ssh_fifo)
+            ;;
+        *)
+            echo 'Unsupported OS'
+            exit
+            ;;
+    esac
+
+    # cleanup first
+    rm "$TMPDIR/._ssh_fifo"* 2>/dev/null
+
+    mkfifo "$tmp_fifo"
+    cat ~/.ssh/config ~/.ssh/config.* >"$tmp_fifo" 2>/dev/null &
+    /usr/bin/ssh -F "$tmp_fifo" "$@"
+    rm "$tmp_fifo"
+}
+
+ssh $*
