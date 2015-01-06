@@ -17,10 +17,6 @@ export EDITOR="vim"
 export CLICOLOR="xterm-color"
 export DISPLAY=:0.0
 
-# path
-export PATH="$HOME/bin:$PATH"
-export PATH="/usr/class/cs143/cool/bin:$PATH"
-
 # command_exists
 command_exists () {
     type "$1" &> /dev/null ;
@@ -45,18 +41,9 @@ export PATH="/opt/local/apache2/bin:$PATH"
 
 # mysql
 export PATH="/usr/local/bin:/usr/local/sbin:/usr/local/mysql/bin:$PATH"
-export PATH="/opt/local/lib/mysql5/bin:$PATH"
-
-alias mysql='mysql5'
-
-# vertica
-alias vsql="/opt/vertica/bin/vsql -h 10.79.61.102 -U super_reader -w 67Unic0rns"
 
 # php
 export PATH="/usr/local/php/bin:$PATH"
-
-# php
-alias cbsh="phpsh php/paraglide.php"
 
 # -----------------------------------------------------------------
 # GIT, RUBY, PYTHON, CLOJURE, NODE, COFFEE, LESS
@@ -68,8 +55,8 @@ export GIT_EDITOR="vim"
 # github credentials
 
 if command_exists security; then
-    export GITHUB_USER=`security find-generic-password -D github | ruby -ne 'if (m = /"acct"\<blob\>\="([a-zA-Z0-9]+)"/.match($_)); print m[1]; end'` 2>/dev/null
-    export GITHUB_PASSWORD=`security find-generic-password -D github -w` 2>/dev/null
+    export GITHUB_USER=$(security find-generic-password -D github | ruby -ne 'if (m = /"acct"\<blob\>\="([a-zA-Z0-9]+)"/.match($_)); print m[1]; end' 2>/dev/null)
+    export GITHUB_PASSWORD=$(security find-generic-password -D github -w 2>/dev/null)
 fi
 
 alias gco="git checkout"
@@ -141,8 +128,6 @@ export PATH="/usr/local/bin:$PATH"
 # ALIASES
 # -----------------------------------------------------------------
 
-alias ssh-proxy='ssh -D 9999 azure -N'
-alias ssh-reverse-http='ssh -R 9999:localhost:80 azure -N'
 alias free='free -m'
 alias flushdns='dscacheutil -flushcache'
 
@@ -177,8 +162,9 @@ function macc {
     fi
 }
 
+
 # -----------------------------------------------------------------
-# LS, GREP AND DIRCOLORS
+# LS, GREP, AND DIRCOLORS
 # -----------------------------------------------------------------
 
 # we always pass these to ls(1)
@@ -210,24 +196,14 @@ puniq () {
     cut -f 2- |tr '\n' : |sed -e 's/:$//' -e 's/^://'
 }
 
+
+# misc
+export PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
+export PATH="$HOME/bin:$PATH"
+
 # condense PATH entries
 PATH=$(puniq $PATH)
 #MANPATH=$(puniq $MANPATH)
-
-
-# -----------------------------------------------------------------
-# AMAZON EC2 KEY PATHS
-# -----------------------------------------------------------------
-
-export EC2_PRIVATE_KEY="/var/www/server/current/config/amazon.key.pem"
-export EC2_CERT="/var/www/server/current/config/amazon.cert.pem"
-
-
-
-# misc
-PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
-
-
 
 
 # -----------------------------------------------------------------
