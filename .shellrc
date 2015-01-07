@@ -111,6 +111,12 @@ command_exists brew && brew ls go >/dev/null 2>&1 | grep vim >/dev/null && \
 # DOCKER, VAGRANT
 # -----------------------------------------------------------------
 
+function figdo {
+    container="$1"
+    shift
+    fig run $container -- $@
+}
+
 export DOCKER_TLS_VERIFY=
 
 export VAGRANT_DEFAULT_PROVIDER="vmware_fusion"
