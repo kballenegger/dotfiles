@@ -378,9 +378,20 @@ let g:syntastic_c_checkers = ['ycm']
 let g:syntastic_cpp_checkers = ['ycm']
 let g:syntastic_error_symbol = '✗'
 let g:syntastic_warning_symbol = '!'
-let g:syntastic_quiet_messages = {'level': 'warnings'}
+let g:syntastic_quiet_messages = {'type': 'style'}
 let g:syntastic_aggregate_errors = 1
+let g:syntastic_check_on_open = 1
 let g:syntastic_ruby_checkers = ['mri', 'rubocop']
+command! Syn call CustomSyn()
+function! CustomSyn()
+  let g:syntastic_quiet_messages = {'type': 'style'}
+  :SyntasticCheck
+endfunction
+command! SynS call CustomSynS()
+function! CustomSynS()
+  let g:syntastic_quiet_messages = {}
+  :SyntasticCheck
+endfunction
 
 " tagbar
 nnoremap <leader>t :TagbarToggle<CR>
