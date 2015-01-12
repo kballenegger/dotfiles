@@ -149,7 +149,7 @@ inoremap <F1> <nop>
 vnoremap <F1> <nop>
 
 " reselect pasted text
-nnoremap <leader>v V`]
+nnoremap <expr> gp '`[' . strpart(getregtype(), 0, 1) . '`]'
 
 " disable arrow keys
 nnoremap <up> <nop>
