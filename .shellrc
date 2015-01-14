@@ -33,19 +33,6 @@ fi
 
 
 # -----------------------------------------------------------------
-# APACHE, MYSQL, VERTICA, PHP
-# -----------------------------------------------------------------
-
-# apache
-export PATH="/opt/local/apache2/bin:$PATH"
-
-# mysql
-export PATH="/usr/local/bin:/usr/local/sbin:/usr/local/mysql/bin:$PATH"
-
-# php
-export PATH="/usr/local/php/bin:$PATH"
-
-# -----------------------------------------------------------------
 # GIT, RUBY, PYTHON, CLOJURE, NODE, COFFEE, LESS
 # -----------------------------------------------------------------
 
