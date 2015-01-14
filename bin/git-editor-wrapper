@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# This wrapper script will wrap around $EDITOR, offering to automatically accept
+# the default merge message before bringing up the full editor.
+
+if [[ "$EDITOR" == "" ]] ; then
+    EDITOR=vim
+fi
+
+file=$1
+
+# only run when file has a suggestion
+if [[ "$(cat $file | sed '/^$/d;/^#/d')" == "" ]] ; then
+    exec "$EDITOR" $file
+fi
+
+echo 'Default suggested message:'
+cat $file | grep -v '^#' | sed 's/^/> /'
+
+while true; do
+
+    echo -n 'Accept? (y/n) > '
+    read resp
+
+    if [[ "$resp" == n || "$resp" == N ||  "$resp" == no ]] ; then
+        exec "$EDITOR" $file
+    fi
+
+    if [[ "$resp" == y || "$resp" == Y ||  "$resp" == yes ]] ; then
+        break
+    fi
+done

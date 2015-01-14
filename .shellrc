@@ -50,7 +50,7 @@ export PATH="/usr/local/php/bin:$PATH"
 # -----------------------------------------------------------------
 
 # git
-export GIT_EDITOR="vim"
+export GIT_EDITOR="~/bin/git-editor-wrapper"
 
 # github credentials
 
