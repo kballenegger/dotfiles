@@ -362,7 +362,7 @@ endif
 
 " easy-align
 vnoremap <leader>a :LiveEasyAlign<cr>
-nnoremap <leader>a vip:LiveEasyAlign<cr>
+nmap <leader>a vii:LiveEasyAlign<cr>
 
 " ack
 nnoremap <leader>/ :Ack!<space>
