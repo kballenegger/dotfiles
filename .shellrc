@@ -34,7 +34,7 @@ fi
 
 
 # -----------------------------------------------------------------
-# GIT, RUBY, PYTHON, CLOJURE, NODE, COFFEE, LESS
+# GIT
 # -----------------------------------------------------------------
 
 # git
@@ -64,36 +64,31 @@ alias grm="git rm"
 # make diff work like git-diff
 alias diffg="git diff --no-index --"
 
-# rubygems
-export PATH="/Users/kenneth/.gem/ruby/1.8/bin:$PATH"
+# note this needs to be after rvm, otherwise wrong ruby will be used
+if command_exists hub; then
+    eval "$(hub alias -s)"
+fi
 
-alias bundle-install-ser="bundle install --gemfile=ruby/Gemfile"
+
+# -----------------------------------------------------------------
+# PROGRAMMING LANGUAGES
+# -----------------------------------------------------------------
 
 # rvm
 if [[ -s $HOME/.rvm/scripts/rvm ]] ; then
     source $HOME/.rvm/scripts/rvm
 fi
 
-# note this needs to be after rvm, otherwise wrong ruby will be used
-if command_exists hub; then
-    eval "$(hub alias -s)"
-fi
-
 # python
 alias pyi="easy_install"
-
-#clojure
-alias pyclj="clojurepy"
-alias cake="/Users/kenneth/.rvm/gems/ruby-1.9.2-p290/gems/cake-0.6.3/bin/cake"
 
 # node
 export NODE_PATH="/usr/local/lib/node"
 
-alias less-watch="coffee ~/lib/lessc-watch/src/lessc-watch.coffee . ."
-
 # go
 command_exists brew && brew ls go >/dev/null 2>&1 | grep vim >/dev/null && \
    export GOROOT=`brew ls go | grep vim | head -n 1 | ruby -ne 'Process.exit(1) unless $_ =~ /^(.+)\/misc\/vim/; puts $1'`
+
 
 # -----------------------------------------------------------------
 # DOCKER, VAGRANT
@@ -102,14 +97,6 @@ command_exists brew && brew ls go >/dev/null 2>&1 | grep vim >/dev/null && \
 export DOCKER_TLS_VERIFY=
 
 export VAGRANT_DEFAULT_PROVIDER="vmware_fusion"
-
-# -----------------------------------------------------------------
-# PACKAGE MANAGER CONFIGUREATION
-# -----------------------------------------------------------------
-
-export PATH="/opt/local/bin:/opt/local/sbin:$PATH"
-
-export PATH="/usr/local/bin:$PATH"
 
 
 # -----------------------------------------------------------------
@@ -185,9 +172,10 @@ puniq () {
 }
 
 
-# misc
-export PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
+# ~/bin
 export PATH="$HOME/bin:$PATH"
+# brew
+export PATH="/usr/local/bin:$PATH"
 
 # condense PATH entries
 PATH=$(puniq $PATH)
