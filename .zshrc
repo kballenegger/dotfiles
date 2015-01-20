@@ -41,6 +41,9 @@ source ~/.shellrc
 # Fix zsh annoying history behavior
 h() { if [ -z "$*" ]; then history 1; else history 1 | egrep "$@"; fi; }
 
+# Do not save space-prefixed commands to history
+setopt HIST_IGNORE_SPACE
+
 autoload -Uz up-line-or-beginning-search
 autoload -Uz down-line-or-beginning-search
 zle -N up-line-or-beginning-search
