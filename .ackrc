@@ -3,3 +3,4 @@
 --ignore-dir=vendor
 --ignore-file=ext:log
 
+--type-add=html:ext:haml
