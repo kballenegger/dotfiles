@@ -1,0 +1,5 @@
+--ignore-dir=node_modules
+--ignore-dir=bower_components
+--ignore-dir=vendor
+--ignore-file=ext:log
+
