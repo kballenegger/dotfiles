@@ -1,0 +1,13 @@
+--recurse=yes
+--tag-relative=yes
+--languages=-sql
+
+--exclude=.git
+--exclude=vendor
+--exclude=tmp
+--exclude=bower_components
+--exclude=node_modules
+--exclude=.gems
+--exclude=bundle
+--exclude=.bundle
+--exclude=Session.vim

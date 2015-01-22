@@ -126,6 +126,10 @@ fu! CustomFoldText()
 endf
 set foldtext=CustomFoldText()
 
+" ctags
+set tags=.git/tags
+
+
 " ==============================
 "           MAPPINGS
 " ==============================
@@ -333,6 +337,7 @@ let g:ctrlp_open_new_file = 'r'
 let g:ctrlp_user_command = ['.git/', 'git --git-dir=%s/.git ls-files -oc --exclude-standard']
 let g:ctrlp_dotfiles = 1
 nnoremap <leader>b :CtrlPBuffer<CR>
+nnoremap <leader>t :CtrlPTag<CR>
 
 " you complete me
 let g:ycm_add_preview_to_completeopt = 0
@@ -394,7 +399,7 @@ function! CustomSynS()
 endfunction
 
 " tagbar
-nnoremap <leader>t :TagbarToggle<CR>
+nnoremap <leader>T :TagbarToggle<CR>
 
 " json
 autocmd InsertEnter *.json setlocal conceallevel=0

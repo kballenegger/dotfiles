@@ -1,10 +1,20 @@
 #!/bin/sh
+
 if [ ! -d .git ]; then
     echo "This must be run at the root of a git repository."
     exit 1
 fi
-mkdir .git/tags_lock 2>/dev/null || exit 0
-trap "rmdir .git/tags_lock; rm .git/tags.$$" EXIT
 
-ctags --tag-relative -R -f .git/tags.$$ --exclude=.git --languages=-sql
-mv .git/tags.$$ .git/tags
+
+# lock
+mkdir .git/tags_lock 2>/dev/null || exit 0
+PID="$$"
+trap "rmdir .git/tags_lock" EXIT
+
+# allow overriding of generation per-project
+if [ -x .git/gen-ctags ]; then
+    .git/gen-ctags
+else
+    ctags -R -f .git/tags.$PID
+    mv .git/tags.$PID .git/tags
+fi
