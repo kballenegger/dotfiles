@@ -145,3 +145,6 @@
 [submodule ".vim/bundle/dentures"]
 	path = .vim/bundle/dentures
 	url = https://github.com/qstrahl/vim-dentures
+[submodule ".vim/bundle/textobj-rubyblock"]
+	path = .vim/bundle/textobj-rubyblock
+	url = https://github.com/nelstrom/vim-textobj-rubyblock
