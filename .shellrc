@@ -108,6 +108,16 @@ export VAGRANT_VMWARE_CLONE_DIRECTORY="$HOME/.vagrant-vms"
 alias free='free -m'
 alias flushdns='dscacheutil -flushcache'
 
+# vim can auto load sessions
+
+vim () {
+    if [ -f 'Session.vim' ] && [ $# -eq 0 ]; then
+        command vim -S Session.vim
+    else
+        command vim "$@"
+    fi
+}
+
 # keep environment when doing sudo su
 alias ssu='sudo su -m'
 
