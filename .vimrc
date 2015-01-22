@@ -388,7 +388,7 @@ let g:syntastic_error_symbol = '✗'
 let g:syntastic_warning_symbol = '!'
 let g:syntastic_quiet_messages = {'type': 'style'}
 let g:syntastic_aggregate_errors = 1
-let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_open = 0
 let g:syntastic_ruby_checkers = ['mri']
 command! Syn call CustomSyn()
 function! CustomSyn()
