@@ -148,3 +148,6 @@
 [submodule ".vim/bundle/textobj-rubyblock"]
 	path = .vim/bundle/textobj-rubyblock
 	url = https://github.com/nelstrom/vim-textobj-rubyblock
+[submodule ".vim/bundle/endwise"]
+	path = .vim/bundle/endwise
+	url = https://github.com/tpope/vim-endwise
