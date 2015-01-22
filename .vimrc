@@ -338,7 +338,7 @@ let g:ctrlp_open_new_file = 'r'
 let g:ctrlp_user_command = ['.git/', 'git --git-dir=%s/.git ls-files -oc --exclude-standard']
 let g:ctrlp_dotfiles = 1
 nnoremap <leader>b :CtrlPBuffer<CR>
-nnoremap <leader>r :CtrlPBuf<CR>
+nnoremap <leader>r :CtrlPTag<CR>
 nnoremap <leader>t :CtrlPBufTag<CR>
 nnoremap <leader>T :CtrlPBufTagAll<CR>
 
@@ -389,14 +389,16 @@ let g:syntastic_warning_symbol = '!'
 let g:syntastic_quiet_messages = {'type': 'style'}
 let g:syntastic_aggregate_errors = 1
 let g:syntastic_check_on_open = 1
-let g:syntastic_ruby_checkers = ['mri', 'rubocop']
+let g:syntastic_ruby_checkers = ['mri']
 command! Syn call CustomSyn()
 function! CustomSyn()
+  let g:syntastic_ruby_checkers = ['mri']
   let g:syntastic_quiet_messages = {'type': 'style'}
   :SyntasticCheck
 endfunction
 command! SynS call CustomSynS()
 function! CustomSynS()
+  let g:syntastic_ruby_checkers = ['mri', 'rubocop']
   let g:syntastic_quiet_messages = {}
   :SyntasticCheck
 endfunction
