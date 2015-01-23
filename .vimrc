@@ -128,7 +128,6 @@ set foldtext=CustomFoldText()
 
 " ctags
 set tags=.git/tags
-set notagrelative
 
 
 " ==============================
