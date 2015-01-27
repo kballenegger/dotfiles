@@ -21,7 +21,7 @@ ssh() {
     rm "$TMPDIR/._ssh_fifo"* 2>/dev/null
 
     mkfifo "$tmp_fifo"
-    cat ~/.ssh/config ~/.ssh/config.* >"$tmp_fifo" 2>/dev/null &
+    cat ~/.ssh/config.global ~/.ssh/config >"$tmp_fifo" 2>/dev/null &
     /usr/bin/ssh -F "$tmp_fifo" "$@"
     rm "$tmp_fifo"
 }
