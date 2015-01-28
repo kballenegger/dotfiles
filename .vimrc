@@ -432,6 +432,11 @@ augroup textobj_sentence
   autocmd FileType textile call textobj#sentence#init()
 augroup END
 
+" indent-guide
+let g:indent_guides_auto_colors = 0
+hi IndentGuidesOdd  ctermbg=234
+hi IndentGuidesEven ctermbg=235
+
 
 " ==============================
 " =        END OF VIMRC        =

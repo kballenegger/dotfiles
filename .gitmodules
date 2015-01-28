@@ -151,3 +151,9 @@
 [submodule ".vim/bundle/endwise"]
 	path = .vim/bundle/endwise
 	url = https://github.com/tpope/vim-endwise
+[submodule ".vim/bundle/xterm-color-table"]
+	path = .vim/bundle/xterm-color-table
+	url = https://github.com/guns/xterm-color-table.vim
+[submodule ".vim/bundle/indent-guides"]
+	path = .vim/bundle/indent-guides
+	url = https://github.com/nathanaelkane/vim-indent-guides
