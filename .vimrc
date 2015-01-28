@@ -115,12 +115,12 @@ fu! CustomFoldText()
         let line = substitute(getline(fs), '\t', repeat(' ', &tabstop), 'g')
     endif
 
-    let w = winwidth(0) - &foldcolumn - (&number ? 8 : 0)
-    let foldSize = 1 + v:foldend - v:foldstart
-    let foldSizeStr = " " . foldSize . " lines "
-    let foldLevelStr = repeat("+--", v:foldlevel)
-    let lineCount = line("$")
-    let foldPercentage = printf("[%.1f", (foldSize*1.0)/lineCount*100) . "%] "
+    let w               = winwidth(0) - &foldcolumn - (&number ? 8 : 0)
+    let foldSize        = 1 + v:foldend - v:foldstart
+    let foldSizeStr     = " " . foldSize . " lines "
+    let foldLevelStr    = repeat("+--", v:foldlevel)
+    let lineCount       = line("$")
+    let foldPercentage  = printf("[%.1f", (foldSize*1.0)/lineCount*100) . "%] "
     let expansionString = repeat(".", w - strwidth(foldSizeStr.line.foldLevelStr.foldPercentage))
     return line . expansionString . foldSizeStr . foldPercentage . foldLevelStr
 endf
@@ -156,9 +156,9 @@ vnoremap <F1> <nop>
 nnoremap <expr> gp '`[' . strpart(getregtype(), 0, 1) . '`]'
 
 " disable arrow keys
-nnoremap <up> <nop>
-nnoremap <down> <nop>
-nnoremap <left> <nop>
+nnoremap <up>    <nop>
+nnoremap <down>  <nop>
+nnoremap <left>  <nop>
 nnoremap <right> <nop>
 
 nnoremap j gj
@@ -211,10 +211,10 @@ inoremap <silent> <esc>mr <esc>:TmuxNavigateRight<cr>
 
 " more advanced splits
 " window
-nnoremap <leader>sw<left>  :topleft  vnew<CR>
-nnoremap <leader>sw<right> :botright vnew<CR>
-nnoremap <leader>sw<up>    :topleft  new<CR>
-nnoremap <leader>sw<down>  :botright new<CR>
+nnoremap <leader>sw<left>  :topleft    vnew<CR>
+nnoremap <leader>sw<right> :botright   vnew<CR>
+nnoremap <leader>sw<up>    :topleft    new<CR>
+nnoremap <leader>sw<down>  :botright   new<CR>
 " buffer
 nnoremap <leader>s<left>   :leftabove  vnew<CR>
 nnoremap <leader>s<right>  :rightbelow vnew<CR>
@@ -223,18 +223,18 @@ nnoremap <leader>s<down>   :rightbelow new<CR>
 
 " resize splits
 nnoremap <c-right> 5<c-w>>
-nnoremap <c-left> 5<c-w><
-nnoremap <c-up> 5<c-w>+
-nnoremap <c-down> 5<c-w>-
+nnoremap <c-left>  5<c-w><
+nnoremap <c-up>    5<c-w>+
+nnoremap <c-down>  5<c-w>-
 " stupid terminal key ququence for this
-noremap <esc>cr 5<c-w>>
-noremap <esc>cl 5<c-w><
-noremap <esc>cu 5<c-w>+
-noremap <esc>cd 5<c-w>-
-inoremap <esc>cr <esc>5<c-w>>a
-inoremap <esc>cl <esc>5<c-w><a
-inoremap <esc>cu <esc>5<c-w>+a
-inoremap <esc>cd <esc>5<c-w>-a
+noremap  <esc>cr   5<c-w>>
+noremap  <esc>cl   5<c-w><
+noremap  <esc>cu   5<c-w>+
+noremap  <esc>cd   5<c-w>-
+inoremap <esc>cr   <esc>5<c-w>>a
+inoremap <esc>cl   <esc>5<c-w><a
+inoremap <esc>cu   <esc>5<c-w>+a
+inoremap <esc>cd   <esc>5<c-w>-a
 
 " mapping enter and shift enter to newline without insert mode
 nnoremap <S-CR> O<Esc>
@@ -288,7 +288,7 @@ autocmd FileType coffeescript map <buffer> <leader>c :CoffeeCompile<CR>
 " extension mappings
 au BufNewFile,BufRead *.cljs setfiletype clojure
 au BufNewFile,BufRead *.wisp setfiletype clojure
-au BufNewFile,BufRead *.md setlocal ft=markdown
+au BufNewFile,BufRead *.md   setlocal    ft=markdown
 au BufNewFile,BufRead *.less setfiletype css
 
 " ruby
@@ -296,8 +296,8 @@ au BufNewFile,BufRead *.ru setfiletype ruby
 
 " set 4-space indented languages
 autocmd Filetype php setlocal ts=4 sw=4 expandtab
-autocmd Filetype c setlocal ts=4 sw=4 expandtab
-autocmd Filetype sh setlocal ts=4 sw=4 expandtab
+autocmd Filetype c   setlocal ts=4 sw=4 expandtab
+autocmd Filetype sh  setlocal ts=4 sw=4 expandtab
 
 " markdown
 autocmd Filetype markdown setlocal foldmethod=manual
@@ -380,24 +380,24 @@ let g:ack_default_options =
             \ " -s -H --nocolor --nogroup --column --smart-case"
 
 " syntastic
-let g:syntastic_objc_checkers = ['ycm']
-let g:syntastic_c_checkers = ['ycm']
-let g:syntastic_cpp_checkers = ['ycm']
-let g:syntastic_error_symbol = '✗'
-let g:syntastic_warning_symbol = '!'
-let g:syntastic_quiet_messages = {'type': 'style'}
+let g:syntastic_objc_checkers    = ['ycm']
+let g:syntastic_c_checkers       = ['ycm']
+let g:syntastic_cpp_checkers     = ['ycm']
+let g:syntastic_error_symbol     = '✗'
+let g:syntastic_warning_symbol   = '!'
+let g:syntastic_quiet_messages   = {'type': 'style'}
 let g:syntastic_aggregate_errors = 1
-let g:syntastic_check_on_open = 0
-let g:syntastic_ruby_checkers = ['mri']
+let g:syntastic_check_on_open    = 0
+let g:syntastic_ruby_checkers    = ['mri']
 command! Syn call CustomSyn()
 function! CustomSyn()
-  let g:syntastic_ruby_checkers = ['mri']
+  let g:syntastic_ruby_checkers  = ['mri']
   let g:syntastic_quiet_messages = {'type': 'style'}
   :SyntasticCheck
 endfunction
 command! SynS call CustomSynS()
 function! CustomSynS()
-  let g:syntastic_ruby_checkers = ['mri', 'rubocop']
+  let g:syntastic_ruby_checkers  = ['mri', 'rubocop']
   let g:syntastic_quiet_messages = {}
   :SyntasticCheck
 endfunction
@@ -413,23 +413,23 @@ autocmd InsertLeave *.json setlocal conceallevel=2
 augroup lexical
   autocmd!
   autocmd FileType markdown call lexical#init()
-  autocmd FileType textile call lexical#init()
-  autocmd FileType text call lexical#init()
+  autocmd FileType textile  call lexical#init()
+  autocmd FileType text     call lexical#init()
 augroup END
 
 " smart quotes
 augroup textobj_quote
   autocmd!
   autocmd FileType markdown call textobj#quote#init()
-  autocmd FileType textile call textobj#quote#init()
-  autocmd FileType text call textobj#quote#init({'educate': 0})
+  autocmd FileType textile  call textobj#quote#init()
+  autocmd FileType text     call textobj#quote#init({'educate': 0})
 augroup END
 
 " sentence selection
 augroup textobj_sentence
   autocmd!
   autocmd FileType markdown call textobj#sentence#init()
-  autocmd FileType textile call textobj#sentence#init()
+  autocmd FileType textile  call textobj#sentence#init()
 augroup END
 
 " indent-guide
