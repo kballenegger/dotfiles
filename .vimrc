@@ -437,8 +437,13 @@ augroup END
 
 " indent-guide
 let g:indent_guides_auto_colors = 0
-hi IndentGuidesOdd  ctermbg=234
+hi clear IndentGuidesOdd
 hi IndentGuidesEven ctermbg=235
+
+autocmd FileType coffeescript :IndentGuidesEnable
+autocmd FileType sass         :IndentGuidesEnable
+autocmd FileType haml         :IndentGuidesEnable
+autocmd FileType python       :IndentGuidesEnable
 
 
 " ==============================
