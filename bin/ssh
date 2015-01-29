@@ -17,13 +17,10 @@ ssh() {
             ;;
     esac
 
-    # cleanup first
-    rm "$TMPDIR/._ssh_fifo"* 2>/dev/null
-
     mkfifo "$tmp_fifo"
     cat ~/.ssh/config.global ~/.ssh/config >"$tmp_fifo" 2>/dev/null &
+    trap "rm $tmp_fifo" EXIT
     /usr/bin/ssh -F "$tmp_fifo" "$@"
-    rm "$tmp_fifo"
 }
 
 ssh $*
