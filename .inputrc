@@ -4,7 +4,13 @@
 # fix esc-left/right
 "\e\e[C": forward-word
 "\e\e[D": backward-word
-# fix alt-word keys
+# fix alt-word keys, ctrl acts as alt
 "\eml": backward-word
 "\emr": forward-word
-
+"\ecl": backward-word
+"\ecr": forward-word
+# fisable ctrl/alt-up/down
+"\emu":
+"\emd":
+"\ecu":
+"\ecd":
