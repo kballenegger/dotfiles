@@ -1,2 +1,10 @@
-"\eml": forward-word
-"\emr": backward-word
+# history search
+"\e[A": history-search-backward
+"\e[B": history-search-forward
+# fix esc-left/right
+"\e\e[C": forward-word
+"\e\e[D": backward-word
+# fix alt-word keys
+"\eml": backward-word
+"\emr": forward-word
+
