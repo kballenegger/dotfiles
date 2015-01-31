@@ -78,13 +78,13 @@ set formatoptions=qrn1
 " over 80-char width
 set colorcolumn=+1
 highlight OverLength ctermbg=233 ctermfg=124
-au BufEnter,InsertLeave * call matchadd('OverLength', '\%81v.\+', -1)
+au BufEnter             * call matchadd('OverLength', '\%81v.\+', -1)
 au InsertEnter          * highlight clear OverLength
 au InsertLeave          * highlight OverLength ctermbg=233 ctermfg=124
 
 " trailing whitespace highlight
 highlight ExtraWhitespace ctermbg=238
-au BufEnter,InsertLeave * call matchadd('ExtraWhitespace', '\s\+\%#\@<!$', -1)
+au BufEnter             * call matchadd('ExtraWhitespace', '\s\+\%#\@<!$', -1)
 au InsertEnter          * highlight clear ExtraWhitespace
 au InsertLeave          * highlight ExtraWhitespace ctermbg=238
 
