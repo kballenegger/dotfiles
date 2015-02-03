@@ -108,6 +108,8 @@ export VAGRANT_VMWARE_CLONE_DIRECTORY="$HOME/.vagrant-vms"
 alias free='free -m'
 alias flushdns='dscacheutil -flushcache'
 
+alias fig=docker-compose
+
 # vim can auto load sessions
 
 vim () {
@@ -146,6 +148,15 @@ function macc {
     else
         touch $1
         open -a /Applications/Macchiato.app $1
+    fi
+}
+
+# quickly find directories for substition
+function percol-dir {
+    if [ -z $1]; then
+        fasd d -l | percol
+    else
+        fasd d -l $1 | percol
     fi
 }
 
