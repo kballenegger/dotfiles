@@ -298,9 +298,10 @@ au BufNewFile,BufRead *.less setfiletype css
 au BufNewFile,BufRead *.ru setfiletype ruby
 
 " set 4-space indented languages
-autocmd Filetype php setlocal ts=4 sw=4 expandtab
-autocmd Filetype c   setlocal ts=4 sw=4 expandtab
-autocmd Filetype sh  setlocal ts=4 sw=4 expandtab
+autocmd Filetype php      setlocal ts=4 sw=4 expandtab
+autocmd Filetype c        setlocal ts=4 sw=4 expandtab
+autocmd Filetype sh       setlocal ts=4 sw=4 expandtab
+autocmd Filetype markdown setlocal ts=4 sw=4 expandtab
 
 " markdown
 autocmd Filetype markdown setlocal foldmethod=manual
