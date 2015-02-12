@@ -440,10 +440,12 @@ let g:indent_guides_auto_colors = 0
 hi clear IndentGuidesOdd
 hi IndentGuidesEven ctermbg=235
 
-autocmd FileType coffeescript :IndentGuidesEnable
-autocmd FileType sass         :IndentGuidesEnable
-autocmd FileType haml         :IndentGuidesEnable
-autocmd FileType python       :IndentGuidesEnable
+" NOTE: temporarily disabled until fix:
+" https://github.com/nathanaelkane/vim-indent-guides/issues/80
+"autocmd FileType coffeescript :IndentGuidesEnable
+"autocmd FileType sass         :IndentGuidesEnable
+"autocmd FileType haml         :IndentGuidesEnable
+"autocmd FileType python       :IndentGuidesEnable
 
 
 " ==============================
