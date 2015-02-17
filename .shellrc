@@ -110,6 +110,8 @@ alias flushdns='dscacheutil -flushcache'
 
 alias fig=docker-compose
 
+alias ta='tmux a -t'
+
 # vim can auto load sessions
 
 vim () {
