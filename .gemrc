@@ -1,13 +1,13 @@
 --- 
 :bulk_threshold: 1000
 :benchmark: false
-:sources: 
+:sources:
 - http://rubygems.org/
 - http://gemcutter.org
 :update_sources: true
 :backtrace: false
 :verbose: true
 
-install: --no-rdoc
-update:  --no-rdoc
+install: --no-document
+update:  --no-document
 
