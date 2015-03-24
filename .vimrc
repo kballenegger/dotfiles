@@ -82,15 +82,21 @@ set formatoptions=qrn1
 " over 80-char width
 set colorcolumn=+1
 highlight OverLength ctermbg=233 ctermfg=124
-au BufEnter             * call matchadd('OverLength', '\%81v.\+', -1)
-au InsertEnter          * highlight clear OverLength
-au InsertLeave          * highlight OverLength ctermbg=233 ctermfg=124
+augroup OverLength
+  autocmd!
+  au BufEnter             * call matchadd('OverLength', '\%81v.\+', -1)
+  au InsertEnter          * highlight clear OverLength
+  au InsertLeave          * highlight OverLength ctermbg=233 ctermfg=124
+augroup END
 
 " trailing whitespace highlight
 highlight ExtraWhitespace ctermbg=238
-au BufEnter             * call matchadd('ExtraWhitespace', '\s\+\%#\@<!$', -1)
-au InsertEnter          * highlight clear ExtraWhitespace
-au InsertLeave          * highlight ExtraWhitespace ctermbg=238
+augroup ExtraWhitespace
+  autocmd!
+  au BufEnter             * call matchadd('ExtraWhitespace', '\s\+\%#\@<!$', -1)
+  au InsertEnter          * highlight clear ExtraWhitespace
+  au InsertLeave          * highlight ExtraWhitespace ctermbg=238
+augroup END
 
 " backspace bullshit
 set backspace=indent,eol,start
@@ -292,23 +298,35 @@ autocmd FileType coffeescript map <buffer> <leader>c :CoffeeCompile<CR>
 "           FILETYPES
 " ==============================
 
+augroup Filetypes
+  autocmd!
+augroup END
+
 " extension mappings
-au BufNewFile,BufRead *.cljs setfiletype clojure
-au BufNewFile,BufRead *.wisp setfiletype clojure
-au BufNewFile,BufRead *.md   setlocal    ft=markdown
-au BufNewFile,BufRead *.less setfiletype css
+augroup Filetypes
+  au BufNewFile,BufRead *.cljs setfiletype clojure
+  au BufNewFile,BufRead *.wisp setfiletype clojure
+  au BufNewFile,BufRead *.md   setlocal    ft=markdown
+  au BufNewFile,BufRead *.less setfiletype css
+augroup END
 
 " ruby
-au BufNewFile,BufRead *.ru setfiletype ruby
+augroup Filetypes
+  au BufNewFile,BufRead *.ru setfiletype ruby
+augroup END
 
 " set 4-space indented languages
-autocmd Filetype php      setlocal ts=4 sw=4 expandtab
-autocmd Filetype c        setlocal ts=4 sw=4 expandtab
-autocmd Filetype sh       setlocal ts=4 sw=4 expandtab
-autocmd Filetype markdown setlocal ts=4 sw=4 expandtab
+augroup Filetypes
+  autocmd Filetype php      setlocal ts=4 sw=4 expandtab
+  autocmd Filetype c        setlocal ts=4 sw=4 expandtab
+  autocmd Filetype sh       setlocal ts=4 sw=4 expandtab
+  autocmd Filetype markdown setlocal ts=4 sw=4 expandtab
+augroup END
 
 " markdown
-autocmd Filetype markdown setlocal foldmethod=manual
+augroup Filetypes
+  autocmd Filetype markdown setlocal foldmethod=manual
+augroup END
 let g:markdown_fenced_languages = [
             \   'sh',
             \   'ruby',
@@ -330,7 +348,10 @@ set rtp+=/usr/local/lib/python2.7/site-packages/powerline/bindings/vim
 
 " autoreload buffers
 let autoreadargs={'autoread':1,'quiet':1}
-au VimEnter * execute WatchForChanges("*",autoreadargs)
+augroup WatchForChanges
+  autocmd!
+  au VimEnter * execute WatchForChanges("*",autoreadargs)
+augroup END
 
 " ctrl-p
 let g:ctrlp_map = '<leader>p'
