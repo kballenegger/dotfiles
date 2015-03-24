@@ -30,7 +30,11 @@ filetype indent on
 
 " color scheme
 let g:solarized_termcolors=256
-set background=dark
+if $ITERM_PROFILE == 'light'
+  set background=light
+else
+  set background=dark
+endif
 colorscheme solarized
 highlight clear SignColumn
 
