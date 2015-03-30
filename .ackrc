@@ -3,5 +3,6 @@
 --ignore-dir=vendor
 --ignore-dir=public/assets
 --ignore-file=ext:log
+--ignore-file=ext:pry_history
 
 --type-add=html:ext:haml
