@@ -2,6 +2,7 @@
 --ignore-dir=bower_components
 --ignore-dir=vendor
 --ignore-dir=public/assets
+--ignore-dir=tmp
 --ignore-file=ext:log
 --ignore-file=ext:pry_history
 
