@@ -1,0 +1,12 @@
+#!/bin/bash
+# TODO: this could be a lot more user friendly
+
+file="$1"
+if [ -z "$file" ] || [ ! -f "$file" ] || ! (echo "$file" | grep -q '\.mov$'); then
+  echo "Usage: $0 something.mov"
+  exit 1
+fi
+out="$(echo "$file" | sed 's/\.mov$/.gif/')"
+
+ffmpeg -i "$file" -vf scale=650:-1 -pix_fmt rgb24 -r 10 -f gif - | \
+    gifsicle --optimize=3 --delay=3 > "$out"
