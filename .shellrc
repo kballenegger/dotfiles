@@ -60,6 +60,7 @@ alias gcp="git cherry-pick"
 alias ga="git add"
 alias gmv="git mv"
 alias grm="git rm"
+alias gplr="git pull --rebase"
 
 # make diff work like git-diff
 alias diffg="git diff --no-index --"
