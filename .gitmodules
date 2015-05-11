@@ -157,3 +157,6 @@
 [submodule ".vim/bundle/indent-guides"]
 	path = .vim/bundle/indent-guides
 	url = https://github.com/nathanaelkane/vim-indent-guides
+[submodule ".vim/bundle/cjsx"]
+	path = .vim/bundle/cjsx
+	url = https://github.com/mtscout6/vim-cjsx
