@@ -418,7 +418,6 @@ let g:syntastic_quiet_messages   = {'type': 'style'}
 let g:syntastic_aggregate_errors = 1
 let g:syntastic_check_on_open    = 0
 let g:syntastic_ruby_checkers    = ['mri']
-let g:syntastic_disabled_filetypes = ['coffee']
 command! Syn call CustomSyn()
 function! CustomSyn()
   let g:syntastic_ruby_checkers  = ['mri']
@@ -431,6 +430,8 @@ function! CustomSynS()
   let g:syntastic_quiet_messages = {}
   :SyntasticCheck
 endfunction
+" unfortunately CJSX files are considered coffee and break syntastic
+au BufEnter *.cjsx let b:syntastic_skip_checks = 1
 
 " tagbar
 nnoremap <leader>R :TagbarToggle<CR>
