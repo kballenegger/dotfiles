@@ -35,8 +35,7 @@ open(URL) do |rss|
     unless \
         item.title =~ /SFO/ ||
         item.title =~ /GVA/ ||
-        item.title =~ /ZHR/ ||
-        item.title =~ /ORD/
+        item.title =~ /ZHR/
       next false # not right airline
     end
 
