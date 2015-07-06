@@ -5,9 +5,12 @@ require 'open-uri'
 require 'sendgrid-ruby' # NOTE: requires the sendgrid-ruby gem
 
 URL = 'http://www.flyertalk.com/forum/external.php?type=rss2&forumids=740'
+PREF_FILE = '/tmp/deal-alert-last-match'
+
 mailer = SendGrid::Client.new(api_user: ENV['SENDGRID_USERNAME'],
                               api_key:  ENV['SENDGRID_PASSWORD'])
 
+last_date = Time.at(File.read(PREF_FILE).strip.to_i) rescue nil
 
 open(URL) do |rss|
   feed = RSS::Parser.parse(rss)
@@ -15,6 +18,10 @@ open(URL) do |rss|
   puts "Loaded #{feed.items.count} items from #{feed.channel.title}"
 
   matches = feed.items.select do |item|
+
+    if last_date && item.date <= last_date
+      next false # already checked
+    end
 
     unless \
         item.title =~ /UA/ ||
@@ -28,7 +35,8 @@ open(URL) do |rss|
     unless \
         item.title =~ /SFO/ ||
         item.title =~ /GVA/ ||
-        item.title =~ /ZHR/
+        item.title =~ /ZHR/ ||
+        item.title =~ /ORD/
       next false # not right airline
     end
 
@@ -59,4 +67,7 @@ MATCH
   end
 
   puts mailer.send(mail)
+
+  # Record success
+  File.open(PREF_FILE, 'w') {|f| f.puts  matches.map(&:date).max.to_i.to_s }
 end
