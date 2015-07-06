@@ -1,0 +1,62 @@
+#!/usr/bin/env ruby
+
+require 'rss'
+require 'open-uri'
+require 'sendgrid-ruby' # NOTE: requires the sendgrid-ruby gem
+
+URL = 'http://www.flyertalk.com/forum/external.php?type=rss2&forumids=740'
+mailer = SendGrid::Client.new(api_user: ENV['SENDGRID_USERNAME'],
+                              api_key:  ENV['SENDGRID_PASSWORD'])
+
+
+open(URL) do |rss|
+  feed = RSS::Parser.parse(rss)
+
+  puts "Loaded #{feed.items.count} items from #{feed.channel.title}"
+
+  matches = feed.items.select do |item|
+
+    unless \
+        item.title =~ /UA/ ||
+        item.title =~ /LH/ ||
+        item.title =~ /LX/ ||
+        item.title =~ /\*A/ ||
+        item.title =~ /SA/
+      next false # not right airline
+    end
+
+    unless \
+        item.title =~ /SFO/ ||
+        item.title =~ /GVA/ ||
+        item.title =~ /ZHR/
+      next false # not right airline
+    end
+
+    puts "Found: #{item.title}"
+    true
+  end.compact
+
+  unless matches.any?
+    puts 'No matches...'
+    exit
+  end
+
+  msg = ([<<-MSG] + matches.map {|match| <<-MATCH }).join
+#{matches.count} deals found:
+
+MSG
+#{match.title}
+#{match.link}
+#{match.description}
+
+MATCH
+
+  mail = SendGrid::Mail.new do |m|
+    m.to      = 'kenneth@ballenegger.com'
+    m.from    = 'deal-alerts@kswizz.com'
+    m.subject = 'Premium Flight Deal Alert'
+    m.text    = msg
+  end
+
+  puts mailer.send(mail)
+end
