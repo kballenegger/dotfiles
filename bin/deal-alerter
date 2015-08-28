@@ -4,51 +4,54 @@ require 'rss'
 require 'open-uri'
 require 'sendgrid-ruby' # NOTE: requires the sendgrid-ruby gem
 
-URL = 'http://www.flyertalk.com/forum/external.php?type=rss2&forumids=740'
-PREF_FILE = '/tmp/deal-alert-last-match'
+FORUMS = [740, 372]
 
-mailer = SendGrid::Client.new(api_user: ENV['SENDGRID_USERNAME'],
-                              api_key:  ENV['SENDGRID_PASSWORD'])
+FORUMS.each do |forum|
 
-last_date = Time.at(File.read(PREF_FILE).strip.to_i) rescue nil
+  url = "http://www.flyertalk.com/forum/external.php?type=rss2&forumids=#{forum}"
+  pref_file = "/tmp/deal-alert-last-match.#{forum}"
 
-open(URL) do |rss|
-  feed = RSS::Parser.parse(rss)
+  mailer = SendGrid::Client.new(api_user: ENV['SENDGRID_USERNAME'],
+                                api_key:  ENV['SENDGRID_PASSWORD'])
 
-  puts "Loaded #{feed.items.count} items from #{feed.channel.title}"
+  last_date = Time.at(File.read(pref_file).strip.to_i) rescue nil
 
-  matches = feed.items.select do |item|
+  open(url) do |rss|
+    feed = RSS::Parser.parse(rss)
 
-    if last_date && item.date <= last_date
-      next false # already checked
+    puts "Loaded #{feed.items.count} items from #{feed.channel.title}"
+
+    matches = feed.items.select do |item|
+
+      if last_date && item.date <= last_date
+        next false # already checked
+      end
+
+      unless \
+          item.title =~ /UA/ ||
+          item.title =~ /LH/ ||
+          item.title =~ /LX/ ||
+          item.title =~ /\*A/
+        next false # not right airline
+      end
+
+      unless \
+          item.title =~ /SFO/ ||
+          item.title =~ /GVA/ ||
+          item.title =~ /ZHR/
+        next false # not right airline
+      end
+
+      puts "Found: #{item.title}"
+      true
+    end.compact
+
+    unless matches.any?
+      puts 'No matches...'
+      exit
     end
 
-    unless \
-        item.title =~ /UA/ ||
-        item.title =~ /LH/ ||
-        item.title =~ /LX/ ||
-        item.title =~ /\*A/ ||
-        item.title =~ /SA/
-      next false # not right airline
-    end
-
-    unless \
-        item.title =~ /SFO/ ||
-        item.title =~ /GVA/ ||
-        item.title =~ /ZHR/
-      next false # not right airline
-    end
-
-    puts "Found: #{item.title}"
-    true
-  end.compact
-
-  unless matches.any?
-    puts 'No matches...'
-    exit
-  end
-
-  msg = ([<<-MSG] + matches.map {|match| <<-MATCH }).join
+    msg = ([<<-MSG] + matches.map {|match| <<-MATCH }).join
 #{matches.count} deals found:
 
 MSG
@@ -58,15 +61,16 @@ MSG
 
 MATCH
 
-  mail = SendGrid::Mail.new do |m|
-    m.to      = 'kenneth@ballenegger.com'
-    m.from    = 'deal-alerts@kswizz.com'
-    m.subject = 'Premium Flight Deal Alert'
-    m.text    = msg
+    mail = SendGrid::Mail.new do |m|
+      m.to      = 'kenneth@ballenegger.com'
+      m.from    = 'deal-alerts@kswizz.com'
+      m.subject = "#{'Premium ' if forum == 740}Flight Deal Alert"
+      m.text    = msg
+    end
+
+    puts mailer.send(mail)
+
+    # Record success
+    File.open(pref_file, 'w') {|f| f.puts  matches.map(&:date).max.to_i.to_s }
   end
-
-  puts mailer.send(mail)
-
-  # Record success
-  File.open(PREF_FILE, 'w') {|f| f.puts  matches.map(&:date).max.to_i.to_s }
 end
