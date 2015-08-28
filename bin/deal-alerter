@@ -38,7 +38,7 @@ FORUMS.each do |forum|
       unless \
           item.title =~ /SFO/ ||
           item.title =~ /GVA/ ||
-          item.title =~ /ZHR/
+          item.title =~ /ZRH/
         next false # not right airline
       end
 
