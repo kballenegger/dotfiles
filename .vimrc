@@ -326,6 +326,8 @@ augroup END
 " markdown
 augroup Filetypes
   autocmd Filetype markdown setlocal foldmethod=manual
+  autocmd Filetype markdown setlocal wrap
+  autocmd Filetype markdown setlocal linebreak
 augroup END
 let g:markdown_fenced_languages = [
             \   'sh',
