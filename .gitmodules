@@ -64,9 +64,6 @@
 [submodule ".vim/bundle/javascript"]
 	path = .vim/bundle/javascript
 	url = https://github.com/pangloss/vim-javascript
-[submodule ".vim/bundle/niji"]
-	path = .vim/bundle/niji
-	url = https://github.com/amdt/vim-niji
 [submodule ".powerline"]
 	path = .powerline
 	url = https://github.com/Lokaltog/powerline
