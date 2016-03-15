@@ -201,7 +201,7 @@ puniq () {
 # ~/bin
 export PATH="$HOME/bin:$PATH"
 # brew
-export PATH="/usr/local/bin:$PATH"
+export PATH="/usr/local/sbin:/usr/local/bin:$PATH"
 
 # condense PATH entries
 PATH=$(puniq $PATH)
