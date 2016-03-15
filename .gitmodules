@@ -160,3 +160,6 @@
 [submodule ".vim/bundle/swift"]
 	path = .vim/bundle/swift
 	url = https://github.com/keith/swift.vim
+[submodule ".vim/bundle/airline"]
+	path = .vim/bundle/airline
+	url = https://github.com/vim-airline/vim-airline.git
