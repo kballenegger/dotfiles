@@ -123,6 +123,14 @@ vim () {
     fi
 }
 
+nvim () {
+    if [ -f 'Session.vim' ] && [ $# -eq 0 ]; then
+        command nvim -S Session.vim
+    else
+        command nvim "$@"
+    fi
+}
+
 # keep environment when doing sudo su
 alias ssu='sudo su -m'
 
