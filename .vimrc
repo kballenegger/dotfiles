@@ -345,11 +345,9 @@ let g:markdown_fenced_languages = [
 " ==============================
 
 
-" source powerline, which is not a pathogen plugin
-"set rtp+=/usr/local/lib/python2.7/site-packages/powerline/bindings/vim
-
-" airline instead of powerline
-let g:airline#extensions#tabline#enabled = 1
+" airline
+let g:airline_powerline_fonts = 1
+let g:airline_theme='bubblegum'
 
 " autoreload buffers
 let autoreadargs={'autoread':1,'quiet':1}
