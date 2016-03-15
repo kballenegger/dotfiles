@@ -212,6 +212,10 @@ inoremap <silent> `<up>    <esc>:TmuxNavigateUp<cr>
 inoremap <silent> `<down>  <esc>:TmuxNavigateDown<cr>
 inoremap <silent> `<left>  <esc>:TmuxNavigateLeft<cr>
 inoremap <silent> `<right> <esc>:TmuxNavigateRight<cr>
+tnoremap <silent> `<up>    <C-\><C-n>:TmuxNavigateUp<cr>
+tnoremap <silent> `<down>  <C-\><C-n>:TmuxNavigateDown<cr>
+tnoremap <silent> `<left>  <C-\><C-n>:TmuxNavigateLeft<cr>
+tnoremap <silent> `<right> <C-\><C-n>:TmuxNavigateRight<cr>
 
 " more advanced splits
 " window
