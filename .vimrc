@@ -203,15 +203,6 @@ nnoremap <leader>q :enew\|bd<CR>
 let g:tmux_navigator_no_mappings = 1
 
 " coordinated vim & tmux pane/split navigation
-" vim-way: with alt-arrow
-nnoremap <silent> <esc>mu :TmuxNavigateUp<cr>
-nnoremap <silent> <esc>md :TmuxNavigateDown<cr>
-nnoremap <silent> <esc>ml :TmuxNavigateLeft<cr>
-nnoremap <silent> <esc>mr :TmuxNavigateRight<cr>
-inoremap <silent> <esc>mu <esc>:TmuxNavigateUp<cr>
-inoremap <silent> <esc>md <esc>:TmuxNavigateDown<cr>
-inoremap <silent> <esc>ml <esc>:TmuxNavigateLeft<cr>
-inoremap <silent> <esc>mr <esc>:TmuxNavigateRight<cr>
 " tmux-way: with `-arrow
 nnoremap <silent> `<up> :TmuxNavigateUp<cr>
 nnoremap <silent> `<down> :TmuxNavigateDown<cr>
