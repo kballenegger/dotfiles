@@ -347,7 +347,7 @@ let g:markdown_fenced_languages = [
 
 " airline
 let g:airline_powerline_fonts = 1
-let g:airline_theme='bubblegum'
+let g:airline_theme='powerlineish'
 
 " autoreload buffers
 let autoreadargs={'autoread':1,'quiet':1}
