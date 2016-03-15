@@ -115,19 +115,17 @@ alias ta='tmux a -t'
 
 # vim can auto load sessions
 
+if command_exists vim; then
+    export vim=nvim
+else
+    export vim=vim
+fi
+
 vim () {
     if [ -f 'Session.vim' ] && [ $# -eq 0 ]; then
-        command vim -S Session.vim
+        command $vim -S Session.vim
     else
-        command vim "$@"
-    fi
-}
-
-nvim () {
-    if [ -f 'Session.vim' ] && [ $# -eq 0 ]; then
-        command nvim -S Session.vim
-    else
-        command nvim "$@"
+        command $vim "$@"
     fi
 }
 

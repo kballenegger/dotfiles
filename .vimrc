@@ -213,14 +213,14 @@ inoremap <silent> <esc>md <esc>:TmuxNavigateDown<cr>
 inoremap <silent> <esc>ml <esc>:TmuxNavigateLeft<cr>
 inoremap <silent> <esc>mr <esc>:TmuxNavigateRight<cr>
 " tmux-way: with `-arrow
-"nnoremap <silent> `<up> :TmuxNavigateUp<cr>
-"nnoremap <silent> `<down> :TmuxNavigateDown<cr>
-"nnoremap <silent> `<left> :TmuxNavigateLeft<cr>
-"nnoremap <silent> `<right> :TmuxNavigateRight<cr>
-"inoremap <silent> `<up>    <esc>:TmuxNavigateUp<cr>
-"inoremap <silent> `<down>  <esc>:TmuxNavigateDown<cr>
-"inoremap <silent> `<left>  <esc>:TmuxNavigateLeft<cr>
-"inoremap <silent> `<right> <esc>:TmuxNavigateRight<cr>
+nnoremap <silent> `<up> :TmuxNavigateUp<cr>
+nnoremap <silent> `<down> :TmuxNavigateDown<cr>
+nnoremap <silent> `<left> :TmuxNavigateLeft<cr>
+nnoremap <silent> `<right> :TmuxNavigateRight<cr>
+inoremap <silent> `<up>    <esc>:TmuxNavigateUp<cr>
+inoremap <silent> `<down>  <esc>:TmuxNavigateDown<cr>
+inoremap <silent> `<left>  <esc>:TmuxNavigateLeft<cr>
+inoremap <silent> `<right> <esc>:TmuxNavigateRight<cr>
 
 " more advanced splits
 " window
