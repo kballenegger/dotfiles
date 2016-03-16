@@ -212,7 +212,7 @@ inoremap <silent> `<up>    <esc>:TmuxNavigateUp<cr>
 inoremap <silent> `<down>  <esc>:TmuxNavigateDown<cr>
 inoremap <silent> `<left>  <esc>:TmuxNavigateLeft<cr>
 inoremap <silent> `<right> <esc>:TmuxNavigateRight<cr>
-if has('nvmim')
+if has('nvim')
   tnoremap <silent> `<up>    <C-\><C-n>:TmuxNavigateUp<cr>
   tnoremap <silent> `<down>  <C-\><C-n>:TmuxNavigateDown<cr>
   tnoremap <silent> `<left>  <C-\><C-n>:TmuxNavigateLeft<cr>
@@ -250,6 +250,12 @@ inoremap <esc>cd   <esc>5<c-w>-a
 nnoremap <S-CR> O<Esc>
 nnoremap <CR> o<Esc>
 autocmd CmdwinEnter * unmap <buffer> <CR>
+
+" nvim terminal mappings
+if has('nvim')
+  tnoremap <leader><esc> <C-\><C-n>
+  autocmd TermOpen * nnoremap <buffer> <CR> a
+endif
 
 " paste mode
 nnoremap <C-p> :set invpaste paste?<CR>
