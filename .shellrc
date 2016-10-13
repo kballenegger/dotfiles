@@ -115,7 +115,7 @@ alias ta='tmux a -t'
 
 # vim can auto load sessions
 
-if command_exists vim; then
+if command_exists nvim; then
     export vim=nvim
 else
     export vim=vim
