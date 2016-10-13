@@ -172,3 +172,6 @@
 [submodule "/Users/kenneth/.vim/bundle/tsuquyomi"]
 	path = /Users/kenneth/.vim/bundle/tsuquyomi
 	url = https://github.com/Quramy/tsuquyomi.git
+[submodule "/Users/kenneth/.vim/bundle/vimproc"]
+	path = /Users/kenneth/.vim/bundle/vimproc
+	url = https://github.com/Shougo/vimproc.vim.git
