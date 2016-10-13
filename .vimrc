@@ -402,6 +402,12 @@ if filereadable($HOME . "/.vim/bundle/you-complete-me/third_party/ycmd/ycm_core.
   let g:UltiSnipsJumpForwardTrigger="<tab>"
 endif
 
+" ycm + typescript autocomplete
+if !exists("g:ycm_semantic_triggers")
+  let g:ycm_semantic_triggers = {}
+endif
+let g:ycm_semantic_triggers['typescript'] = ['.']
+
 " easy-align
 vnoremap <leader>a :LiveEasyAlign<cr>
 nmap <leader>a vii:LiveEasyAlign<cr>
