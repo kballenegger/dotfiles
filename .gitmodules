@@ -166,12 +166,12 @@
 [submodule ".vim/bundle/airline-themes"]
 	path = .vim/bundle/airline-themes
 	url = https://github.com/vim-airline/vim-airline-themes.git
-[submodule "/Users/kenneth/.vim/bundle/typescript"]
-	path = /Users/kenneth/.vim/bundle/typescript
+[submodule ".vim/bundle/typescript"]
+	path = .vim/bundle/typescript
 	url = https://github.com/leafgarland/typescript-vim.git
-[submodule "/Users/kenneth/.vim/bundle/tsuquyomi"]
-	path = /Users/kenneth/.vim/bundle/tsuquyomi
+[submodule ".vim/bundle/tsuquyomi"]
+	path = .vim/bundle/tsuquyomi
 	url = https://github.com/Quramy/tsuquyomi.git
-[submodule "/Users/kenneth/.vim/bundle/vimproc"]
-	path = /Users/kenneth/.vim/bundle/vimproc
+[submodule ".vim/bundle/vimproc"]
+	path = .vim/bundle/vimproc
 	url = https://github.com/Shougo/vimproc.vim.git
