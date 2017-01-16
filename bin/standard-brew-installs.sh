@@ -5,13 +5,16 @@ brew install tmux
 brew install fasd
 brew install ruby
 brew install python
+brew install node
 brew install httpie
 brew install jq
 brew install git
 brew install ack
+brew install reattach-to-user-namespace
 
 brew tap neovim/neovim
 brew install neovim
+pip install neovim
 
 # just guessing
 
