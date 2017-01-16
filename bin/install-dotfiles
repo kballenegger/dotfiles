@@ -36,8 +36,7 @@ rm -rf dotfiles
 
 
 # get submodules
-git submodule init
-git submodule update
+git submodule update --init --recursive
 
 # create a new branch
 git checkout -b "dotfiles-$USER"
