@@ -69,6 +69,7 @@ vnoremap ? ?\v
 set ignorecase
 set smartcase
 set gdefault
+set nohlsearch
 
 " swap files location
 set backupdir=~/.vim-tmp,~/.tmp,~/tmp,/var/tmp,/tmp
