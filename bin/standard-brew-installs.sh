@@ -11,6 +11,7 @@ brew install jq
 brew install git
 brew install ack
 brew install reattach-to-user-namespace
+brew install watchman
 
 brew tap neovim/neovim
 brew install neovim
