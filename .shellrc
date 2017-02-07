@@ -65,6 +65,9 @@ alias gplr="git pull --rebase"
 # make diff work like git-diff
 alias diffg="git diff --no-index --"
 
+# gack = ack search only files in git
+alias gack="git ls-files -oc --exclude-standard | ack -x"
+
 # note this needs to be after rvm, otherwise wrong ruby will be used
 if command_exists hub; then
     eval "$(hub alias -s)"
