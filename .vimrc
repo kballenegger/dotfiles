@@ -431,6 +431,9 @@ let g:syntastic_quiet_messages   = {'type': 'style'}
 let g:syntastic_aggregate_errors = 1
 let g:syntastic_check_on_open    = 0
 let g:syntastic_ruby_checkers    = ['mri']
+let g:syntastic_always_populate_loc_list = 1
+let g:tsuquyomi_disable_quickfix = 1
+let g:syntastic_typescript_checkers = ['tsuquyomi']
 command! Syn call CustomSyn()
 function! CustomSyn()
   let g:syntastic_ruby_checkers  = ['mri']
