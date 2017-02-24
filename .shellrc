@@ -12,7 +12,7 @@
 # SHELL CONFIGURATION
 # -----------------------------------------------------------------
 
-export CLICOLOR="xterm-color"
+export CLICOLOR="xterm-256color"
 export DISPLAY=:0.0
 export LC_ALL="en_US.UTF-8"
 

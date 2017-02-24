@@ -20,6 +20,9 @@ call pathogen#infect()
 "              VIM
 " ==============================
 
+" enable truecolor
+let $NVIM_TUI_ENABLE_TRUE_COLOR=1
+
 " go-lang (this must come before syntax on, for some reason...)
 set rtp+=$GOROOT/misc/vim
 
@@ -103,7 +106,7 @@ augroup END
 set backspace=indent,eol,start
 
 " mouse
-if has("mouse")
+if has('mouse')
     set mouse=a
 endif
 
@@ -142,7 +145,6 @@ set foldtext=CustomFoldText()
 
 " ctags
 set tags=.git/tags
-
 
 " ==============================
 "           MAPPINGS
