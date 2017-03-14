@@ -28,8 +28,7 @@ set rtp+=$GOROOT/misc/vim
 
 " enable file types and syntax highlighing
 syntax on
-filetype plugin on
-filetype indent on
+filetype plugin indent on
 
 " color scheme
 let g:solarized_termcolors=256
@@ -493,6 +492,8 @@ hi IndentGuidesEven ctermbg=235
 "autocmd FileType haml         :IndentGuidesEnable
 "autocmd FileType python       :IndentGuidesEnable
 
+" closetag
+let g:closetag_filenames = '*.html,*.jsx,*.tsx'
 
 " ==============================
 " =        END OF VIMRC        =

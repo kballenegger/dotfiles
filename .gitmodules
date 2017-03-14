@@ -175,3 +175,6 @@
 [submodule ".vim/bundle/vimproc"]
 	path = .vim/bundle/vimproc
 	url = https://github.com/Shougo/vimproc.vim.git
+[submodule ".vim/bundle/tsx"]
+	path = .vim/bundle/tsx
+	url = https://github.com/ianks/vim-tsx.git
