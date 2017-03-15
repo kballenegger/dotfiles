@@ -25,9 +25,6 @@
 [submodule ".vim/bundle/autoclose"]
 	path = .vim/bundle/autoclose
 	url = https://github.com/Townk/vim-autoclose.git
-[submodule ".vim/bundle/delimit-mate"]
-	path = .vim/bundle/delimit-mate
-	url = https://github.com/Raimondi/delimitMate.git
 [submodule ".vim/bundle/tagbar"]
 	path = .vim/bundle/tagbar
 	url = https://github.com/majutsushi/tagbar.git
@@ -178,3 +175,6 @@
 [submodule ".vim/bundle/tsx"]
 	path = .vim/bundle/tsx
 	url = https://github.com/ianks/vim-tsx.git
+[submodule ".vim/bundle/lexima"]
+	path = .vim/bundle/lexima
+	url = https://github.com/cohama/lexima.vim.git
