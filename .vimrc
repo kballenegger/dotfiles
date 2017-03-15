@@ -498,6 +498,7 @@ call lexima#add_rule({'char': '>', 'at': '\%#>', 'leave': 1})
 call lexima#add_rule({'char': '<BS>', 'at': '<\%#>', 'delete': 1})
 
 " closetag
+autocmd BufEnter *.jsx,*.tsx let b:unaryTagsStack=''
 let g:closetag_filenames = '*.html,*.jsx,*.tsx'
 
 " ==============================
