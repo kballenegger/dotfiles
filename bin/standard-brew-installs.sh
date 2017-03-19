@@ -38,3 +38,4 @@ brew cask install cloudapp
 brew cask install fantastical
 brew cask install pdf-expert
 brew cask install adobe-photoshop-lightroom
+brew cask install charles
