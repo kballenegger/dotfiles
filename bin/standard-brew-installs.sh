@@ -12,6 +12,7 @@ brew install git
 brew install ack
 brew install reattach-to-user-namespace
 brew install watchman
+brew install pv
 
 brew tap neovim/neovim
 brew install neovim
@@ -39,3 +40,9 @@ brew cask install fantastical
 brew cask install pdf-expert
 brew cask install adobe-photoshop-lightroom
 brew cask install charles
+brew cask install skype
+brew cask install google-nik-collection
+brew cask install carbon-copy-cloner
+brew cask install vlc
+brew cask install private-internet-access
+brew cask install vyprvpn
