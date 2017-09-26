@@ -13,6 +13,7 @@ brew install ack
 brew install reattach-to-user-namespace
 brew install watchman
 brew install pv
+brew install dnsmasq
 
 brew tap neovim/neovim
 brew install neovim
@@ -46,3 +47,4 @@ brew cask install carbon-copy-cloner
 brew cask install vlc
 brew cask install private-internet-access
 brew cask install vyprvpn
+brew cask install shimo
