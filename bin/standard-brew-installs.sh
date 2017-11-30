@@ -1,3 +1,6 @@
+# services
+brew tap homebrew/services
+
 # brew installs
 
 brew install zsh
@@ -48,3 +51,4 @@ brew cask install vlc
 brew cask install private-internet-access
 brew cask install vyprvpn
 brew cask install shimo
+brew cask install telegram
