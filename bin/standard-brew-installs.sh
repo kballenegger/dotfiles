@@ -52,3 +52,7 @@ brew cask install private-internet-access
 brew cask install vyprvpn
 brew cask install shimo
 brew cask install telegram
+brew cask install ngrok
+brew cask install franz
+brew cask install caffeine
+brew cask install signal
