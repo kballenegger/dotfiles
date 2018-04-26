@@ -41,7 +41,7 @@ brew cask install beamer
 brew cask install bartender
 brew cask install cloudapp
 brew cask install fantastical
-brew cask install pdf-expert
+brew cask install pdfexpert
 brew cask install adobe-photoshop-lightroom
 brew cask install charles
 brew cask install skype
