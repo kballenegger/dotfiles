@@ -56,3 +56,4 @@ brew cask install ngrok
 brew cask install franz
 brew cask install caffeine
 brew cask install signal
+brew cask install zoomus
