@@ -17,6 +17,7 @@ brew install reattach-to-user-namespace
 brew install watchman
 brew install pv
 brew install dnsmasq
+brew install tree
 
 brew tap neovim/neovim
 brew install neovim
@@ -57,3 +58,4 @@ brew cask install franz
 brew cask install caffeine
 brew cask install signal
 brew cask install zoomus
+brew cask install hazel
