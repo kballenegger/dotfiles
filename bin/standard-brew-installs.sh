@@ -18,6 +18,7 @@ brew install watchman
 brew install pv
 brew install dnsmasq
 brew install tree
+brew install pngpaste
 
 brew tap neovim/neovim
 brew install neovim
