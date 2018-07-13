@@ -196,3 +196,6 @@
 [submodule ".tmux/plugins/tmux-sessionist"]
 	path = .tmux/plugins/tmux-sessionist
 	url = https://github.com/tmux-plugins/tmux-sessionist
+[submodule "/Users/kenneth/.vim/bundle/tmuxline.vim"]
+	path = /Users/kenneth/.vim/bundle/tmuxline.vim
+	url = https://github.com/edkolev/tmuxline.vim
