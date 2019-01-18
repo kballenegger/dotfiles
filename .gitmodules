@@ -150,7 +150,7 @@
 	url = https://github.com/guns/xterm-color-table.vim
 [submodule ".vim/bundle/indent-guides"]
 	path = .vim/bundle/indent-guides
-	url = https://github.com/nathanaelkane/vim-indent-guides
+	url = https://github.com/rockandska/vim-indent-guides.git
 [submodule ".vim/bundle/cjsx"]
 	path = .vim/bundle/cjsx
 	url = https://github.com/mtscout6/vim-cjsx
