@@ -60,3 +60,6 @@ brew cask install caffeine
 brew cask install signal
 brew cask install zoomus
 brew cask install hazel
+
+# necessary packages
+gem install pry
