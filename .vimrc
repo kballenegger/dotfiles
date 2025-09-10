@@ -1,6 +1,9 @@
 " kill vi compatibility
 set nocompatible
 
+" Use Homebrew Python venv for Python 3 provider
+let g:python3_host_prog = expand('~/.venvs/neovim/bin/python3')
+
 " ==============================
 "           PATHOGEN
 " ==============================
