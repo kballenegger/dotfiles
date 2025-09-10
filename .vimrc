@@ -4,6 +4,9 @@ set nocompatible
 " Use Homebrew Python venv for Python 3 provider
 let g:python3_host_prog = expand('~/.venvs/neovim/bin/python3')
 
+" dispatch shouldn't take over m mapping
+let g:dispatch_no_maps = 1
+
 " ==============================
 "           PATHOGEN
 " ==============================
@@ -26,6 +29,9 @@ call pathogen#infect()
 " enable truecolor
 let $NVIM_TUI_ENABLE_TRUE_COLOR=1
 
+set termguicolors
+set background=dark
+
 " go-lang (this must come before syntax on, for some reason...)
 set rtp+=$GOROOT/misc/vim
 
@@ -34,13 +40,13 @@ syntax on
 filetype plugin indent on
 
 " color scheme
-let g:solarized_termcolors=256
+"let g:solarized_termcolors=256
 if $ITERM_PROFILE == 'light'
   set background=light
 else
   set background=dark
 endif
-colorscheme solarized
+colorscheme solarized8_flat
 highlight clear SignColumn
 
 " show line numbers

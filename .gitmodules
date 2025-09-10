@@ -199,3 +199,6 @@
 [submodule "/Users/kenneth/.vim/bundle/tmuxline.vim"]
 	path = /Users/kenneth/.vim/bundle/tmuxline.vim
 	url = https://github.com/edkolev/tmuxline.vim
+[submodule ".vim/bundle/solarized8"]
+	path = .vim/bundle/solarized8
+	url = https://github.com/lifepillar/vim-solarized8
