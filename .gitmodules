@@ -202,3 +202,6 @@
 [submodule ".vim/bundle/solarized8"]
 	path = .vim/bundle/solarized8
 	url = https://github.com/lifepillar/vim-solarized8
+[submodule ".vim/bundle/colorschemes"]
+	path = .vim/bundle/colorschemes
+	url = https://github.com/flazz/vim-colorschemes.git
