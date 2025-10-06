@@ -46,7 +46,7 @@ if $ITERM_PROFILE == 'light'
 else
   set background=dark
 endif
-colorscheme solarized8_flat
+colorscheme gruvbox
 highlight clear SignColumn
 
 " show line numbers

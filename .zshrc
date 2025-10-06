@@ -62,8 +62,12 @@ bindkey '\emr' emacs-forward-word
 # AUTOJUMPING
 # -----------------------------------------------------------------
 
-alias j="fasd_cd -d"
+#alias j="fasd_cd -d"
+alias j=z
+eval "$(zoxide init zsh)"
 
+# fzf config (auto-added)
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 # -----------------------------------------------------------------
 # PERCOL HISTORY

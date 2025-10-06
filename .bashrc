@@ -45,6 +45,8 @@ if [ -f /usr/local/etc/autojump ]; then
     . /usr/local/etc/autojump
 fi
 
+# fzf config (auto added)
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
 # -----------------------------------------------------------------
 # SOURCING LOCAL .BASHRC
