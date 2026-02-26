@@ -27,6 +27,9 @@ else
     export EDITOR="vim"
 fi
 
+# Tailscale on Mac has the binary inside the app
+alias tailscale="/Applications/Tailscale.app/Contents/MacOS/Tailscale"
+alias ts=tailscale
 
 # -----------------------------------------------------------------
 # BUILD TOOLS
