@@ -506,6 +506,9 @@ hi IndentGuidesEven ctermbg=235
 "call lexima#add_rule({'char': '>', 'at': '\%#>', 'leave': 1})
 "call lexima#add_rule({'char': '<BS>', 'at': '\<\%#\>', 'delete': 1})
 
+" disable vim-pasta in other plugin prompts
+let g:pasta_disabled_filetypes = ['ctrlp', 'fzf', 'TelescopePrompt']
+
 " closetag
 autocmd BufEnter *.jsx,*.tsx let b:unaryTagsStack=''
 let g:closetag_filenames = '*.html,*.jsx,*.tsx'
