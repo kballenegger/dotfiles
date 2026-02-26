@@ -1,1 +1,2 @@
-bash ~/bin/on-login.sh
+# Disable dotfiles auto-update
+#bash ~/bin/on-login.sh
