@@ -5,8 +5,8 @@
 
 # Native site-functions come first
 # NOTE: this must happen before initializing zprezto
-fpath=(/usr/local/share/zsh/site-functions $fpath)
-zstyle ':completion:*:*:git:*' script /usr/local/etc/bash_completion.d/git-completion.bash
+fpath=(/opt/homebrew/share/zsh/site-functions $fpath)
+zstyle ':completion:*:*:git:*' script /opt/homebrew/etc/bash_completion.d/git-completion.bash
 
 
 # -----------------------------------------------------------------

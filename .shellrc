@@ -160,7 +160,7 @@ function pbgist {
 }
 
 function macc {
-    if [ -z $1]; then
+    if [ -z "$1" ]; then
         open /Applications/Macchiato.app
     else
         touch $1
@@ -170,10 +170,10 @@ function macc {
 
 # quickly find directories for substition
 function percol-dir {
-    if [ -z $1]; then
+    if [ -z "$1" ]; then
         fasd d -l | percol
     else
-        fasd d -l $1 | percol
+        fasd d -l "$1" | percol
     fi
 }
 
