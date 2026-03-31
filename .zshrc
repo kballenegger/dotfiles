@@ -104,3 +104,6 @@ fi
 # the end
 
 test -e ${HOME}/.iterm2_shell_integration.zsh && source ${HOME}/.iterm2_shell_integration.zsh
+
+# OpenClaw Completion
+source "/Users/kenneth-bot/.openclaw/completions/openclaw.zsh"
