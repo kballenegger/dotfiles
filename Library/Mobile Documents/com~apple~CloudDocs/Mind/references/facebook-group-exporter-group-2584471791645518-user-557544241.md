@@ -1,11 +1,11 @@
 # Facebook Group Post Exporter Script (User-in-Group URL Mode)
 
-- Last updated: 2026-04-15 04:25:33
+- Last updated: 2026-04-15 05:19:08
 - Source script: `~/klaw-workspace/tmp/facebook-userscripts/export-group-posts-by-user.user.js`
 - Source README: `~/klaw-workspace/tmp/facebook-userscripts/README.md`
-- Commit: `ef5a33c`
-- Version: v3.4.0
-- Patch note: hidden gallery photo crawl (captures photos beyond visible 1–5)
+- Commit: `f4918d5`
+- Version: v3.5.0
+- Patch note: carousel mode for full photo viewer crawl; deterministic end-of-scroll hard-stop (5 idle cycles)
 
 ## Script
 
@@ -13,7 +13,7 @@
 // ==UserScript==
 // @name         FB Group Posts Export by User
 // @namespace    https://github.com/kenneth-bot/klaw-workspace
-// @version      3.4.0
+// @version      3.5.0
 // @description  Export posts from a Facebook group user page (/groups/<gid>/user/<uid>) as JSON + photo ZIP. URL-driven, no hardcoded IDs.
 // @author       Kenneth
 // @match        https://www.facebook.com/groups/*/user/*
@@ -44,6 +44,7 @@
     EOF_CONSECUTIVE_CYCLES: 3,       // All hard-stop signals must hold for this many cycles
     EOF_TAIL_SIGNATURE_COUNT: 5,     // Number of tail post keys to track for re-observation
     EOF_BOTTOM_PROBE_COUNT: 2,       // scrollTo(bottom) probes per cycle
+    EOF_HARD_STOP_IDLE_CYCLES: 5,    // Deterministic hard-stop: if N consecutive scroll cycles produce zero new posts, stop regardless of other signals
 
     // ── Photo download ─────────────────────────────────────────
     DOWNLOAD_PHOTOS: true,
@@ -58,6 +59,13 @@
     GALLERY_CRAWL_TIMEOUT_MS: 10000,
     GALLERY_CRAWL_DELAY_MS: 800,
     GALLERY_CRAWL_MAX_PAGES_PER_POST: 10,
+
+    // ── Carousel (interactive photo viewer) crawl ────────────
+    CAROUSEL_CRAWL_ENABLED: true,          // Open photo viewer and navigate through full carousel
+    CAROUSEL_CRAWL_MAX_PHOTOS: 100,        // Max images to capture per carousel session
+    CAROUSEL_CRAWL_NAV_DELAY_MS: 600,      // Delay between carousel navigation steps
+    CAROUSEL_CRAWL_OPEN_WAIT_MS: 1200,     // Wait for photo viewer overlay to appear after click
+    CAROUSEL_CRAWL_CLOSE_WAIT_MS: 500,     // Wait after closing viewer before resuming
 
     DRY_RUN: false,
   };
@@ -753,6 +761,263 @@
     return discoveredUrls.slice(0, CONFIG.GALLERY_CRAWL_MAX_PHOTOS_PER_POST);
   }
 
+  /* ────────── carousel (interactive photo viewer) crawl ────────── */
+
+  /**
+   * Detect the photo viewer overlay in the DOM.
+   * Facebook renders the photo viewer as an overlay with role="dialog" or
+   * a full-viewport container with a large image. We look for multiple
+   * signals to stay resilient to DOM changes:
+   * 1. role="dialog" containing a large fbcdn img
+   * 2. A fixed/absolute overlay container with a large fbcdn img
+   * 3. Any ancestor with [data-pagelet="MediaViewerPhoto"] or similar
+   */
+  function findPhotoViewerOverlay() {
+    // Strategy 1: role="dialog" with a large image inside
+    const dialogs = document.querySelectorAll('[role="dialog"]');
+    for (const d of dialogs) {
+      const img = d.querySelector('img[src*="scontent"], img[src*="fbcdn"]');
+      if (img) return { container: d, img };
+    }
+
+    // Strategy 2: data-pagelet containing "Media" or "Photo"
+    const pagelets = document.querySelectorAll('[data-pagelet*="Media"], [data-pagelet*="Photo"]');
+    for (const p of pagelets) {
+      const img = p.querySelector('img[src*="scontent"], img[src*="fbcdn"]');
+      if (img) return { container: p, img };
+    }
+
+    // Strategy 3: any fixed/absolute positioned large container with a big image
+    const allImgs = document.querySelectorAll('img[src*="scontent"], img[src*="fbcdn"]');
+    for (const img of allImgs) {
+      const w = img.naturalWidth || parseInt(img.getAttribute('width'), 10) || 0;
+      const h = img.naturalHeight || parseInt(img.getAttribute('height'), 10) || 0;
+      if (w > 400 || h > 400) {
+        const parent = img.closest('[style*="position: fixed"], [style*="position:fixed"], [style*="position: absolute"]');
+        if (parent) return { container: parent, img };
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Extract the high-res image URL from the currently displayed photo viewer.
+   */
+  function extractViewerImageUrl() {
+    const viewer = findPhotoViewerOverlay();
+    if (!viewer) return null;
+
+    const img = viewer.img;
+    let bestUrl = img.src;
+
+    // Check srcset for even higher-res
+    const srcset = img.getAttribute('srcset');
+    if (srcset) {
+      const highRes = parseBestSrcset(srcset);
+      if (highRes) bestUrl = highRes;
+    }
+
+    if (bestUrl && isFbCdnUrl(bestUrl) && !isAvatarUrl(bestUrl)) {
+      return upgradeToHighRes(bestUrl);
+    }
+    return null;
+  }
+
+  /**
+   * Find the "next" navigation element in the photo viewer.
+   * Facebook uses SVG arrow buttons with role="button".
+   * We avoid relying on localized aria-labels by looking for:
+   * 1. Buttons positioned on the right side of the viewer
+   * 2. SVG chevron/arrow shapes pointing right
+   * 3. Keyboard shortcut "j" dispatched as a DOM event
+   */
+  function findNextButton() {
+    const viewer = findPhotoViewerOverlay();
+    if (!viewer) return null;
+    const container = viewer.container;
+
+    // Look for role="button" elements on the right side of the container
+    const buttons = container.querySelectorAll('[role="button"]');
+    const viewerRect = container.getBoundingClientRect();
+    const midX = viewerRect.left + viewerRect.width / 2;
+
+    // Collect candidate right-side buttons with SVG inside (navigation arrows)
+    const rightButtons = [];
+    for (const btn of buttons) {
+      const svg = btn.querySelector('svg');
+      if (!svg) continue;
+      const btnRect = btn.getBoundingClientRect();
+      // Button should be on the right half and vertically centered-ish
+      if (btnRect.left > midX && btnRect.height < 100 && btnRect.width < 100) {
+        rightButtons.push(btn);
+      }
+    }
+
+    if (rightButtons.length > 0) {
+      return rightButtons[0];
+    }
+
+    return null;
+  }
+
+  /**
+   * Navigate to the next photo in the viewer.
+   * Tries clicking the next button first, then falls back to keyboard "j".
+   * Returns true if navigation was attempted.
+   */
+  function navigateToNextPhoto() {
+    const nextBtn = findNextButton();
+    if (nextBtn) {
+      nextBtn.click();
+      return true;
+    }
+
+    // Fallback: dispatch "j" key event (FB keyboard shortcut for next photo)
+    document.dispatchEvent(new KeyboardEvent('keydown', {
+      key: 'j', code: 'KeyJ', keyCode: 74, which: 74, bubbles: true,
+    }));
+    return true;
+  }
+
+  /**
+   * Close the photo viewer overlay.
+   * Tries multiple strategies:
+   * 1. Press Escape key
+   * 2. Click close/back button (aria-label with "Close" or "Back")
+   * 3. Click the overlay backdrop
+   */
+  function closePhotoViewer() {
+    // Strategy 1: Escape key
+    document.dispatchEvent(new KeyboardEvent('keydown', {
+      key: 'Escape', code: 'Escape', keyCode: 27, which: 27, bubbles: true,
+    }));
+  }
+
+  /**
+   * Crawl the carousel for a post by opening its first photo,
+   * then navigating through all photos in the viewer.
+   *
+   * @param {Element} postEl - the post DOM element
+   * @param {string[]} existingUrls - already-known photo URLs for dedup
+   * @returns {string[]} newly discovered photo URLs
+   */
+  async function crawlCarousel(postEl, existingUrls) {
+    if (!CONFIG.CAROUSEL_CRAWL_ENABLED) return [];
+
+    // Find a clickable photo link in the post
+    const photoLink = postEl.querySelector('a[href*="/photo/"]');
+    if (!photoLink) return [];
+
+    const existingKeys = new Set(existingUrls.map(urlPathKey));
+    const discoveredUrls = [];
+    const seenKeys = new Set();
+
+    // Remember scroll position to restore after
+    const savedScrollY = window.scrollY;
+
+    try {
+      // Scroll the photo link into view and click it
+      photoLink.scrollIntoView({ block: 'center', behavior: 'instant' });
+      await sleep(200);
+      photoLink.click();
+      await sleep(CONFIG.CAROUSEL_CRAWL_OPEN_WAIT_MS);
+
+      // Verify the viewer opened
+      if (!findPhotoViewerOverlay()) {
+        log('Carousel: viewer did not open, skipping.');
+        extractionStats.carousel_errors++;
+        return [];
+      }
+
+      extractionStats.carousel_posts_crawled++;
+
+      // Capture first image
+      const firstUrl = extractViewerImageUrl();
+      if (firstUrl) {
+        const firstKey = urlPathKey(firstUrl);
+        seenKeys.add(firstKey);
+        if (!existingKeys.has(firstKey)) {
+          discoveredUrls.push(firstUrl);
+          extractionStats.carousel_photos_captured++;
+        }
+      }
+
+      // Navigate through carousel
+      let steps = 0;
+      let consecutiveDups = 0;
+
+      while (steps < CONFIG.CAROUSEL_CRAWL_MAX_PHOTOS) {
+        const prevUrl = extractViewerImageUrl();
+        navigateToNextPhoto();
+        extractionStats.carousel_nav_steps++;
+        steps++;
+
+        await sleep(CONFIG.CAROUSEL_CRAWL_NAV_DELAY_MS);
+
+        // Check if viewer is still open (may have closed at end of gallery)
+        if (!findPhotoViewerOverlay()) {
+          log(`Carousel: viewer closed after ${steps} steps (end of gallery).`);
+          break;
+        }
+
+        const currentUrl = extractViewerImageUrl();
+        if (!currentUrl) {
+          consecutiveDups++;
+          if (consecutiveDups >= 3) {
+            log('Carousel: 3 consecutive null images, stopping.');
+            break;
+          }
+          continue;
+        }
+
+        const currentKey = urlPathKey(currentUrl);
+
+        // Dedup loop detection: if we've seen this image before, we've looped
+        if (seenKeys.has(currentKey)) {
+          consecutiveDups++;
+          if (consecutiveDups >= 2) {
+            log(`Carousel: loop detected after ${steps} steps (${seenKeys.size} unique images).`);
+            break;
+          }
+          continue;
+        }
+
+        consecutiveDups = 0;
+        seenKeys.add(currentKey);
+
+        if (!existingKeys.has(currentKey)) {
+          existingKeys.add(currentKey);
+          discoveredUrls.push(currentUrl);
+          extractionStats.carousel_photos_captured++;
+        }
+      }
+
+      if (steps >= CONFIG.CAROUSEL_CRAWL_MAX_PHOTOS) {
+        log(`Carousel: hit max photo cap (${CONFIG.CAROUSEL_CRAWL_MAX_PHOTOS}).`);
+      }
+    } catch (err) {
+      warn('Carousel crawl error:', err.message || err);
+      extractionStats.carousel_errors++;
+    } finally {
+      // Close the viewer and restore scroll position
+      closePhotoViewer();
+      await sleep(CONFIG.CAROUSEL_CRAWL_CLOSE_WAIT_MS);
+      // Double-check viewer is closed
+      if (findPhotoViewerOverlay()) {
+        closePhotoViewer();
+        await sleep(300);
+      }
+      window.scrollTo(0, savedScrollY);
+    }
+
+    if (discoveredUrls.length > 0) {
+      log(`Carousel crawl: ${discoveredUrls.length} new photo(s) from ${seenKeys.size} total in viewer.`);
+    }
+
+    return discoveredUrls;
+  }
+
   /* ────────── post discovery ────────── */
 
   /**
@@ -799,9 +1064,14 @@
     see_more_expanded: 0,
     hidden_photos_discovered: 0,
     hidden_photo_fetch_failures: 0,
+    carousel_posts_crawled: 0,
+    carousel_photos_captured: 0,
+    carousel_nav_steps: 0,
+    carousel_errors: 0,
     discovery_method: 'unknown',
     end_of_feed_detected: false,
     end_of_feed_reason: '',
+    scroll_hard_stop_idle_count: 0,
   };
 
   async function scanCurrentPosts() {
@@ -827,10 +1097,14 @@
       // Attempt gallery crawl to discover hidden photos beyond visible thumbnails
       const hiddenPhotos = await resolveHiddenPhotos(article, inlinePhotos);
 
-      // Merge inline + hidden photos, deduplicate by URL path key
+      // Attempt carousel crawl (interactive photo viewer) for additional photos
+      const allKnownSoFar = [...inlinePhotos, ...hiddenPhotos];
+      const carouselPhotos = await crawlCarousel(article, allKnownSoFar);
+
+      // Merge inline + hidden + carousel photos, deduplicate by URL path key
       const mergedSeen = new Set();
       const photos = [];
-      for (const url of [...inlinePhotos, ...hiddenPhotos]) {
+      for (const url of [...inlinePhotos, ...hiddenPhotos, ...carouselPhotos]) {
         const key2 = urlPathKey(url);
         if (!mergedSeen.has(key2)) {
           mergedSeen.add(key2);
@@ -856,7 +1130,7 @@
       if (permalink) extractionStats.posts_with_permalink++;
       if (timestamp) extractionStats.posts_with_timestamp++;
 
-      log(`Found post #${collectedPosts.size}: ${permalink || '(no link)'} [${photos.length} images (${hiddenPhotos.length} hidden), text=${text ? text.length + 'ch' : 'none'}]`);
+      log(`Found post #${collectedPosts.size}: ${permalink || '(no link)'} [${photos.length} images (${hiddenPhotos.length} hidden, ${carouselPhotos.length} carousel), text=${text ? text.length + 'ch' : 'none'}]`);
     }
     return newCount;
   }
@@ -898,6 +1172,10 @@
     let prevTailSig = '';            // previous tail signature for re-observation check
     let tailSigRepeatCount = 0;      // how many times we've seen the same tail signature
 
+    // ── Deterministic hard-stop: consecutive scroll cycles with zero new posts ──
+    let zeroNewPostCycles = 0;       // increments every scroll cycle with no new unique posts
+    let lastPostCount = collectedPosts.size;
+
     while (attempts < CONFIG.MAX_SCROLL_ATTEMPTS) {
       attempts++;
       window.scrollBy(0, CONFIG.SCROLL_STEP_PX);
@@ -918,8 +1196,29 @@
         prevSize = currSize;
       }
 
+      // ── Deterministic hard-stop counter ──
+      // Track consecutive scroll cycles that produce zero new unique post keys.
+      // This is independent of the multi-signal EOF detection and guarantees
+      // termination even if other signals (e.g. atBottom) are unreliable.
+      if (currSize > lastPostCount) {
+        zeroNewPostCycles = 0;
+        lastPostCount = currSize;
+      } else {
+        zeroNewPostCycles++;
+      }
+
+      if (zeroNewPostCycles >= CONFIG.EOF_HARD_STOP_IDLE_CYCLES) {
+        const reason = `hard_stop_${zeroNewPostCycles}_idle_cycles`;
+        extractionStats.end_of_feed_detected = true;
+        extractionStats.end_of_feed_reason = reason;
+        extractionStats.scroll_hard_stop_idle_count = zeroNewPostCycles;
+        log(`Hard-stop: ${zeroNewPostCycles} consecutive scroll cycles with no new posts. Stopping.`);
+        statusFn(`End of feed (hard-stop) — ${currSize} posts`);
+        break;
+      }
+
       statusFn(
-        `Scrolling… ${currSize} posts (scroll ${attempts}, idle ${idleCount})`
+        `Scrolling… ${currSize} posts (scroll ${attempts}, idle ${idleCount}, noNewPost ${zeroNewPostCycles}/${CONFIG.EOF_HARD_STOP_IDLE_CYCLES})`
       );
 
       // ── End-of-feed signal evaluation ──
@@ -997,6 +1296,8 @@
             idleCount = 0;
             eofCycleCount = 0;
             tailSigRepeatCount = 0;
+            zeroNewPostCycles = 0;
+            lastPostCount = afterSize;
             prevHeight = afterHeight;
             prevSize = afterSize;
           } else {
@@ -1015,7 +1316,7 @@
     }
 
     log(
-      `Scrolling complete. ${attempts} scrolls, ${collectedPosts.size} posts collected, eof=${extractionStats.end_of_feed_detected}, retries left=${retryBudget}`
+      `Scrolling complete. ${attempts} scrolls, ${collectedPosts.size} posts collected, eof=${extractionStats.end_of_feed_detected} (reason=${extractionStats.end_of_feed_reason}), retries left=${retryBudget}, zeroNewPost=${zeroNewPostCycles}`
     );
   }
 
@@ -1437,6 +1738,7 @@ Edit the `CONFIG` block at the top of the script:
 | `EOF_CONSECUTIVE_CYCLES` | `3` | All end-of-feed signals must hold for this many consecutive cycles before stopping |
 | `EOF_TAIL_SIGNATURE_COUNT` | `5` | Number of tail post keys tracked for re-observation detection |
 | `EOF_BOTTOM_PROBE_COUNT` | `2` | `scrollTo(bottom)` probes per cycle to confirm viewport is at document bottom |
+| `EOF_HARD_STOP_IDLE_CYCLES` | `5` | Deterministic hard-stop: if this many consecutive scroll cycles produce zero new unique posts, scrolling stops unconditionally |
 
 ### Photo Download
 
@@ -1457,6 +1759,16 @@ Edit the `CONFIG` block at the top of the script:
 | `GALLERY_CRAWL_DELAY_MS` | `800` | Rate-limit delay between gallery page fetches (to avoid Facebook blocks) |
 | `GALLERY_CRAWL_MAX_PAGES_PER_POST` | `10` | Max gallery pages to visit per post (each page typically reveals one photo + link to the next) |
 
+### Carousel (Interactive Photo Viewer) Crawl
+
+| Key | Default | Description |
+|-----|---------|-------------|
+| `CAROUSEL_CRAWL_ENABLED` | `true` | Open Facebook's photo viewer and navigate through the full carousel to capture all images |
+| `CAROUSEL_CRAWL_MAX_PHOTOS` | `100` | Max images to capture per carousel session |
+| `CAROUSEL_CRAWL_NAV_DELAY_MS` | `600` | Delay between carousel navigation steps |
+| `CAROUSEL_CRAWL_OPEN_WAIT_MS` | `1200` | Wait for photo viewer overlay to appear after clicking a photo |
+| `CAROUSEL_CRAWL_CLOSE_WAIT_MS` | `500` | Wait after closing viewer before resuming |
+
 ### Other
 
 | Key | Default | Description |
@@ -1468,7 +1780,8 @@ Edit the `CONFIG` block at the top of the script:
 1. **Height + post-count tracking** — after each scroll, it checks whether `scrollHeight` grew and whether new posts appeared.
 2. **Idle counter** — if neither metric grew for `IDLE_THRESHOLD` consecutive scrolls, end-of-feed evaluation begins and **retry bursts** fire.
 3. **Retry budget** — up to `RETRY_BURSTS` bursts. If a burst finds new content, normal scrolling resumes and all EOF counters reset.
-4. **Safety cap** — `MAX_SCROLL_ATTEMPTS` is the hard ceiling.
+4. **Deterministic hard-stop** — independently of the multi-signal EOF detection, a simple counter tracks consecutive scroll cycles that produce zero new unique posts. If `EOF_HARD_STOP_IDLE_CYCLES` (default: 5) consecutive cycles yield no new posts, scrolling stops unconditionally. This prevents infinite scrolling when other EOF signals are unreliable.
+5. **Safety cap** — `MAX_SCROLL_ATTEMPTS` is the hard ceiling.
 
 ### End-of-Feed Detection
 
@@ -1561,7 +1874,7 @@ Multi-photo Facebook posts often show only 1–5 thumbnails in the feed, with ad
 - **HTML structure changes** — Facebook's photo page HTML structure may change, causing gallery parsing to miss URLs. Check `extraction_stats.hidden_photo_fetch_failures` for failures.
 - **Requires `@connect www.facebook.com`** — the userscript header includes this grant to allow fetching Facebook gallery pages via `GM_xmlhttpRequest`.
 
-### Extraction Stats
+### Extraction Stats (Gallery Crawl)
 
 The JSON output includes two additional counters in `extraction_stats`:
 
@@ -1569,6 +1882,44 @@ The JSON output includes two additional counters in `extraction_stats`:
 |---------|-------------|
 | `hidden_photos_discovered` | Total number of photos found via gallery crawl that were not visible as inline thumbnails |
 | `hidden_photo_fetch_failures` | Number of gallery page fetches that failed (timeout, network error, HTTP error) |
+
+## Carousel (Interactive Photo Viewer) Crawl
+
+In addition to the HTML-based gallery crawl, the script can open Facebook's interactive photo viewer and navigate through the full carousel to capture every image — including those that the HTML-based approach may miss.
+
+### How It Works
+
+1. **Photo link click** — for each post with photo links, the script clicks the first photo to open Facebook's full-screen photo viewer overlay.
+2. **Image capture** — the currently displayed high-resolution image is extracted from the viewer DOM.
+3. **Navigation** — the script clicks the "next" arrow button (or dispatches the "j" keyboard shortcut) to advance through the carousel.
+4. **Loop detection** — if a previously-seen image URL reappears, the carousel has looped and navigation stops.
+5. **Merge + dedupe** — carousel photos are merged with inline and gallery-crawl photos, deduplicated by URL path key.
+6. **Cleanup** — the viewer is closed (Escape key) and the scroll position is restored.
+
+### Detection Strategy (Resilient to DOM Changes)
+
+The photo viewer overlay is detected using a multi-strategy approach that doesn't rely on localized aria-labels:
+
+- `role="dialog"` containers with fbcdn images
+- `data-pagelet` containers with "Media" or "Photo" in the name
+- Fixed/absolute positioned containers with large (>400px) fbcdn images
+- Next button: right-side `role="button"` elements containing SVG icons
+- Fallback: "j" keyboard shortcut (Facebook's built-in photo viewer navigation)
+
+### Extraction Stats (Carousel)
+
+| Counter | Description |
+|---------|-------------|
+| `carousel_posts_crawled` | Number of posts where the carousel viewer was opened |
+| `carousel_photos_captured` | Total new photos captured via carousel navigation |
+| `carousel_nav_steps` | Total navigation steps taken across all carousels |
+| `carousel_errors` | Number of carousel crawl failures (viewer didn't open, etc.) |
+
+### Scroll Termination Stats
+
+| Counter | Description |
+|---------|-------------|
+| `scroll_hard_stop_idle_count` | Number of consecutive zero-new-post cycles at termination (if hard-stop triggered) |
 
 ## Output Files
 
@@ -1591,9 +1942,14 @@ The JSON output includes two additional counters in `extraction_stats`:
       "see_more_expanded": 12,
       "hidden_photos_discovered": 23,
       "hidden_photo_fetch_failures": 0,
+      "carousel_posts_crawled": 8,
+      "carousel_photos_captured": 15,
+      "carousel_nav_steps": 47,
+      "carousel_errors": 0,
       "discovery_method": "data-virtualized",
       "end_of_feed_detected": true,
-      "end_of_feed_reason": "no_post_growth+no_height_growth+viewport_at_bottom+tail_signature_repeated_3x"
+      "end_of_feed_reason": "hard_stop_5_idle_cycles",
+      "scroll_hard_stop_idle_count": 5
     }
   },
   "posts": [
@@ -1677,5 +2033,4 @@ The primary `data-virtualized` selector didn't match. The script fell back to `r
 - **Large exports** — for groups with thousands of posts, increase `MAX_SCROLL_ATTEMPTS`. The scroll phase may take several minutes.
 - **Photo CORS** — `GM_xmlhttpRequest` bypasses browser CORS, but Facebook may rate-limit image fetches.
 - **Read-only** — the script never performs any write actions.
-
 ```
