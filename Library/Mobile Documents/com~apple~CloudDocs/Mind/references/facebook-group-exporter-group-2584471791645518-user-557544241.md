@@ -1,11 +1,10 @@
 # Facebook Group Post Exporter Script (User-in-Group URL Mode)
 
-- Last updated: 2026-04-15 07:45:00
+- Last updated: 2026-04-15
 - Source script: `~/klaw-workspace/tmp/facebook-userscripts/export-group-posts-by-user.user.js`
 - Source README: `~/klaw-workspace/tmp/facebook-userscripts/README.md`
-- Commit: `7c77c89`
-- Version: v3.6.0
-- Patch note: v3.6.0 — enhanced carousel robustness (multi-language close/next buttons, position-sorted nav), dual-signal hard-stop (DOM nodes + unique keys), validation summary logging
+- Version: v3.7.0
+- Patch note: v3.7.0 — fixed carousel traversal: SVG path fingerprint for next-button, strict viewer scoping (no random link clicks), robust stop conditions (loop-to-start, missing control, max cap), carousel control debug stats
 
 ## Script
 
@@ -13,7 +12,7 @@
 // ==UserScript==
 // @name         FB Group Posts Export by User
 // @namespace    https://github.com/kenneth-bot/klaw-workspace
-// @version      3.6.0
+// @version      3.7.0
 // @description  Export posts from a Facebook group user page (/groups/<gid>/user/<uid>) as JSON + photo ZIP. URL-driven, no hardcoded IDs.
 // @author       Kenneth
 // @match        https://www.facebook.com/groups/*/user/*
@@ -825,69 +824,133 @@
   }
 
   /**
+   * SVG path fingerprint for Facebook's carousel "next" arrow.
+   * The path data starts with this prefix — used to positively identify
+   * the correct next-image control inside the photo viewer overlay.
+   */
+  const NEXT_ARROW_PATH_PREFIX = 'M8.116 3.116a1.25 1.25 0 0 1 1.768 0';
+
+  /**
+   * Check if an element is visible, enabled, and interactable.
+   */
+  function isVisibleAndEnabled(el) {
+    if (!el) return false;
+    const style = window.getComputedStyle(el);
+    if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') return false;
+    if (el.disabled || el.getAttribute('aria-disabled') === 'true') return false;
+    const rect = el.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) return false;
+    return true;
+  }
+
+  /**
    * Find the "next" navigation element in the photo viewer.
-   * Facebook uses SVG arrow buttons with role="button".
-   * We avoid relying on localized aria-labels by looking for:
-   * 1. Buttons positioned on the right side of the viewer
-   * 2. SVG chevron/arrow shapes pointing right
-   * 3. Keyboard shortcut "j" dispatched as a DOM event
+   *
+   * SCOPED: only searches inside the active lightbox/dialog container.
+   * Never returns generic page links or anchors outside the viewer.
+   *
+   * Strategy chain (most specific → least):
+   * 1. SVG path fingerprint — match descendant svg > path whose d attribute
+   *    starts with the known next-arrow prefix, then climb to clickable ancestor.
+   * 2. Position-based — right-side role="button" with SVG, inside viewer,
+   *    vertically centered.
+   * 3. Aria-label fallback — multi-language "next" patterns.
+   *
+   * All candidates must be visible, enabled, and inside the viewer container.
+   *
+   * Returns { btn, strategy } or null.
    */
   function findNextButton() {
     const viewer = findPhotoViewerOverlay();
     if (!viewer) return null;
     const container = viewer.container;
+    carouselDebug.next_selector_attempts++;
 
-    // Strategy 1: right-side SVG buttons (position-based, locale-independent)
-    const buttons = container.querySelectorAll('[role="button"]');
+    // ── Strategy 1: SVG path fingerprint (most reliable) ──
+    const allPaths = container.querySelectorAll('svg path[d]');
+    for (const pathEl of allPaths) {
+      const d = pathEl.getAttribute('d') || '';
+      if (d.startsWith(NEXT_ARROW_PATH_PREFIX)) {
+        // Climb from <path> → <svg> → clickable ancestor (button/[role="button"]/a)
+        let candidate = pathEl.closest('[role="button"], button, a');
+        if (!candidate) {
+          // Try the SVG's parent chain
+          candidate = pathEl.closest('svg');
+          if (candidate) candidate = candidate.closest('[role="button"], button, a');
+        }
+        if (candidate && container.contains(candidate) && isVisibleAndEnabled(candidate)) {
+          log('Carousel next: found via SVG path fingerprint.');
+          return { btn: candidate, strategy: 'svg_path_fingerprint' };
+        }
+        carouselDebug.rejected_next_candidates++;
+      }
+    }
+
+    // ── Strategy 2: viewBox="0 0 24 24" SVGs inside right-side buttons ──
+    const buttons = container.querySelectorAll('[role="button"], button');
     const viewerRect = container.getBoundingClientRect();
     const midX = viewerRect.left + viewerRect.width / 2;
     const midY = viewerRect.top + viewerRect.height / 2;
 
     const rightButtons = [];
     for (const btn of buttons) {
-      const svg = btn.querySelector('svg');
+      if (!container.contains(btn)) continue;
+      if (!isVisibleAndEnabled(btn)) { carouselDebug.rejected_next_candidates++; continue; }
+      const svg = btn.querySelector('svg[viewBox="0 0 24 24"]') || btn.querySelector('svg');
       if (!svg) continue;
       const btnRect = btn.getBoundingClientRect();
-      // Right half, vertically near center, reasonable icon size
+      // Must be in right half, vertically near center, reasonable icon size
       if (btnRect.left > midX && btnRect.height < 100 && btnRect.width < 100) {
-        // Prefer buttons closer to vertical center
         const distFromCenter = Math.abs((btnRect.top + btnRect.height / 2) - midY);
         rightButtons.push({ btn, distFromCenter });
+      } else {
+        carouselDebug.rejected_next_candidates++;
       }
     }
 
     if (rightButtons.length > 0) {
       rightButtons.sort((a, b) => a.distFromCenter - b.distFromCenter);
-      return rightButtons[0].btn;
+      log(`Carousel next: found via position (right-side, ${rightButtons.length} candidates).`);
+      return { btn: rightButtons[0].btn, strategy: 'position_right_side' };
     }
 
-    // Strategy 2: aria-label fallback (multi-language next patterns)
+    // ── Strategy 3: aria-label fallback (multi-language next patterns) ──
     const nextPatterns = /^(next|siguiente|suivant|n[äa]chste|avanti|berikutnya|tiếp|ถัดไป|التالي|अगला|次|다음|下一[个張]|next photo)$/i;
     for (const btn of buttons) {
+      if (!container.contains(btn)) continue;
+      if (!isVisibleAndEnabled(btn)) { carouselDebug.rejected_next_candidates++; continue; }
       const label = btn.getAttribute('aria-label') || '';
-      if (nextPatterns.test(label.trim())) return btn;
+      if (nextPatterns.test(label.trim())) {
+        log(`Carousel next: found via aria-label="${label.trim()}".`);
+        return { btn, strategy: 'aria_label' };
+      }
     }
 
+    log('Carousel next: no valid next button found in viewer.');
     return null;
   }
 
   /**
    * Navigate to the next photo in the viewer.
-   * Tries clicking the next button first, then falls back to keyboard "j".
-   * Returns true if navigation was attempted.
+   * Tries clicking the viewer-scoped next button first, then falls back
+   * to keyboard "j" (FB shortcut). Never clicks links outside the viewer.
+   *
+   * Returns { clicked: true/false, strategy: string } for validation logging.
    */
   function navigateToNextPhoto() {
-    const nextBtn = findNextButton();
-    if (nextBtn) {
-      nextBtn.click();
-      return true;
+    const result = findNextButton();
+    if (result) {
+      result.btn.click();
+      carouselDebug.next_clicks++;
+      return { clicked: true, strategy: result.strategy };
     }
 
     // Fallback: dispatch "j" key event (FB keyboard shortcut for next photo)
     document.dispatchEvent(new KeyboardEvent('keydown', {
       key: 'j', code: 'KeyJ', keyCode: 74, which: 74, bubbles: true,
     }));
-    return true;
+    carouselDebug.next_clicks++;
+    return { clicked: true, strategy: 'keyboard_j' };
   }
 
   /**
@@ -954,6 +1017,7 @@
     const existingKeys = new Set(existingUrls.map(urlPathKey));
     const discoveredUrls = [];
     const seenKeys = new Set();
+    const navLog = []; // per-step validation log
 
     // Remember scroll position to restore after
     const savedScrollY = window.scrollY;
@@ -974,12 +1038,13 @@
 
       extractionStats.carousel_posts_crawled++;
 
-      // Capture first image
+      // Capture first image (starting image for loop detection)
       const firstUrl = extractViewerImageUrl();
+      const startingKey = firstUrl ? urlPathKey(firstUrl) : null;
       if (firstUrl) {
-        const firstKey = urlPathKey(firstUrl);
-        seenKeys.add(firstKey);
-        if (!existingKeys.has(firstKey)) {
+        seenKeys.add(startingKey);
+        carouselDebug.carousel_images_collected++;
+        if (!existingKeys.has(startingKey)) {
           discoveredUrls.push(firstUrl);
           extractionStats.carousel_photos_captured++;
         }
@@ -987,48 +1052,106 @@
 
       // Navigate through carousel
       let steps = 0;
-      let consecutiveDups = 0;
+      let consecutiveNextMissing = 0; // next control missing/disabled counter
+      const MAX_NEXT_MISSING = 3;     // stop after N checks with no next control
 
       while (steps < CONFIG.CAROUSEL_CRAWL_MAX_PHOTOS) {
-        const prevUrl = extractViewerImageUrl();
-        navigateToNextPhoto();
+        // Attempt navigation — returns strategy info for validation
+        const navResult = navigateToNextPhoto();
         extractionStats.carousel_nav_steps++;
         steps++;
 
+        // Track strategy usage
+        if (navResult.strategy) {
+          carouselDebug.strategies_used[navResult.strategy] =
+            (carouselDebug.strategies_used[navResult.strategy] || 0) + 1;
+        }
+
+        // Validation log entry
+        const stepLog = {
+          step: steps,
+          strategy: navResult.strategy,
+          viewer_scoped: navResult.strategy !== 'keyboard_j',
+        };
+
         await sleep(CONFIG.CAROUSEL_CRAWL_NAV_DELAY_MS);
+
+        // Stop condition: next control missing/disabled for N checks
+        if (navResult.strategy === 'keyboard_j') {
+          // keyboard_j is a blind fallback — count as "next missing"
+          consecutiveNextMissing++;
+          if (consecutiveNextMissing >= MAX_NEXT_MISSING) {
+            log(`Carousel: next control missing/fallback for ${MAX_NEXT_MISSING} consecutive steps, stopping.`);
+            extractionStats.carousel_next_missing_stops++;
+            stepLog.stop_reason = 'next_control_missing';
+            navLog.push(stepLog);
+            break;
+          }
+        } else {
+          consecutiveNextMissing = 0;
+        }
 
         // Check if viewer is still open (may have closed at end of gallery)
         if (!findPhotoViewerOverlay()) {
           log(`Carousel: viewer closed after ${steps} steps (end of gallery).`);
           extractionStats.carousel_viewer_closed_naturally++;
+          stepLog.stop_reason = 'viewer_closed';
+          navLog.push(stepLog);
           break;
         }
 
         const currentUrl = extractViewerImageUrl();
+        stepLog.image_captured = !!currentUrl;
+
         if (!currentUrl) {
-          consecutiveDups++;
-          if (consecutiveDups >= 3) {
-            log('Carousel: 3 consecutive null images, stopping.');
-            break;
-          }
+          navLog.push(stepLog);
           continue;
         }
 
         const currentKey = urlPathKey(currentUrl);
 
-        // Dedup loop detection: if we've seen this image before, we've looped
+        // Stop condition: loop detected — image URL returns to already-seen image
         if (seenKeys.has(currentKey)) {
-          consecutiveDups++;
-          if (consecutiveDups >= 2) {
-            log(`Carousel: loop detected after ${steps} steps (${seenKeys.size} unique images).`);
+          // Immediate stop on loop back to starting image
+          if (currentKey === startingKey) {
+            log(`Carousel: loop complete — returned to starting image after ${steps} steps (${seenKeys.size} unique images).`);
             extractionStats.carousel_loop_detected++;
+            carouselDebug.loop_detected++;
+            stepLog.stop_reason = 'loop_to_start';
+            navLog.push(stepLog);
             break;
+          }
+          // Seen a non-starting duplicate — likely navigated backwards or FB glitch
+          // Allow one more try before stopping
+          stepLog.duplicate = true;
+          navLog.push(stepLog);
+          // Check one more step to confirm it's a real loop
+          const nextNavResult = navigateToNextPhoto();
+          extractionStats.carousel_nav_steps++;
+          steps++;
+          await sleep(CONFIG.CAROUSEL_CRAWL_NAV_DELAY_MS);
+          const retryUrl = extractViewerImageUrl();
+          const retryKey = retryUrl ? urlPathKey(retryUrl) : null;
+          if (!retryUrl || seenKeys.has(retryKey)) {
+            log(`Carousel: loop confirmed after ${steps} steps (${seenKeys.size} unique images).`);
+            extractionStats.carousel_loop_detected++;
+            carouselDebug.loop_detected++;
+            break;
+          }
+          // False alarm — continue with the new image
+          seenKeys.add(retryKey);
+          carouselDebug.carousel_images_collected++;
+          if (!existingKeys.has(retryKey)) {
+            existingKeys.add(retryKey);
+            discoveredUrls.push(retryUrl);
+            extractionStats.carousel_photos_captured++;
           }
           continue;
         }
 
-        consecutiveDups = 0;
         seenKeys.add(currentKey);
+        carouselDebug.carousel_images_collected++;
+        navLog.push(stepLog);
 
         if (!existingKeys.has(currentKey)) {
           existingKeys.add(currentKey);
@@ -1037,9 +1160,20 @@
         }
       }
 
+      // Stop condition: max step cap
       if (steps >= CONFIG.CAROUSEL_CRAWL_MAX_PHOTOS) {
         log(`Carousel: hit max photo cap (${CONFIG.CAROUSEL_CRAWL_MAX_PHOTOS}).`);
       }
+
+      // Validation summary — proves correctness of next-button selection
+      const strategyCounts = {};
+      for (const entry of navLog) {
+        strategyCounts[entry.strategy] = (strategyCounts[entry.strategy] || 0) + 1;
+      }
+      const viewerScopedClicks = navLog.filter((e) => e.viewer_scoped).length;
+      const fallbackClicks = navLog.filter((e) => !e.viewer_scoped).length;
+      log(`Carousel validation: ${steps} steps, ${seenKeys.size} unique images, ${viewerScopedClicks} viewer-scoped clicks, ${fallbackClicks} keyboard fallbacks, strategies=${JSON.stringify(strategyCounts)}`);
+
     } catch (err) {
       warn('Carousel crawl error:', err.message || err);
       extractionStats.carousel_errors++;
@@ -1114,12 +1248,23 @@
     carousel_errors: 0,
     carousel_loop_detected: 0,
     carousel_viewer_closed_naturally: 0,
+    carousel_next_missing_stops: 0,
     discovery_method: 'unknown',
     end_of_feed_detected: false,
     end_of_feed_reason: '',
     scroll_hard_stop_idle_count: 0,
     scroll_hard_stop_dom_idle_count: 0,
     scroll_total_cycles: 0,
+  };
+
+  // Carousel control selection debug counters — included in validation summary
+  const carouselDebug = {
+    next_selector_attempts: 0,
+    next_clicks: 0,
+    rejected_next_candidates: 0,
+    loop_detected: 0,
+    carousel_images_collected: 0,
+    strategies_used: {},  // { strategy_name: count }
   };
 
   async function scanCurrentPosts() {
@@ -1462,6 +1607,7 @@
         exported_at: new Date().toISOString(),
         post_count: posts.length,
         extraction_stats: { ...extractionStats },
+        carousel_control_debug: { ...carouselDebug },
       },
       posts,
     };
@@ -1645,6 +1791,7 @@
       unique_photo_urls: new Set(posts.flatMap((p) => (p.photos || []).map(urlPathKey))).size,
       duplicate_photo_urls_removed: posts.reduce((n, p) => n + (p.photos ? p.photos.length : 0), 0) - new Set(posts.flatMap((p) => (p.photos || []).map(urlPathKey))).size,
       stats: { ...extractionStats },
+      carousel_debug: { ...carouselDebug },
     };
     log('Validation summary:', JSON.stringify(validation, null, 2));
 
@@ -1965,21 +2112,39 @@ In addition to the HTML-based gallery crawl, the script can open Facebook's inte
 
 1. **Photo link click** — for each post with photo links, the script clicks the first photo to open Facebook's full-screen photo viewer overlay.
 2. **Image capture** — the currently displayed high-resolution image is extracted from the viewer DOM.
-3. **Navigation** — the script clicks the "next" arrow button (or dispatches the "j" keyboard shortcut) to advance through the carousel.
-4. **Loop detection** — if a previously-seen image URL reappears, the carousel has looped and navigation stops.
-5. **Merge + dedupe** — carousel photos are merged with inline and gallery-crawl photos, deduplicated by URL path key.
-6. **Cleanup** — the viewer is closed (Escape key) and the scroll position is restored.
+3. **Navigation** — the script clicks the true in-viewer "next" arrow control, scoped strictly inside the active lightbox dialog. It never clicks generic page links or anchors outside the viewer overlay.
+4. **Loop detection** — if the displayed image URL returns to the starting image (or any already-seen image persists after retry), the carousel has looped and navigation stops immediately.
+5. **Stop conditions** — traversal stops on: (a) loop back to starting image, (b) next control missing/disabled for 3 consecutive checks, (c) max step cap reached, (d) viewer closed naturally.
+6. **Merge + dedupe** — carousel photos are merged with inline and gallery-crawl photos, deduplicated by URL path key.
+7. **Cleanup** — the viewer is closed (Escape key with fallback to positional/aria-label close buttons) and the scroll position is restored.
 
-### Detection Strategy (Resilient to DOM Changes)
+### Next-Button Detection Strategy (v3.7.0)
 
-The photo viewer overlay is detected using a multi-strategy approach that doesn't rely on localized aria-labels:
+The next button is resolved using a strict chain that only returns controls inside the active photo viewer overlay. All candidates must be visible, enabled, and contained within the viewer container.
 
+| Priority | Strategy | How it works |
+|----------|----------|-------------|
+| 1 | **SVG path fingerprint** | Searches for `svg path[d]` whose `d` attribute starts with the known Facebook next-arrow prefix (`M8.116 3.116a1.25 1.25 0 0 1 1.768 0 ...`), then climbs to the nearest clickable ancestor (`[role="button"]`, `button`, or `a`). Most reliable — immune to locale changes. |
+| 2 | **Position-based** | Right-side `role="button"` or `<button>` with SVG (preferring `viewBox="0 0 24 24"`), position-sorted by vertical center proximity. Only considers the right half of the viewer. |
+| 3 | **Aria-label** | Multi-language next patterns (English, Spanish, French, German, Italian, Indonesian, Vietnamese, Thai, Arabic, Hindi, Japanese, Korean, Chinese). |
+| 4 | **Keyboard fallback** | Dispatches "j" keydown event (Facebook's built-in viewer shortcut). Used only when no clickable button is found. |
+
+Viewer overlay detection:
 - `role="dialog"` containers with fbcdn images
 - `data-pagelet` containers with "Media" or "Photo" in the name
 - Fixed/absolute positioned containers with large (>400px) fbcdn images
-- Next button: right-side `role="button"` with SVG (position-sorted by vertical center proximity), then multi-language aria-label fallback (English, Spanish, French, German, Italian, Indonesian, Vietnamese, Thai, Arabic, Hindi, Japanese, Korean, Chinese)
-- Fallback: "j" keyboard shortcut (Facebook's built-in photo viewer navigation)
-- Close button: Escape key (primary), then top-corner SVG button by position, then multi-language aria-label close/back patterns
+
+Close button: Escape key (primary), then top-corner SVG button by position, then multi-language aria-label close/back patterns.
+
+### Carousel Validation Logging
+
+Each carousel crawl emits a validation summary to the console showing:
+- Total steps and unique images collected
+- Viewer-scoped clicks vs keyboard fallbacks
+- Per-strategy click counts (e.g., `{"svg_path_fingerprint": 12, "keyboard_j": 0}`)
+- Stop reason (loop_to_start, viewer_closed, next_control_missing, max_cap)
+
+The `carousel_control_debug` object in the JSON output provides aggregate counters across all carousel sessions.
 
 ### Extraction Stats (Carousel)
 
@@ -1991,6 +2156,18 @@ The photo viewer overlay is detected using a multi-strategy approach that doesn'
 | `carousel_errors` | Number of carousel crawl failures (viewer didn't open, etc.) |
 | `carousel_loop_detected` | Number of carousels that ended due to loop detection (revisited image) |
 | `carousel_viewer_closed_naturally` | Number of carousels that ended because the viewer closed at end of gallery |
+| `carousel_next_missing_stops` | Number of carousels that stopped because the next control was missing for 3 consecutive checks |
+
+### Carousel Control Debug Stats
+
+| Counter | Description |
+|---------|-------------|
+| `next_selector_attempts` | Total calls to `findNextButton()` |
+| `next_clicks` | Total successful next-button clicks (any strategy) |
+| `rejected_next_candidates` | DOM elements considered but rejected (invisible, disabled, outside viewer, wrong position) |
+| `loop_detected` | Carousel loops detected (image URL returned to already-seen) |
+| `carousel_images_collected` | Total unique images captured across all carousels |
+| `strategies_used` | Object mapping strategy names to click counts |
 
 ### Scroll Termination Stats
 
