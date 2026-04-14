@@ -3,8 +3,8 @@
 - Last updated: 2026-04-15
 - Source script: `~/klaw-workspace/tmp/facebook-userscripts/export-group-posts-by-user.user.js`
 - Source README: `~/klaw-workspace/tmp/facebook-userscripts/README.md`
-- Version: v3.7.0
-- Patch note: v3.7.0 — fixed carousel traversal: SVG path fingerprint for next-button, strict viewer scoping (no random link clicks), robust stop conditions (loop-to-start, missing control, max cap), carousel control debug stats
+- Version: v3.8.0
+- Patch note: v3.8.0 — carousel lazy-load resilience: per-slide readiness wait loop with bounded polling, consecutive-pending threshold instead of immediate skip, recovered-after-pending tracking, new debug stats (image_ready_wait_ms_total, image_ready_timeouts, consecutive_pending_hits, recovered_after_pending)
 
 ## Script
 
@@ -12,7 +12,7 @@
 // ==UserScript==
 // @name         FB Group Posts Export by User
 // @namespace    https://github.com/kenneth-bot/klaw-workspace
-// @version      3.7.0
+// @version      3.8.0
 // @description  Export posts from a Facebook group user page (/groups/<gid>/user/<uid>) as JSON + photo ZIP. URL-driven, no hardcoded IDs.
 // @author       Kenneth
 // @match        https://www.facebook.com/groups/*/user/*
@@ -65,6 +65,9 @@
     CAROUSEL_CRAWL_NAV_DELAY_MS: 600,      // Delay between carousel navigation steps
     CAROUSEL_CRAWL_OPEN_WAIT_MS: 1200,     // Wait for photo viewer overlay to appear after click
     CAROUSEL_CRAWL_CLOSE_WAIT_MS: 500,     // Wait after closing viewer before resuming
+    CAROUSEL_CRAWL_IMAGE_READY_POLL_MS: 200,       // Polling interval when waiting for lazy-loaded image to become ready
+    CAROUSEL_CRAWL_IMAGE_READY_TIMEOUT_MS: 3000,   // Max wait per slide for image src to populate
+    CAROUSEL_CRAWL_MAX_CONSECUTIVE_PENDING: 3,      // Max consecutive unresolved lazy-loads before treating as failure
 
     DRY_RUN: false,
   };
@@ -824,6 +827,37 @@
   }
 
   /**
+   * Wait for the currently displayed viewer image to become ready (non-empty,
+   * high-res src). Handles lazy-loading where src/srcset may not be populated
+   * immediately after navigation.
+   *
+   * @returns {{ url: string|null, waited_ms: number, timed_out: boolean }}
+   */
+  async function waitForImageReady() {
+    const pollMs = CONFIG.CAROUSEL_CRAWL_IMAGE_READY_POLL_MS;
+    const timeoutMs = CONFIG.CAROUSEL_CRAWL_IMAGE_READY_TIMEOUT_MS;
+    let elapsed = 0;
+
+    // First check — image might already be ready
+    let url = extractViewerImageUrl();
+    if (url) return { url, waited_ms: 0, timed_out: false };
+
+    // Poll until ready or timeout
+    while (elapsed < timeoutMs) {
+      await sleep(pollMs);
+      elapsed += pollMs;
+      url = extractViewerImageUrl();
+      if (url) {
+        log(`Carousel: image became ready after ${elapsed}ms wait.`);
+        return { url, waited_ms: elapsed, timed_out: false };
+      }
+    }
+
+    log(`Carousel: image not ready after ${timeoutMs}ms, treating as pending.`);
+    return { url: null, waited_ms: elapsed, timed_out: true };
+  }
+
+  /**
    * SVG path fingerprint for Facebook's carousel "next" arrow.
    * The path data starts with this prefix — used to positively identify
    * the correct next-image control inside the photo viewer overlay.
@@ -1039,7 +1073,11 @@
       extractionStats.carousel_posts_crawled++;
 
       // Capture first image (starting image for loop detection)
-      const firstUrl = extractViewerImageUrl();
+      // Use readiness wait to handle lazy-loaded first frame
+      const firstReady = await waitForImageReady();
+      carouselDebug.image_ready_wait_ms_total += firstReady.waited_ms;
+      if (firstReady.timed_out) carouselDebug.image_ready_timeouts++;
+      const firstUrl = firstReady.url;
       const startingKey = firstUrl ? urlPathKey(firstUrl) : null;
       if (firstUrl) {
         seenKeys.add(startingKey);
@@ -1053,6 +1091,8 @@
       // Navigate through carousel
       let steps = 0;
       let consecutiveNextMissing = 0; // next control missing/disabled counter
+      let consecutivePending = 0;     // consecutive lazy-load timeouts
+      let maxConsecutivePending = 0;  // high-water mark for debug
       const MAX_NEXT_MISSING = 3;     // stop after N checks with no next control
 
       while (steps < CONFIG.CAROUSEL_CRAWL_MAX_PHOTOS) {
@@ -1100,13 +1140,42 @@
           break;
         }
 
-        const currentUrl = extractViewerImageUrl();
+        // Wait for image readiness (handles lazy-loading)
+        const readyResult = await waitForImageReady();
+        carouselDebug.image_ready_wait_ms_total += readyResult.waited_ms;
+        stepLog.image_ready_wait_ms = readyResult.waited_ms;
+
+        const currentUrl = readyResult.url;
         stepLog.image_captured = !!currentUrl;
 
         if (!currentUrl) {
+          // Image still not ready after timeout — track as pending
+          carouselDebug.image_ready_timeouts++;
+          consecutivePending++;
+          if (consecutivePending > maxConsecutivePending) {
+            maxConsecutivePending = consecutivePending;
+          }
+          stepLog.pending = true;
           navLog.push(stepLog);
+
+          // Only stop after exceeding consecutive pending threshold
+          if (consecutivePending >= CONFIG.CAROUSEL_CRAWL_MAX_CONSECUTIVE_PENDING) {
+            log(`Carousel: ${consecutivePending} consecutive images not ready (lazy-load timeout), stopping.`);
+            extractionStats.carousel_lazy_load_stops =
+              (extractionStats.carousel_lazy_load_stops || 0) + 1;
+            stepLog.stop_reason = 'consecutive_pending_exceeded';
+            break;
+          }
+          // Do NOT stop — allow more attempts
           continue;
         }
+
+        // Image resolved — reset pending counter (and track recovery)
+        if (consecutivePending > 0) {
+          carouselDebug.recovered_after_pending++;
+          log(`Carousel: recovered after ${consecutivePending} pending frame(s).`);
+        }
+        consecutivePending = 0;
 
         const currentKey = urlPathKey(currentUrl);
 
@@ -1130,7 +1199,10 @@
           extractionStats.carousel_nav_steps++;
           steps++;
           await sleep(CONFIG.CAROUSEL_CRAWL_NAV_DELAY_MS);
-          const retryUrl = extractViewerImageUrl();
+          const retryReady = await waitForImageReady();
+          carouselDebug.image_ready_wait_ms_total += retryReady.waited_ms;
+          if (retryReady.timed_out) carouselDebug.image_ready_timeouts++;
+          const retryUrl = retryReady.url;
           const retryKey = retryUrl ? urlPathKey(retryUrl) : null;
           if (!retryUrl || seenKeys.has(retryKey)) {
             log(`Carousel: loop confirmed after ${steps} steps (${seenKeys.size} unique images).`);
@@ -1160,6 +1232,14 @@
         }
       }
 
+      // Update high-water mark for consecutive pending
+      if (maxConsecutivePending > 0) {
+        carouselDebug.consecutive_pending_hits = Math.max(
+          carouselDebug.consecutive_pending_hits || 0,
+          maxConsecutivePending
+        );
+      }
+
       // Stop condition: max step cap
       if (steps >= CONFIG.CAROUSEL_CRAWL_MAX_PHOTOS) {
         log(`Carousel: hit max photo cap (${CONFIG.CAROUSEL_CRAWL_MAX_PHOTOS}).`);
@@ -1172,7 +1252,9 @@
       }
       const viewerScopedClicks = navLog.filter((e) => e.viewer_scoped).length;
       const fallbackClicks = navLog.filter((e) => !e.viewer_scoped).length;
-      log(`Carousel validation: ${steps} steps, ${seenKeys.size} unique images, ${viewerScopedClicks} viewer-scoped clicks, ${fallbackClicks} keyboard fallbacks, strategies=${JSON.stringify(strategyCounts)}`);
+      const pendingSteps = navLog.filter((e) => e.pending).length;
+      const totalWaitMs = navLog.reduce((sum, e) => sum + (e.image_ready_wait_ms || 0), 0);
+      log(`Carousel validation: ${steps} steps, ${seenKeys.size} unique images, ${viewerScopedClicks} viewer-scoped clicks, ${fallbackClicks} keyboard fallbacks, ${pendingSteps} lazy-load waits (${totalWaitMs}ms total), recoveries=${carouselDebug.recovered_after_pending}, strategies=${JSON.stringify(strategyCounts)}`);
 
     } catch (err) {
       warn('Carousel crawl error:', err.message || err);
@@ -1249,6 +1331,7 @@
     carousel_loop_detected: 0,
     carousel_viewer_closed_naturally: 0,
     carousel_next_missing_stops: 0,
+    carousel_lazy_load_stops: 0,
     discovery_method: 'unknown',
     end_of_feed_detected: false,
     end_of_feed_reason: '',
@@ -1265,6 +1348,10 @@
     loop_detected: 0,
     carousel_images_collected: 0,
     strategies_used: {},  // { strategy_name: count }
+    image_ready_wait_ms_total: 0,
+    image_ready_timeouts: 0,
+    consecutive_pending_hits: 0,   // high-water mark of consecutive pending frames
+    recovered_after_pending: 0,
   };
 
   async function scanCurrentPosts() {
@@ -1989,6 +2076,9 @@ Edit the `CONFIG` block at the top of the script:
 | `CAROUSEL_CRAWL_NAV_DELAY_MS` | `600` | Delay between carousel navigation steps |
 | `CAROUSEL_CRAWL_OPEN_WAIT_MS` | `1200` | Wait for photo viewer overlay to appear after clicking a photo |
 | `CAROUSEL_CRAWL_CLOSE_WAIT_MS` | `500` | Wait after closing viewer before resuming |
+| `CAROUSEL_CRAWL_IMAGE_READY_POLL_MS` | `200` | Polling interval when waiting for a lazy-loaded carousel image to become ready |
+| `CAROUSEL_CRAWL_IMAGE_READY_TIMEOUT_MS` | `3000` | Max wait per slide for image src/srcset to populate (bounded retry) |
+| `CAROUSEL_CRAWL_MAX_CONSECUTIVE_PENDING` | `3` | Max consecutive slides that time out before treating as carousel failure (allows recovery from transient lazy-load delays) |
 
 ### Other
 
@@ -2111,12 +2201,13 @@ In addition to the HTML-based gallery crawl, the script can open Facebook's inte
 ### How It Works
 
 1. **Photo link click** — for each post with photo links, the script clicks the first photo to open Facebook's full-screen photo viewer overlay.
-2. **Image capture** — the currently displayed high-resolution image is extracted from the viewer DOM.
+2. **Image capture with readiness wait** — after opening the viewer and after each navigation step, the script polls for the displayed image URL to become non-empty/high-res. This handles lazy-loaded images whose `src`/`srcset` is not populated immediately. Polling uses a bounded retry loop (`CAROUSEL_CRAWL_IMAGE_READY_POLL_MS` interval, `CAROUSEL_CRAWL_IMAGE_READY_TIMEOUT_MS` max wait).
 3. **Navigation** — the script clicks the true in-viewer "next" arrow control, scoped strictly inside the active lightbox dialog. It never clicks generic page links or anchors outside the viewer overlay.
-4. **Loop detection** — if the displayed image URL returns to the starting image (or any already-seen image persists after retry), the carousel has looped and navigation stops immediately.
-5. **Stop conditions** — traversal stops on: (a) loop back to starting image, (b) next control missing/disabled for 3 consecutive checks, (c) max step cap reached, (d) viewer closed naturally.
-6. **Merge + dedupe** — carousel photos are merged with inline and gallery-crawl photos, deduplicated by URL path key.
-7. **Cleanup** — the viewer is closed (Escape key with fallback to positional/aria-label close buttons) and the scroll position is restored.
+4. **Lazy-load resilience** — if an image times out (still not ready after the bounded wait), the slide is marked as "pending" but traversal continues. Only after `CAROUSEL_CRAWL_MAX_CONSECUTIVE_PENDING` consecutive unresolved slides does the carousel stop. If a later image resolves successfully, the pending counter resets and a recovery event is logged.
+5. **Loop detection** — if the displayed image URL returns to the starting image (or any already-seen image persists after retry), the carousel has looped and navigation stops immediately.
+6. **Stop conditions** — traversal stops on: (a) loop back to starting image, (b) next control missing/disabled for 3 consecutive checks, (c) max step cap reached, (d) viewer closed naturally, (e) consecutive lazy-load timeout threshold exceeded.
+7. **Merge + dedupe** — carousel photos are merged with inline and gallery-crawl photos, deduplicated by URL path key.
+8. **Cleanup** — the viewer is closed (Escape key with fallback to positional/aria-label close buttons) and the scroll position is restored.
 
 ### Next-Button Detection Strategy (v3.7.0)
 
@@ -2141,8 +2232,10 @@ Close button: Escape key (primary), then top-corner SVG button by position, then
 Each carousel crawl emits a validation summary to the console showing:
 - Total steps and unique images collected
 - Viewer-scoped clicks vs keyboard fallbacks
+- Lazy-load wait count and total wait time in milliseconds
+- Recovery count (times traversal recovered after pending frames)
 - Per-strategy click counts (e.g., `{"svg_path_fingerprint": 12, "keyboard_j": 0}`)
-- Stop reason (loop_to_start, viewer_closed, next_control_missing, max_cap)
+- Stop reason (loop_to_start, viewer_closed, next_control_missing, consecutive_pending_exceeded, max_cap)
 
 The `carousel_control_debug` object in the JSON output provides aggregate counters across all carousel sessions.
 
@@ -2157,6 +2250,7 @@ The `carousel_control_debug` object in the JSON output provides aggregate counte
 | `carousel_loop_detected` | Number of carousels that ended due to loop detection (revisited image) |
 | `carousel_viewer_closed_naturally` | Number of carousels that ended because the viewer closed at end of gallery |
 | `carousel_next_missing_stops` | Number of carousels that stopped because the next control was missing for 3 consecutive checks |
+| `carousel_lazy_load_stops` | Number of carousels that stopped because consecutive lazy-load timeouts exceeded the threshold |
 
 ### Carousel Control Debug Stats
 
@@ -2168,6 +2262,10 @@ The `carousel_control_debug` object in the JSON output provides aggregate counte
 | `loop_detected` | Carousel loops detected (image URL returned to already-seen) |
 | `carousel_images_collected` | Total unique images captured across all carousels |
 | `strategies_used` | Object mapping strategy names to click counts |
+| `image_ready_wait_ms_total` | Total milliseconds spent polling for lazy-loaded images to become ready across all carousels |
+| `image_ready_timeouts` | Number of individual slides where the image did not become ready within the timeout |
+| `consecutive_pending_hits` | High-water mark of consecutive pending (unresolved) slides observed in any single carousel |
+| `recovered_after_pending` | Number of times a carousel recovered (got a valid image) after one or more pending frames |
 
 ### Scroll Termination Stats
 
@@ -2204,6 +2302,7 @@ The `carousel_control_debug` object in the JSON output provides aggregate counte
       "carousel_errors": 0,
       "carousel_loop_detected": 3,
       "carousel_viewer_closed_naturally": 5,
+      "carousel_lazy_load_stops": 0,
       "discovery_method": "data-virtualized",
       "end_of_feed_detected": true,
       "end_of_feed_reason": "hard_stop_5_idle_cycles_zero_dom_and_keys",
