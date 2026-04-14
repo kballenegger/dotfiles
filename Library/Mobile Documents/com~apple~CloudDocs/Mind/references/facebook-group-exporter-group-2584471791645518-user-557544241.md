@@ -1,11 +1,11 @@
 # Facebook Group Post Exporter Script (User-in-Group URL Mode)
 
-- Last updated: 2026-04-15 05:19:08
+- Last updated: 2026-04-15 07:45:00
 - Source script: `~/klaw-workspace/tmp/facebook-userscripts/export-group-posts-by-user.user.js`
 - Source README: `~/klaw-workspace/tmp/facebook-userscripts/README.md`
-- Commit: `f4918d5`
-- Version: v3.5.0
-- Patch note: carousel mode for full photo viewer crawl; deterministic end-of-scroll hard-stop (5 idle cycles)
+- Commit: `7c77c89`
+- Version: v3.6.0
+- Patch note: v3.6.0 — enhanced carousel robustness (multi-language close/next buttons, position-sorted nav), dual-signal hard-stop (DOM nodes + unique keys), validation summary logging
 
 ## Script
 
@@ -13,7 +13,7 @@
 // ==UserScript==
 // @name         FB Group Posts Export by User
 // @namespace    https://github.com/kenneth-bot/klaw-workspace
-// @version      3.5.0
+// @version      3.6.0
 // @description  Export posts from a Facebook group user page (/groups/<gid>/user/<uid>) as JSON + photo ZIP. URL-driven, no hardcoded IDs.
 // @author       Kenneth
 // @match        https://www.facebook.com/groups/*/user/*
@@ -837,25 +837,35 @@
     if (!viewer) return null;
     const container = viewer.container;
 
-    // Look for role="button" elements on the right side of the container
+    // Strategy 1: right-side SVG buttons (position-based, locale-independent)
     const buttons = container.querySelectorAll('[role="button"]');
     const viewerRect = container.getBoundingClientRect();
     const midX = viewerRect.left + viewerRect.width / 2;
+    const midY = viewerRect.top + viewerRect.height / 2;
 
-    // Collect candidate right-side buttons with SVG inside (navigation arrows)
     const rightButtons = [];
     for (const btn of buttons) {
       const svg = btn.querySelector('svg');
       if (!svg) continue;
       const btnRect = btn.getBoundingClientRect();
-      // Button should be on the right half and vertically centered-ish
+      // Right half, vertically near center, reasonable icon size
       if (btnRect.left > midX && btnRect.height < 100 && btnRect.width < 100) {
-        rightButtons.push(btn);
+        // Prefer buttons closer to vertical center
+        const distFromCenter = Math.abs((btnRect.top + btnRect.height / 2) - midY);
+        rightButtons.push({ btn, distFromCenter });
       }
     }
 
     if (rightButtons.length > 0) {
-      return rightButtons[0];
+      rightButtons.sort((a, b) => a.distFromCenter - b.distFromCenter);
+      return rightButtons[0].btn;
+    }
+
+    // Strategy 2: aria-label fallback (multi-language next patterns)
+    const nextPatterns = /^(next|siguiente|suivant|n[äa]chste|avanti|berikutnya|tiếp|ถัดไป|التالي|अगला|次|다음|下一[个張]|next photo)$/i;
+    for (const btn of buttons) {
+      const label = btn.getAttribute('aria-label') || '';
+      if (nextPatterns.test(label.trim())) return btn;
     }
 
     return null;
@@ -882,16 +892,48 @@
 
   /**
    * Close the photo viewer overlay.
-   * Tries multiple strategies:
-   * 1. Press Escape key
-   * 2. Click close/back button (aria-label with "Close" or "Back")
-   * 3. Click the overlay backdrop
+   * Tries multiple strategies (resilient to localized labels):
+   * 1. Press Escape key (universal keyboard shortcut)
+   * 2. Click close/back button by position (top-left/top-right SVG buttons)
+   * 3. Click elements with common close aria-labels (multi-language)
    */
   function closePhotoViewer() {
-    // Strategy 1: Escape key
+    // Strategy 1: Escape key (most reliable, works across all locales)
     document.dispatchEvent(new KeyboardEvent('keydown', {
       key: 'Escape', code: 'Escape', keyCode: 27, which: 27, bubbles: true,
     }));
+
+    // Strategy 2: find a close button by position (top-left or top-right
+    // corner of the viewer, with an SVG icon — avoids locale-dependent labels)
+    const viewer = findPhotoViewerOverlay();
+    if (viewer) {
+      const container = viewer.container;
+      const rect = container.getBoundingClientRect();
+      const buttons = container.querySelectorAll('[role="button"]');
+      for (const btn of buttons) {
+        const svg = btn.querySelector('svg');
+        if (!svg) continue;
+        const btnRect = btn.getBoundingClientRect();
+        // Close buttons are typically in the top-left or top-right corner
+        const inTopStrip = btnRect.top - rect.top < 80;
+        const inCorner = (btnRect.left - rect.left < 80) || (rect.right - btnRect.right < 80);
+        if (inTopStrip && inCorner && btnRect.width < 60 && btnRect.height < 60) {
+          try { btn.click(); } catch { /* ignore */ }
+          return;
+        }
+      }
+
+      // Strategy 3: aria-label patterns for close/back (multi-language)
+      const closePatterns = /^(close|back|cerrar|volver|fermer|retour|schlie[ßs]en|zur[üu]ck|chiudi|indietro|tutup|kembali|đóng|quay lại|ปิด|إغلاق|बंद|閉じる|닫기|关闭|關閉)$/i;
+      const allBtns = container.querySelectorAll('[role="button"][aria-label], [aria-label]');
+      for (const btn of allBtns) {
+        const label = btn.getAttribute('aria-label') || '';
+        if (closePatterns.test(label.trim())) {
+          try { btn.click(); } catch { /* ignore */ }
+          return;
+        }
+      }
+    }
   }
 
   /**
@@ -958,6 +1000,7 @@
         // Check if viewer is still open (may have closed at end of gallery)
         if (!findPhotoViewerOverlay()) {
           log(`Carousel: viewer closed after ${steps} steps (end of gallery).`);
+          extractionStats.carousel_viewer_closed_naturally++;
           break;
         }
 
@@ -978,6 +1021,7 @@
           consecutiveDups++;
           if (consecutiveDups >= 2) {
             log(`Carousel: loop detected after ${steps} steps (${seenKeys.size} unique images).`);
+            extractionStats.carousel_loop_detected++;
             break;
           }
           continue;
@@ -1068,10 +1112,14 @@
     carousel_photos_captured: 0,
     carousel_nav_steps: 0,
     carousel_errors: 0,
+    carousel_loop_detected: 0,
+    carousel_viewer_closed_naturally: 0,
     discovery_method: 'unknown',
     end_of_feed_detected: false,
     end_of_feed_reason: '',
     scroll_hard_stop_idle_count: 0,
+    scroll_hard_stop_dom_idle_count: 0,
+    scroll_total_cycles: 0,
   };
 
   async function scanCurrentPosts() {
@@ -1175,9 +1223,11 @@
     // ── Deterministic hard-stop: consecutive scroll cycles with zero new posts ──
     let zeroNewPostCycles = 0;       // increments every scroll cycle with no new unique posts
     let lastPostCount = collectedPosts.size;
+    let lastDomNodeCount = findPostElements().length;  // raw DOM node count for independent tracking
 
     while (attempts < CONFIG.MAX_SCROLL_ATTEMPTS) {
       attempts++;
+      extractionStats.scroll_total_cycles = attempts;
       window.scrollBy(0, CONFIG.SCROLL_STEP_PX);
       await sleep(CONFIG.SCROLL_INTERVAL_MS);
 
@@ -1197,28 +1247,37 @@
       }
 
       // ── Deterministic hard-stop counter ──
-      // Track consecutive scroll cycles that produce zero new unique post keys.
-      // This is independent of the multi-signal EOF detection and guarantees
-      // termination even if other signals (e.g. atBottom) are unreliable.
-      if (currSize > lastPostCount) {
-        zeroNewPostCycles = 0;
-        lastPostCount = currSize;
-      } else {
+      // Checks TWO independent signals per cycle:
+      //   1. Zero growth in unique post keys (collectedPosts.size)
+      //   2. Zero growth in raw post/article DOM nodes (findPostElements().length)
+      // Both must be zero for the cycle to count as idle. This prevents
+      // false positives when new DOM nodes appear (ads, spinners) without
+      // being new posts, or vice versa.
+      const currDomNodeCount = findPostElements().length;
+      const noNewPostKeys = currSize <= lastPostCount;
+      const noNewDomNodes = currDomNodeCount <= lastDomNodeCount;
+
+      if (noNewPostKeys && noNewDomNodes) {
         zeroNewPostCycles++;
+      } else {
+        zeroNewPostCycles = 0;
       }
+      lastPostCount = currSize;
+      lastDomNodeCount = currDomNodeCount;
 
       if (zeroNewPostCycles >= CONFIG.EOF_HARD_STOP_IDLE_CYCLES) {
-        const reason = `hard_stop_${zeroNewPostCycles}_idle_cycles`;
+        const reason = `hard_stop_${zeroNewPostCycles}_idle_cycles_zero_dom_and_keys`;
         extractionStats.end_of_feed_detected = true;
         extractionStats.end_of_feed_reason = reason;
         extractionStats.scroll_hard_stop_idle_count = zeroNewPostCycles;
-        log(`Hard-stop: ${zeroNewPostCycles} consecutive scroll cycles with no new posts. Stopping.`);
+        extractionStats.scroll_hard_stop_dom_idle_count = zeroNewPostCycles;
+        log(`Hard-stop: ${zeroNewPostCycles} consecutive scroll cycles with zero new post DOM nodes AND zero new unique post keys. Stopping.`);
         statusFn(`End of feed (hard-stop) — ${currSize} posts`);
         break;
       }
 
       statusFn(
-        `Scrolling… ${currSize} posts (scroll ${attempts}, idle ${idleCount}, noNewPost ${zeroNewPostCycles}/${CONFIG.EOF_HARD_STOP_IDLE_CYCLES})`
+        `Scrolling… ${currSize} posts, ${currDomNodeCount} DOM nodes (scroll ${attempts}, idle ${idleCount}, noNewPost ${zeroNewPostCycles}/${CONFIG.EOF_HARD_STOP_IDLE_CYCLES})`
       );
 
       // ── End-of-feed signal evaluation ──
@@ -1298,6 +1357,7 @@
             tailSigRepeatCount = 0;
             zeroNewPostCycles = 0;
             lastPostCount = afterSize;
+            lastDomNodeCount = findPostElements().length;
             prevHeight = afterHeight;
             prevSize = afterSize;
           } else {
@@ -1315,8 +1375,9 @@
       extractionStats.end_of_feed_reason = 'max_scroll_attempts_reached';
     }
 
+    extractionStats.scroll_total_cycles = attempts;
     log(
-      `Scrolling complete. ${attempts} scrolls, ${collectedPosts.size} posts collected, eof=${extractionStats.end_of_feed_detected} (reason=${extractionStats.end_of_feed_reason}), retries left=${retryBudget}, zeroNewPost=${zeroNewPostCycles}`
+      `Scrolling complete. ${attempts} scrolls, ${collectedPosts.size} posts collected (${findPostElements().length} DOM nodes), eof=${extractionStats.end_of_feed_detected} (reason=${extractionStats.end_of_feed_reason}), retries left=${retryBudget}, zeroNewPost=${zeroNewPostCycles}`
     );
   }
 
@@ -1574,6 +1635,19 @@
   async function runExport(posts) {
     const total = posts.length;
 
+    // Emit validation summary for every run (dry or real)
+    const validation = {
+      total_posts: total,
+      posts_with_permalink: posts.filter((p) => p.permalink && !p.permalink.startsWith('(no')).length,
+      posts_with_text: posts.filter((p) => p.text && p.text.length > 0).length,
+      posts_with_photos: posts.filter((p) => p.photos && p.photos.length > 0).length,
+      total_photo_urls: posts.reduce((n, p) => n + (p.photos ? p.photos.length : 0), 0),
+      unique_photo_urls: new Set(posts.flatMap((p) => (p.photos || []).map(urlPathKey))).size,
+      duplicate_photo_urls_removed: posts.reduce((n, p) => n + (p.photos ? p.photos.length : 0), 0) - new Set(posts.flatMap((p) => (p.photos || []).map(urlPathKey))).size,
+      stats: { ...extractionStats },
+    };
+    log('Validation summary:', JSON.stringify(validation, null, 2));
+
     if (CONFIG.DRY_RUN) {
       updateStatus(`DRY RUN: ${total} posts found.`);
       log('DRY_RUN — no files downloaded.');
@@ -1738,7 +1812,7 @@ Edit the `CONFIG` block at the top of the script:
 | `EOF_CONSECUTIVE_CYCLES` | `3` | All end-of-feed signals must hold for this many consecutive cycles before stopping |
 | `EOF_TAIL_SIGNATURE_COUNT` | `5` | Number of tail post keys tracked for re-observation detection |
 | `EOF_BOTTOM_PROBE_COUNT` | `2` | `scrollTo(bottom)` probes per cycle to confirm viewport is at document bottom |
-| `EOF_HARD_STOP_IDLE_CYCLES` | `5` | Deterministic hard-stop: if this many consecutive scroll cycles produce zero new unique posts, scrolling stops unconditionally |
+| `EOF_HARD_STOP_IDLE_CYCLES` | `5` | Deterministic hard-stop: if this many consecutive scroll cycles produce zero new post/article DOM nodes AND zero new unique post keys, scrolling stops unconditionally |
 
 ### Photo Download
 
@@ -1780,7 +1854,7 @@ Edit the `CONFIG` block at the top of the script:
 1. **Height + post-count tracking** — after each scroll, it checks whether `scrollHeight` grew and whether new posts appeared.
 2. **Idle counter** — if neither metric grew for `IDLE_THRESHOLD` consecutive scrolls, end-of-feed evaluation begins and **retry bursts** fire.
 3. **Retry budget** — up to `RETRY_BURSTS` bursts. If a burst finds new content, normal scrolling resumes and all EOF counters reset.
-4. **Deterministic hard-stop** — independently of the multi-signal EOF detection, a simple counter tracks consecutive scroll cycles that produce zero new unique posts. If `EOF_HARD_STOP_IDLE_CYCLES` (default: 5) consecutive cycles yield no new posts, scrolling stops unconditionally. This prevents infinite scrolling when other EOF signals are unreliable.
+4. **Deterministic hard-stop** — independently of the multi-signal EOF detection, a dual-signal counter tracks consecutive scroll cycles where BOTH zero new post/article DOM nodes AND zero new unique post keys are observed. If `EOF_HARD_STOP_IDLE_CYCLES` (default: 5) consecutive cycles meet both conditions, scrolling stops unconditionally. This prevents infinite scrolling when other EOF signals are unreliable, while avoiding false positives from transient DOM changes (ads, spinners).
 5. **Safety cap** — `MAX_SCROLL_ATTEMPTS` is the hard ceiling.
 
 ### End-of-Feed Detection
@@ -1903,8 +1977,9 @@ The photo viewer overlay is detected using a multi-strategy approach that doesn'
 - `role="dialog"` containers with fbcdn images
 - `data-pagelet` containers with "Media" or "Photo" in the name
 - Fixed/absolute positioned containers with large (>400px) fbcdn images
-- Next button: right-side `role="button"` elements containing SVG icons
+- Next button: right-side `role="button"` with SVG (position-sorted by vertical center proximity), then multi-language aria-label fallback (English, Spanish, French, German, Italian, Indonesian, Vietnamese, Thai, Arabic, Hindi, Japanese, Korean, Chinese)
 - Fallback: "j" keyboard shortcut (Facebook's built-in photo viewer navigation)
+- Close button: Escape key (primary), then top-corner SVG button by position, then multi-language aria-label close/back patterns
 
 ### Extraction Stats (Carousel)
 
@@ -1914,12 +1989,16 @@ The photo viewer overlay is detected using a multi-strategy approach that doesn'
 | `carousel_photos_captured` | Total new photos captured via carousel navigation |
 | `carousel_nav_steps` | Total navigation steps taken across all carousels |
 | `carousel_errors` | Number of carousel crawl failures (viewer didn't open, etc.) |
+| `carousel_loop_detected` | Number of carousels that ended due to loop detection (revisited image) |
+| `carousel_viewer_closed_naturally` | Number of carousels that ended because the viewer closed at end of gallery |
 
 ### Scroll Termination Stats
 
 | Counter | Description |
 |---------|-------------|
-| `scroll_hard_stop_idle_count` | Number of consecutive zero-new-post cycles at termination (if hard-stop triggered) |
+| `scroll_hard_stop_idle_count` | Number of consecutive zero-new-post-key cycles at termination (if hard-stop triggered) |
+| `scroll_hard_stop_dom_idle_count` | Number of consecutive zero-new-DOM-node cycles at termination (if hard-stop triggered) |
+| `scroll_total_cycles` | Total scroll cycles executed before termination |
 
 ## Output Files
 
@@ -1946,10 +2025,14 @@ The photo viewer overlay is detected using a multi-strategy approach that doesn'
       "carousel_photos_captured": 15,
       "carousel_nav_steps": 47,
       "carousel_errors": 0,
+      "carousel_loop_detected": 3,
+      "carousel_viewer_closed_naturally": 5,
       "discovery_method": "data-virtualized",
       "end_of_feed_detected": true,
-      "end_of_feed_reason": "hard_stop_5_idle_cycles",
-      "scroll_hard_stop_idle_count": 5
+      "end_of_feed_reason": "hard_stop_5_idle_cycles_zero_dom_and_keys",
+      "scroll_hard_stop_idle_count": 5,
+      "scroll_hard_stop_dom_idle_count": 5,
+      "scroll_total_cycles": 142
     }
   },
   "posts": [
