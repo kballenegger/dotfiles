@@ -1,11 +1,11 @@
 # Facebook Group Post Exporter Script (User-in-Group URL Mode)
 
-- Last updated: 2026-04-15 04:05:29
+- Last updated: 2026-04-15 04:25:33
 - Source script: `~/klaw-workspace/tmp/facebook-userscripts/export-group-posts-by-user.user.js`
 - Source README: `~/klaw-workspace/tmp/facebook-userscripts/README.md`
-- Commit: `6a1ac6f`
-- Version: v3.2.0
-- Patch note: auto-expands "See more" before text extraction
+- Commit: `ef5a33c`
+- Version: v3.4.0
+- Patch note: hidden gallery photo crawl (captures photos beyond visible 1–5)
 
 ## Script
 
@@ -13,12 +13,13 @@
 // ==UserScript==
 // @name         FB Group Posts Export by User
 // @namespace    https://github.com/kenneth-bot/klaw-workspace
-// @version      3.2.0
+// @version      3.4.0
 // @description  Export posts from a Facebook group user page (/groups/<gid>/user/<uid>) as JSON + photo ZIP. URL-driven, no hardcoded IDs.
 // @author       Kenneth
 // @match        https://www.facebook.com/groups/*/user/*
 // @grant        GM_xmlhttpRequest
 // @connect      fbcdn.net
+// @connect      www.facebook.com
 // @connect      cdnjs.cloudflare.com
 // @require      https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js
 // @run-at       document-idle
@@ -39,12 +40,24 @@
     RETRY_BURSTS: 3,
     RETRY_BURST_WAIT_MS: 4000,
 
+    // ── End-of-feed detection ────────────────────────────────
+    EOF_CONSECUTIVE_CYCLES: 3,       // All hard-stop signals must hold for this many cycles
+    EOF_TAIL_SIGNATURE_COUNT: 5,     // Number of tail post keys to track for re-observation
+    EOF_BOTTOM_PROBE_COUNT: 2,       // scrollTo(bottom) probes per cycle
+
     // ── Photo download ─────────────────────────────────────────
     DOWNLOAD_PHOTOS: true,
     MAX_PHOTOS_PER_POST: 50,
     MAX_TOTAL_PHOTOS: 500,
     PHOTO_FETCH_TIMEOUT_MS: 15000,
     JSZIP_CDN: 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js',
+
+    // ── Hidden photo gallery crawl ──────────────────────────────
+    GALLERY_CRAWL_ENABLED: true,
+    GALLERY_CRAWL_MAX_PHOTOS_PER_POST: 50,
+    GALLERY_CRAWL_TIMEOUT_MS: 10000,
+    GALLERY_CRAWL_DELAY_MS: 800,
+    GALLERY_CRAWL_MAX_PAGES_PER_POST: 10,
 
     DRY_RUN: false,
   };
@@ -540,6 +553,206 @@
     return best;
   }
 
+  /* ────────── hidden photo gallery crawl ────────── */
+
+  /**
+   * Extract gallery entry-point links from a post element.
+   * Looks for:
+   * - Links with set=gm.<postId> (photo set links)
+   * - Links with /photo/?fbid=... (individual photo gallery links)
+   * Returns an array of { url, fbid, setId } objects.
+   */
+  function extractGalleryLinks(postEl) {
+    const links = [];
+    const seen = new Set();
+    const anchors = postEl.querySelectorAll('a[href]');
+
+    for (const a of anchors) {
+      if (isInsideComment(a)) continue;
+      const href = a.href || '';
+
+      // Photo set links: /photo/?fbid=NNN&set=gm.NNN
+      const fbidMatch = href.match(/\/photo\/?\?fbid=(\d+)/);
+      const setMatch = href.match(/set=gm\.(\d+)/);
+
+      if (fbidMatch) {
+        const fbid = fbidMatch[1];
+        if (seen.has(fbid)) continue;
+        seen.add(fbid);
+        links.push({
+          url: href,
+          fbid,
+          setId: setMatch ? setMatch[1] : null,
+        });
+      }
+    }
+    return links;
+  }
+
+  /**
+   * Fetch a Facebook page via GM_xmlhttpRequest and return the HTML text.
+   * Returns null if the fetch fails or is blocked.
+   */
+  function fetchFacebookPage(url) {
+    return new Promise((resolve) => {
+      GM_xmlhttpRequest({
+        method: 'GET',
+        url,
+        headers: {
+          'Accept': 'text/html,application/xhtml+xml',
+        },
+        timeout: CONFIG.GALLERY_CRAWL_TIMEOUT_MS,
+        onload: (resp) => {
+          if (resp.status >= 200 && resp.status < 300) {
+            resolve(resp.responseText || null);
+          } else {
+            warn(`Gallery fetch HTTP ${resp.status} for ${url}`);
+            resolve(null);
+          }
+        },
+        onerror: () => {
+          warn(`Gallery fetch network error for ${url}`);
+          resolve(null);
+        },
+        ontimeout: () => {
+          warn(`Gallery fetch timeout for ${url}`);
+          resolve(null);
+        },
+      });
+    });
+  }
+
+  /**
+   * Parse high-resolution photo URLs from a Facebook photo gallery page HTML.
+   * Facebook embeds image data in multiple ways:
+   * 1. JSON data in scripts containing "image" objects with "uri" fields
+   * 2. og:image meta tags
+   * 3. Direct img tags with scontent/fbcdn URLs
+   * Also extracts "next photo" links for pagination through the gallery set.
+   */
+  function parseGalleryPagePhotos(html) {
+    const photos = [];
+    const nextLinks = [];
+
+    if (!html) return { photos, nextLinks };
+
+    // Strategy 1: Extract high-res URIs from embedded JSON data
+    // Facebook embeds photo data in script tags as JSON with patterns like
+    // "image":{"uri":"https://scontent-..."}
+    const uriPattern = /"(?:image|large_share_image|full_image|photo_image)":\s*\{\s*"uri"\s*:\s*"(https:\/\/[^"]*(?:scontent|fbcdn)[^"]*)"/g;
+    let match;
+    while ((match = uriPattern.exec(html)) !== null) {
+      const url = match[1].replace(/\\\//g, '/');
+      if (isFbCdnUrl(url) && !isAvatarUrl(url) && !isDecorativeBackground(url)) {
+        photos.push(url);
+      }
+    }
+
+    // Strategy 2: og:image meta tag (usually has the displayed photo)
+    const ogMatch = html.match(/property="og:image"\s+content="([^"]+)"/);
+    if (ogMatch) {
+      const url = ogMatch[1].replace(/&amp;/g, '&');
+      if (isFbCdnUrl(url)) {
+        photos.push(url);
+      }
+    }
+
+    // Strategy 3: data-src or src attributes on large images in the HTML
+    const imgPattern = /(?:data-src|src)="(https:\/\/[^"]*(?:scontent|fbcdn)[^"]*)"/g;
+    while ((match = imgPattern.exec(html)) !== null) {
+      const url = match[1].replace(/&amp;/g, '&');
+      if (isFbCdnUrl(url) && !isAvatarUrl(url) && !isStaticAssetUrl(url) && !isDecorativeBackground(url)) {
+        photos.push(url);
+      }
+    }
+
+    // Extract "next" photo links in the same set for pagination
+    // Pattern: /photo/?fbid=NNN&set=gm.NNN (different fbid than current)
+    const nextPattern = /href="(\/photo\/?\?fbid=\d+[^"]*set=gm\.\d+[^"]*)"/g;
+    while ((match = nextPattern.exec(html)) !== null) {
+      let href = match[1].replace(/&amp;/g, '&');
+      if (!href.startsWith('http')) {
+        href = 'https://www.facebook.com' + href;
+      }
+      nextLinks.push(href);
+    }
+
+    return { photos, nextLinks };
+  }
+
+  /**
+   * Resolve hidden photos for a post by crawling its photo gallery links.
+   * Fetches gallery pages, extracts high-res photo URLs, and follows
+   * "next photo" links up to the configured depth/page limits.
+   *
+   * Returns an array of newly discovered photo URLs (not in existingUrls).
+   */
+  async function resolveHiddenPhotos(postEl, existingUrls) {
+    if (!CONFIG.GALLERY_CRAWL_ENABLED) return [];
+
+    const galleryLinks = extractGalleryLinks(postEl);
+    if (galleryLinks.length === 0) return [];
+
+    const existingKeys = new Set(existingUrls.map(urlPathKey));
+    const discoveredUrls = [];
+    const visitedPages = new Set();
+    const pagesToVisit = [];
+
+    // Seed with the gallery entry points we found in the DOM
+    for (const link of galleryLinks) {
+      if (!visitedPages.has(link.url)) {
+        pagesToVisit.push(link.url);
+      }
+    }
+
+    let pagesVisited = 0;
+
+    while (pagesToVisit.length > 0 && pagesVisited < CONFIG.GALLERY_CRAWL_MAX_PAGES_PER_POST) {
+      const pageUrl = pagesToVisit.shift();
+      if (visitedPages.has(pageUrl)) continue;
+      visitedPages.add(pageUrl);
+      pagesVisited++;
+
+      // Rate limit
+      if (pagesVisited > 1) {
+        await sleep(CONFIG.GALLERY_CRAWL_DELAY_MS);
+      }
+
+      const html = await fetchFacebookPage(pageUrl);
+      if (!html) {
+        extractionStats.hidden_photo_fetch_failures++;
+        continue;
+      }
+
+      const { photos, nextLinks } = parseGalleryPagePhotos(html);
+
+      for (const photoUrl of photos) {
+        const upgraded = upgradeToHighRes(photoUrl);
+        const key = urlPathKey(upgraded);
+        if (!existingKeys.has(key)) {
+          existingKeys.add(key);
+          discoveredUrls.push(upgraded);
+          extractionStats.hidden_photos_discovered++;
+        }
+      }
+
+      // Queue next photo links for traversal (within limits)
+      if (discoveredUrls.length < CONFIG.GALLERY_CRAWL_MAX_PHOTOS_PER_POST) {
+        for (const nextUrl of nextLinks) {
+          if (!visitedPages.has(nextUrl) && !pagesToVisit.includes(nextUrl)) {
+            pagesToVisit.push(nextUrl);
+          }
+        }
+      }
+    }
+
+    if (discoveredUrls.length > 0) {
+      log(`Gallery crawl discovered ${discoveredUrls.length} hidden photo(s) from ${pagesVisited} page(s).`);
+    }
+
+    return discoveredUrls.slice(0, CONFIG.GALLERY_CRAWL_MAX_PHOTOS_PER_POST);
+  }
+
   /* ────────── post discovery ────────── */
 
   /**
@@ -584,7 +797,11 @@
     posts_with_permalink: 0,
     posts_with_timestamp: 0,
     see_more_expanded: 0,
+    hidden_photos_discovered: 0,
+    hidden_photo_fetch_failures: 0,
     discovery_method: 'unknown',
+    end_of_feed_detected: false,
+    end_of_feed_reason: '',
   };
 
   async function scanCurrentPosts() {
@@ -604,8 +821,22 @@
       if (collectedPosts.has(key)) continue;
 
       const text = extractText(article);
-      const photos = extractPhotos(article);
+      const inlinePhotos = extractPhotos(article);
       const timestamp = extractTimestamp(article);
+
+      // Attempt gallery crawl to discover hidden photos beyond visible thumbnails
+      const hiddenPhotos = await resolveHiddenPhotos(article, inlinePhotos);
+
+      // Merge inline + hidden photos, deduplicate by URL path key
+      const mergedSeen = new Set();
+      const photos = [];
+      for (const url of [...inlinePhotos, ...hiddenPhotos]) {
+        const key2 = urlPathKey(url);
+        if (!mergedSeen.has(key2)) {
+          mergedSeen.add(key2);
+          photos.push(url);
+        }
+      }
 
       collectedPosts.set(key, {
         permalink: permalink || '(no permalink found)',
@@ -625,7 +856,7 @@
       if (permalink) extractionStats.posts_with_permalink++;
       if (timestamp) extractionStats.posts_with_timestamp++;
 
-      log(`Found post #${collectedPosts.size}: ${permalink || '(no link)'} [${photos.length} images, text=${text ? text.length + 'ch' : 'none'}]`);
+      log(`Found post #${collectedPosts.size}: ${permalink || '(no link)'} [${photos.length} images (${hiddenPhotos.length} hidden), text=${text ? text.length + 'ch' : 'none'}]`);
     }
     return newCount;
   }
@@ -636,12 +867,36 @@
     return new Promise((r) => setTimeout(r, ms));
   }
 
+  /**
+   * Compute a tail signature: the last N post keys joined, used to detect
+   * when we keep re-observing the same tail posts across cycles.
+   */
+  function getTailSignature(n) {
+    const keys = [...collectedPosts.keys()];
+    return keys.slice(-n).join('|');
+  }
+
+  /**
+   * Check if the viewport is at (or very near) the document bottom.
+   */
+  function isAtBottom(tolerance) {
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const viewportH = window.innerHeight;
+    const docH = document.documentElement.scrollHeight;
+    return scrollTop + viewportH >= docH - (tolerance || 5);
+  }
+
   async function autoScroll(statusFn) {
     let attempts = 0;
     let idleCount = 0;
     let retryBudget = CONFIG.RETRY_BURSTS;
     let prevSize = collectedPosts.size;
     let prevHeight = document.documentElement.scrollHeight;
+
+    // ── End-of-feed multi-signal state ──
+    let eofCycleCount = 0;           // consecutive cycles where ALL hard-stop signals hold
+    let prevTailSig = '';            // previous tail signature for re-observation check
+    let tailSigRepeatCount = 0;      // how many times we've seen the same tail signature
 
     while (attempts < CONFIG.MAX_SCROLL_ATTEMPTS) {
       attempts++;
@@ -667,40 +922,100 @@
         `Scrolling… ${currSize} posts (scroll ${attempts}, idle ${idleCount})`
       );
 
+      // ── End-of-feed signal evaluation ──
       if (idleCount >= CONFIG.IDLE_THRESHOLD) {
-        if (retryBudget <= 0) {
-          log('Idle threshold reached with no retry budget left. Stopping.');
+        // Signal 1: no growth in unique post IDs
+        const noPostGrowth = currSize === prevSize;
+
+        // Signal 2: no scrollHeight increase (already tracked by idleCount)
+        const noHeightGrowth = currHeight <= prevHeight;
+
+        // Signal 3: viewport at bottom after forced bottom probes
+        let atBottom = false;
+        for (let p = 0; p < CONFIG.EOF_BOTTOM_PROBE_COUNT; p++) {
+          window.scrollTo(0, document.documentElement.scrollHeight);
+          await sleep(300);
+          if (isAtBottom(10)) {
+            atBottom = true;
+            break;
+          }
+        }
+
+        // Signal 4: tail post signatures unchanged
+        const tailSig = getTailSignature(CONFIG.EOF_TAIL_SIGNATURE_COUNT);
+        if (tailSig && tailSig === prevTailSig) {
+          tailSigRepeatCount++;
+        } else {
+          tailSigRepeatCount = 0;
+          prevTailSig = tailSig;
+        }
+        const tailRepeated = tailSigRepeatCount >= 1;
+
+        const allSignals = noPostGrowth && noHeightGrowth && atBottom && tailRepeated;
+
+        if (allSignals) {
+          eofCycleCount++;
+          log(`EOF signals all active — cycle ${eofCycleCount}/${CONFIG.EOF_CONSECUTIVE_CYCLES}`);
+        } else {
+          eofCycleCount = 0;
+        }
+
+        // Hard stop: all signals held for enough consecutive cycles
+        if (eofCycleCount >= CONFIG.EOF_CONSECUTIVE_CYCLES) {
+          const reasons = [
+            'no_post_growth',
+            'no_height_growth',
+            'viewport_at_bottom',
+            `tail_signature_repeated_${tailSigRepeatCount + 1}x`,
+          ];
+          const reason = reasons.join('+');
+          extractionStats.end_of_feed_detected = true;
+          extractionStats.end_of_feed_reason = reason;
+          log(`End of feed detected: ${reason}. Stopping.`);
+          statusFn(`End of feed reached — ${currSize} posts`);
           break;
         }
 
-        retryBudget--;
-        const burstNum = CONFIG.RETRY_BURSTS - retryBudget;
-        log(`Idle → retry burst ${burstNum}/${CONFIG.RETRY_BURSTS}…`);
-        statusFn(
-          `Retry ${burstNum}/${CONFIG.RETRY_BURSTS}… ${currSize} posts`
-        );
+        // Retry burst (prevents premature stop)
+        if (retryBudget > 0) {
+          retryBudget--;
+          const burstNum = CONFIG.RETRY_BURSTS - retryBudget;
+          log(`Idle → retry burst ${burstNum}/${CONFIG.RETRY_BURSTS}…`);
+          statusFn(
+            `Retry ${burstNum}/${CONFIG.RETRY_BURSTS}… ${currSize} posts`
+          );
 
-        window.scrollTo(0, document.documentElement.scrollHeight);
-        await sleep(CONFIG.RETRY_BURST_WAIT_MS);
-        await scanCurrentPosts();
+          window.scrollTo(0, document.documentElement.scrollHeight);
+          await sleep(CONFIG.RETRY_BURST_WAIT_MS);
+          await scanCurrentPosts();
 
-        const afterHeight = document.documentElement.scrollHeight;
-        const afterSize = collectedPosts.size;
+          const afterHeight = document.documentElement.scrollHeight;
+          const afterSize = collectedPosts.size;
 
-        if (afterHeight > prevHeight || afterSize > prevSize) {
-          log('Retry burst found new content — resuming normal scroll.');
-          idleCount = 0;
-          prevHeight = afterHeight;
-          prevSize = afterSize;
-        } else {
-          log('Retry burst found nothing new.');
-          idleCount = 0;
+          if (afterHeight > prevHeight || afterSize > prevSize) {
+            log('Retry burst found new content — resuming normal scroll.');
+            idleCount = 0;
+            eofCycleCount = 0;
+            tailSigRepeatCount = 0;
+            prevHeight = afterHeight;
+            prevSize = afterSize;
+          } else {
+            log('Retry burst found nothing new.');
+            idleCount = 0;
+          }
         }
+        // If no retry budget left but EOF cycles not yet met, continue looping
+        // to accumulate consecutive EOF cycles before stopping
       }
     }
 
+    // If we exhausted MAX_SCROLL_ATTEMPTS without EOF detection
+    if (!extractionStats.end_of_feed_detected && attempts >= CONFIG.MAX_SCROLL_ATTEMPTS) {
+      extractionStats.end_of_feed_reason = 'max_scroll_attempts_reached';
+    }
+
     log(
-      `Scrolling complete. ${attempts} scrolls, ${collectedPosts.size} posts collected, retries left=${retryBudget}`
+      `Scrolling complete. ${attempts} scrolls, ${collectedPosts.size} posts collected, eof=${extractionStats.end_of_feed_detected}, retries left=${retryBudget}`
     );
   }
 
@@ -1119,6 +1434,9 @@ Edit the `CONFIG` block at the top of the script:
 | `IDLE_THRESHOLD` | `8` | Consecutive idle scrolls before triggering a retry burst |
 | `RETRY_BURSTS` | `3` | Number of retry bursts after the feed appears exhausted |
 | `RETRY_BURST_WAIT_MS` | `4000` | Extra wait time during each retry burst |
+| `EOF_CONSECUTIVE_CYCLES` | `3` | All end-of-feed signals must hold for this many consecutive cycles before stopping |
+| `EOF_TAIL_SIGNATURE_COUNT` | `5` | Number of tail post keys tracked for re-observation detection |
+| `EOF_BOTTOM_PROBE_COUNT` | `2` | `scrollTo(bottom)` probes per cycle to confirm viewport is at document bottom |
 
 ### Photo Download
 
@@ -1129,6 +1447,16 @@ Edit the `CONFIG` block at the top of the script:
 | `MAX_TOTAL_PHOTOS` | `500` | Global cap on total photos across all posts |
 | `PHOTO_FETCH_TIMEOUT_MS` | `15000` | Per-image fetch timeout |
 
+### Hidden Photo Gallery Crawl
+
+| Key | Default | Description |
+|-----|---------|-------------|
+| `GALLERY_CRAWL_ENABLED` | `true` | Enable crawling photo gallery pages to discover photos beyond visible thumbnails |
+| `GALLERY_CRAWL_MAX_PHOTOS_PER_POST` | `50` | Max hidden photos to discover per post via gallery crawl |
+| `GALLERY_CRAWL_TIMEOUT_MS` | `10000` | Timeout per gallery page fetch |
+| `GALLERY_CRAWL_DELAY_MS` | `800` | Rate-limit delay between gallery page fetches (to avoid Facebook blocks) |
+| `GALLERY_CRAWL_MAX_PAGES_PER_POST` | `10` | Max gallery pages to visit per post (each page typically reveals one photo + link to the next) |
+
 ### Other
 
 | Key | Default | Description |
@@ -1138,9 +1466,26 @@ Edit the `CONFIG` block at the top of the script:
 ## How Scrolling Works
 
 1. **Height + post-count tracking** — after each scroll, it checks whether `scrollHeight` grew and whether new posts appeared.
-2. **Idle counter** — if neither metric grew for `IDLE_THRESHOLD` consecutive scrolls, a **retry burst** fires: jump to page bottom + wait `RETRY_BURST_WAIT_MS`.
-3. **Retry budget** — up to `RETRY_BURSTS` bursts. If a burst finds new content, normal scrolling resumes.
+2. **Idle counter** — if neither metric grew for `IDLE_THRESHOLD` consecutive scrolls, end-of-feed evaluation begins and **retry bursts** fire.
+3. **Retry budget** — up to `RETRY_BURSTS` bursts. If a burst finds new content, normal scrolling resumes and all EOF counters reset.
 4. **Safety cap** — `MAX_SCROLL_ATTEMPTS` is the hard ceiling.
+
+### End-of-Feed Detection
+
+Once the idle threshold is reached, the script evaluates four hard-stop signals on every cycle:
+
+| Signal | What it checks |
+|--------|---------------|
+| **No post growth** | Unique post ID count hasn't increased since last progress |
+| **No height growth** | `document.documentElement.scrollHeight` hasn't increased |
+| **Viewport at bottom** | After forced `scrollTo(bottom)` probes, the viewport is at the document bottom (within a small tolerance) |
+| **Tail signature repeated** | The last N post keys (configurable via `EOF_TAIL_SIGNATURE_COUNT`) are identical to the previous cycle — the same posts keep appearing at the feed tail |
+
+The script stops **only when all four signals hold for `EOF_CONSECUTIVE_CYCLES` consecutive cycles** (default: 3). This prevents premature stops caused by temporary loading pauses or Facebook's lazy-rendering delays. Retry bursts fire in parallel to give the feed every chance to load more content.
+
+The JSON output includes two fields in `extraction_stats`:
+- **`end_of_feed_detected`** (`true`/`false`) — whether the script detected a natural end of feed.
+- **`end_of_feed_reason`** — a `+`-joined string of the signals that fired (e.g., `no_post_growth+no_height_growth+viewport_at_bottom+tail_signature_repeated_3x`), or `max_scroll_attempts_reached` if the safety cap stopped scrolling before EOF was confirmed.
 
 ## How Post Discovery Works
 
@@ -1197,6 +1542,34 @@ The script uses multiple strategies to find post photos reliably:
 
 **Quality upgrade:** Thumbnail URLs (e.g., `p160x160`) are automatically upgraded by stripping the size transform parameter to request the original resolution.
 
+## Hidden Photo Gallery Crawl
+
+Multi-photo Facebook posts often show only 1–5 thumbnails in the feed, with additional photos hidden behind a "+N" overlay link. The script resolves these hidden photos by crawling the linked photo gallery pages.
+
+### How It Works
+
+1. **Gallery link detection** — for each post, the script finds `<a>` links with `/photo/?fbid=...` and `set=gm.<postId>` patterns.
+2. **Page fetch** — each gallery link is fetched via `GM_xmlhttpRequest` (same-origin bypass). The HTML response is parsed for high-resolution photo URLs embedded in JSON data, `og:image` meta tags, and `img` elements.
+3. **Pagination** — the script follows "next photo" links within the same set, visiting up to `GALLERY_CRAWL_MAX_PAGES_PER_POST` pages per post.
+4. **Merge + dedupe** — discovered gallery photos are merged with the inline-extracted visible thumbnails. Duplicates are removed by URL path key.
+5. **Rate limiting** — a configurable delay (`GALLERY_CRAWL_DELAY_MS`, default 800ms) is inserted between consecutive page fetches to avoid triggering Facebook rate limits.
+
+### Caveats
+
+- **Facebook may block fetches** — if you are not logged in or Facebook's anti-scraping detects unusual activity, gallery page fetches may return login walls or empty responses. The script falls back gracefully to inline-only photos.
+- **Slower export** — gallery crawl adds network latency per multi-photo post. Disable with `GALLERY_CRAWL_ENABLED: false` for faster exports when hidden photos are not needed.
+- **HTML structure changes** — Facebook's photo page HTML structure may change, causing gallery parsing to miss URLs. Check `extraction_stats.hidden_photo_fetch_failures` for failures.
+- **Requires `@connect www.facebook.com`** — the userscript header includes this grant to allow fetching Facebook gallery pages via `GM_xmlhttpRequest`.
+
+### Extraction Stats
+
+The JSON output includes two additional counters in `extraction_stats`:
+
+| Counter | Description |
+|---------|-------------|
+| `hidden_photos_discovered` | Total number of photos found via gallery crawl that were not visible as inline thumbnails |
+| `hidden_photo_fetch_failures` | Number of gallery page fetches that failed (timeout, network error, HTTP error) |
+
 ## Output Files
 
 ### JSON (`fb-group-<gid>-user-<uid>-<timestamp>.json`)
@@ -1216,7 +1589,11 @@ The script uses multiple strategies to find post photos reliably:
       "posts_with_permalink": 42,
       "posts_with_timestamp": 40,
       "see_more_expanded": 12,
-      "discovery_method": "data-virtualized"
+      "hidden_photos_discovered": 23,
+      "hidden_photo_fetch_failures": 0,
+      "discovery_method": "data-virtualized",
+      "end_of_feed_detected": true,
+      "end_of_feed_reason": "no_post_growth+no_height_growth+viewport_at_bottom+tail_signature_repeated_3x"
     }
   },
   "posts": [
