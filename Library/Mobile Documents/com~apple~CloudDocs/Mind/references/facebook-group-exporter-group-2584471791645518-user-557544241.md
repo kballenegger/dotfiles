@@ -1,10 +1,11 @@
 # Facebook Group Post Exporter Script (User-in-Group URL Mode)
 
-- Last updated: 2026-04-15 03:55:57
+- Last updated: 2026-04-15 04:05:29
 - Source script: `~/klaw-workspace/tmp/facebook-userscripts/export-group-posts-by-user.user.js`
 - Source README: `~/klaw-workspace/tmp/facebook-userscripts/README.md`
-- Commit: `8e2d9ce`
-- Version: v3.1.0
+- Commit: `6a1ac6f`
+- Version: v3.2.0
+- Patch note: auto-expands "See more" before text extraction
 
 ## Script
 
@@ -12,7 +13,7 @@
 // ==UserScript==
 // @name         FB Group Posts Export by User
 // @namespace    https://github.com/kenneth-bot/klaw-workspace
-// @version      3.1.0
+// @version      3.2.0
 // @description  Export posts from a Facebook group user page (/groups/<gid>/user/<uid>) as JSON + photo ZIP. URL-driven, no hardcoded IDs.
 // @author       Kenneth
 // @match        https://www.facebook.com/groups/*/user/*
@@ -208,6 +209,98 @@
       }
     }
     return null;
+  }
+
+  /* ────────── "See more" expansion ────────── */
+
+  /**
+   * Localized patterns for "See more" buttons in Facebook.
+   * Matches common languages: English, Spanish, French, Portuguese, German,
+   * Italian, Indonesian, Vietnamese, Filipino, Thai, Arabic, Hindi, etc.
+   * Also matches aria-label variants.
+   */
+  const SEE_MORE_PATTERNS = [
+    /^see\s*more$/i,
+    /^ver\s*m[aá]s$/i,
+    /^voir\s*plus$/i,
+    /^ver\s*mais$/i,
+    /^mehr\s*ansehen$/i,
+    /^vedi\s*altro$/i,
+    /^lihat\s*selengkapnya$/i,
+    /^xem\s*th[eê]m$/i,
+    /^tingnan\s*ang\s*iba\s*pa$/i,
+    /^ดูเพิ่มเติม$/,
+    /^عرض المزيد$/,
+    /^और\s*देखें$/,
+    /^もっと見る$/,
+    /^더\s*보기$/,
+    /^查看更多$/,
+    /^顯示更多$/,
+  ];
+
+  /**
+   * Check if a text matches any known "See more" pattern.
+   */
+  function isSeeMoreText(text) {
+    if (!text) return false;
+    const trimmed = text.trim();
+    return SEE_MORE_PATTERNS.some((re) => re.test(trimmed));
+  }
+
+  /**
+   * Find "See more" buttons inside a post element.
+   * Facebook renders these as <div role="button">, <span>, or <a> elements
+   * with localized "See more" text or matching aria-label.
+   */
+  function findSeeMoreButtons(container) {
+    const buttons = [];
+    // role="button" elements and <a> tags are the most common wrappers
+    const candidates = container.querySelectorAll(
+      '[role="button"], a[href="#"], span[style*="cursor"]'
+    );
+    for (const el of candidates) {
+      if (isInsideComment(el)) continue;
+      // Check direct text content (avoid matching inside nested buttons)
+      const text = el.textContent.trim();
+      if (isSeeMoreText(text)) {
+        buttons.push(el);
+        continue;
+      }
+      // Check aria-label
+      const ariaLabel = el.getAttribute('aria-label') || '';
+      if (isSeeMoreText(ariaLabel)) {
+        buttons.push(el);
+      }
+    }
+    return buttons;
+  }
+
+  /**
+   * Expand all collapsed "See more" text blocks inside a set of post elements.
+   * Clicks each button and waits briefly for the DOM to update.
+   * Idempotent: already-expanded posts won't have "See more" buttons visible.
+   * Returns the number of buttons clicked.
+   */
+  async function expandSeeMoreInPosts(postElements) {
+    let totalClicked = 0;
+    for (const postEl of postElements) {
+      const seeMoreBtns = findSeeMoreButtons(postEl);
+      for (const btn of seeMoreBtns) {
+        try {
+          btn.click();
+          totalClicked++;
+        } catch {
+          // Ignore click errors (e.g., element removed from DOM)
+        }
+      }
+    }
+    if (totalClicked > 0) {
+      // Wait for DOM to update after clicking all buttons in this batch
+      await sleep(600);
+      extractionStats.see_more_expanded += totalClicked;
+      log(`Expanded ${totalClicked} "See more" button(s).`);
+    }
+    return totalClicked;
   }
 
   /* ────────── text extraction ────────── */
@@ -490,15 +583,19 @@
     total_images: 0,
     posts_with_permalink: 0,
     posts_with_timestamp: 0,
+    see_more_expanded: 0,
     discovery_method: 'unknown',
   };
 
-  function scanCurrentPosts() {
+  async function scanCurrentPosts() {
     const articles = findPostElements();
     extractionStats.discovery_method =
       articles.length > 0 && articles[0].hasAttribute('data-virtualized')
         ? 'data-virtualized'
         : 'role-article-fallback';
+
+    // Expand collapsed "See more" text before extracting content
+    await expandSeeMoreInPosts(articles);
 
     let newCount = 0;
     for (const article of articles) {
@@ -551,7 +648,7 @@
       window.scrollBy(0, CONFIG.SCROLL_STEP_PX);
       await sleep(CONFIG.SCROLL_INTERVAL_MS);
 
-      scanCurrentPosts();
+      await scanCurrentPosts();
 
       const currHeight = document.documentElement.scrollHeight;
       const currSize = collectedPosts.size;
@@ -585,7 +682,7 @@
 
         window.scrollTo(0, document.documentElement.scrollHeight);
         await sleep(CONFIG.RETRY_BURST_WAIT_MS);
-        scanCurrentPosts();
+        await scanCurrentPosts();
 
         const afterHeight = document.documentElement.scrollHeight;
         const afterSize = collectedPosts.size;
@@ -921,15 +1018,15 @@
     setButtonsEnabled(false);
 
     log('Full Scan + Export. Group:', groupId, 'User:', userId);
-    updateStatus('Scanning visible posts…');
+    updateStatus('Expanding & scanning visible posts…');
 
-    scanCurrentPosts();
+    await scanCurrentPosts();
     log(`After initial scan: ${collectedPosts.size} posts`);
 
     updateStatus(`Auto-scrolling… ${collectedPosts.size} posts so far`);
     await autoScroll(updateStatus);
 
-    scanCurrentPosts();
+    await scanCurrentPosts();
     const posts = [...collectedPosts.values()];
     log(`Done scrolling. Total posts: ${posts.length}`);
 
@@ -945,9 +1042,9 @@
     setButtonsEnabled(false);
 
     log('Export Loaded Now. Group:', groupId, 'User:', userId);
-    updateStatus('Scanning loaded posts…');
+    updateStatus('Expanding & scanning loaded posts…');
 
-    scanCurrentPosts();
+    await scanCurrentPosts();
     const posts = [...collectedPosts.values()];
     log(`Found ${posts.length} loaded posts`);
 
@@ -1052,6 +1149,22 @@ The script uses a two-tier strategy to find posts:
 1. **Primary: `data-virtualized="false"` containers** — Facebook's modern virtualized feed wraps each rendered post in these containers. Posts scrolled out of view become `data-virtualized="true"` empty skeletons.
 2. **Fallback: `role="article"` elements** — for older FB layouts. Automatically excludes comments (`aria-label="Comment by …"`), loading skeletons, and nested reply articles.
 
+## Automatic "See More" Expansion
+
+Before extracting text, the script automatically clicks all visible "See more" buttons inside each post to reveal truncated content. This runs:
+
+- **Before each scan pass** — both during initial scan and after each scroll step.
+- **In both export modes** — "Export Loaded Now" and "Full Scan + Export".
+
+The expansion is **idempotent**: already-expanded posts have no "See more" buttons to click. A 600ms delay after clicking allows Facebook's DOM to render the full text before extraction.
+
+**Localization:** The script recognizes "See more" buttons in English, Spanish, French, Portuguese, German, Italian, Indonesian, Vietnamese, Filipino, Thai, Arabic, Hindi, Japanese, Korean, and Chinese (Simplified + Traditional). Additional languages can be added to the `SEE_MORE_PATTERNS` array.
+
+**Limitations:**
+- Some posts use nested "See more" links that require multiple expansions — the script clicks all visible buttons in a single pass but does not recurse into newly revealed "See more" links.
+- If Facebook changes the button markup (e.g., removes `role="button"` or changes the text), expansion may silently fail and the text field will contain the truncated version.
+- The `see_more_expanded` counter in `extraction_stats` tracks how many buttons were clicked across all scan passes.
+
 ## How Text Extraction Works
 
 Post body text is extracted with a fallback chain:
@@ -1102,6 +1215,7 @@ The script uses multiple strategies to find post photos reliably:
       "total_images": 67,
       "posts_with_permalink": 42,
       "posts_with_timestamp": 40,
+      "see_more_expanded": 12,
       "discovery_method": "data-virtualized"
     }
   },
