@@ -226,6 +226,11 @@ export PATH="/usr/local/Cellar/ruby/2.7.1/bin:$PATH"
 PATH=$(puniq $PATH)
 #MANPATH=$(puniq $MANPATH)
 
+# -----------------------------------------------------------------
+# PROXY CLAUDE THROUGH VPS
+# -----------------------------------------------------------------
+
+alias claude='HTTPS_PROXY=http://127.0.0.1:2080 HTTP_PROXY=http://127.0.0.1:2080 ALL_PROXY=socks5h://127.0.0.1:2080 /opt/homebrew/bin/claude'
 
 # -----------------------------------------------------------------
 # SOURCING LOCAL .SHELLRC
