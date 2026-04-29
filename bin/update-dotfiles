@@ -1,6 +1,12 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# Pull the latest dotfiles and refresh submodules.
 
-cd ~
-git fetch
-git merge origin/dotfiles
-git submodule update --init --recursive
+set -euo pipefail
+
+cd "$HOME"
+
+branch="$(git symbolic-ref --short HEAD 2>/dev/null || echo dotfiles)"
+
+git fetch --quiet origin "$branch"
+git merge --ff-only "origin/$branch"
+git submodule update --init --recursive --jobs 8

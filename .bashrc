@@ -21,8 +21,8 @@ shopt -s histappend
 # -----------------------------------------------------------------
 
 parse_git_branch() {
-    git_branch=`git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'`
-    if [ $git_branch ]; then
+    git_branch=$(git branch 2>/dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/')
+    if [ -n "$git_branch" ]; then
         echo "•$git_branch"
     fi
 }
@@ -32,21 +32,27 @@ export PS1='[\[\033[0;35m\]\h\[\033[0;36m\] \w\[\033[00m\]\[\033[33m\]$(parse_gi
 
 
 # -----------------------------------------------------------------
-# AUTOJUMP AND BASH COMPLETION CONFIGURATION
+# BASH COMPLETION
 # -----------------------------------------------------------------
 
-# bash completion
-if [ -f /usr/local/etc/bash_completion ]; then
-    . /usr/local/etc/bash_completion
-fi
-
-# autojump
-if [ -f /usr/local/etc/autojump ]; then
-    . /usr/local/etc/autojump
+# bash-completion v2 (homebrew on mac, distro packages on linux)
+if [ -n "${BREW_PREFIX:-}" ] || command -v brew >/dev/null 2>&1; then
+    _bcp="$(brew --prefix 2>/dev/null)"
+    if [ -r "$_bcp/etc/profile.d/bash_completion.sh" ]; then
+        . "$_bcp/etc/profile.d/bash_completion.sh"
+    elif [ -r "$_bcp/etc/bash_completion" ]; then
+        . "$_bcp/etc/bash_completion"
+    fi
+    unset _bcp
+elif [ -r /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+elif [ -r /etc/bash_completion ]; then
+    . /etc/bash_completion
 fi
 
 # fzf config (auto added)
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
+
 
 # -----------------------------------------------------------------
 # SOURCING LOCAL .BASHRC
@@ -55,6 +61,3 @@ fi
 if [ -f ~/.bashrc.local ]; then
     source ~/.bashrc.local
 fi
-
-
-
