@@ -1,25 +1,84 @@
 " kill vi compatibility
 set nocompatible
 
-" Use Homebrew Python venv for Python 3 provider
+" Use Homebrew Python venv for Python 3 provider (neovim only)
 let g:python3_host_prog = expand('~/.venvs/neovim/bin/python3')
 
 " dispatch shouldn't take over m mapping
 let g:dispatch_no_maps = 1
 
 " ==============================
-"           PATHOGEN
+"           VIM-PLUG
 " ==============================
 
-" use YCM if possible, otherwise use supertab
-if filereadable($HOME . "/.vim/bundle/you-complete-me/third_party/ycmd/ycm_core.so")
-    let g:pathogen_disabled = ['supertab']
-else
-    let g:pathogen_disabled = ['you-complete-me']
+" Auto-install vim-plug on first run.
+let s:plug_path = has('nvim') ? stdpath('data') . '/site/autoload/plug.vim'
+                              \ : expand('~/.vim/autoload/plug.vim')
+if empty(glob(s:plug_path))
+  silent execute '!curl -fLo ' . shellescape(s:plug_path) . ' --create-dirs '
+        \ . 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
-" enable pathogen
-call pathogen#infect()
+call plug#begin('~/.vim/plugged')
+
+" --- editing / movement ---
+Plug 'tpope/vim-abolish'
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-repeat'
+Plug 'tpope/vim-unimpaired'
+Plug 'tpope/vim-endwise'
+Plug 'tpope/vim-obsession'
+Plug 'tpope/vim-dispatch'
+Plug 'tpope/vim-markdown'
+Plug 'scrooloose/nerdcommenter'
+Plug 'junegunn/vim-easy-align'
+Plug 'easymotion/vim-easymotion'
+Plug 'sickill/vim-pasta'
+Plug 'danro/rename.vim'
+Plug 'cohama/lexima.vim'
+Plug 'vim-scripts/closetag.vim'
+Plug 'editorconfig/editorconfig-vim'
+
+" --- finder / search ---
+Plug 'ctrlpvim/ctrlp.vim'
+Plug 'mileszs/ack.vim'
+Plug 'majutsushi/tagbar'
+
+" --- text objects ---
+Plug 'kana/vim-textobj-user'
+Plug 'nelstrom/vim-textobj-rubyblock'
+Plug 'reedes/vim-textobj-quote'
+Plug 'reedes/vim-textobj-sentence'
+
+" --- writing ---
+Plug 'reedes/vim-lexical'
+Plug 'reedes/vim-wordy'
+
+" --- ui ---
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+Plug 'airblade/vim-gitgutter'
+Plug 'kshenoy/vim-signature'
+Plug 'flazz/vim-colorschemes'
+Plug 'lifepillar/vim-solarized8'
+
+" --- completion / lint ---
+Plug 'SirVer/ultisnips'
+Plug 'vim-syntastic/syntastic'
+
+" --- tmux ---
+Plug 'christoomey/vim-tmux-navigator'
+
+" --- languages ---
+Plug 'pangloss/vim-javascript'
+Plug 'mxw/vim-jsx'
+Plug 'leafgarland/typescript-vim'
+Plug 'elzr/vim-json'
+Plug 'vim-ruby/vim-ruby'
+Plug 'keith/swift.vim'
+
+call plug#end()
 
 
 " ==============================
@@ -33,20 +92,21 @@ set termguicolors
 set background=dark
 
 " go-lang (this must come before syntax on, for some reason...)
-set rtp+=$GOROOT/misc/vim
+if !empty($GOROOT)
+  set rtp+=$GOROOT/misc/vim
+endif
 
 " enable file types and syntax highlighing
 syntax on
 filetype plugin indent on
 
 " color scheme
-"let g:solarized_termcolors=256
 if $ITERM_PROFILE == 'light'
   set background=light
 else
   set background=dark
 endif
-colorscheme gruvbox
+silent! colorscheme gruvbox
 highlight clear SignColumn
 
 " show line numbers
@@ -128,6 +188,14 @@ vnoremap . :normal .<CR>
 set exrc
 set secure
 
+" autoreload changed files (replaces autoreadwatch plugin)
+set autoread
+augroup AutoReload
+  autocmd!
+  autocmd FocusGained,BufEnter,CursorHold,CursorHoldI *
+        \ if mode() !~ '\v(c|r.?|!|t)' && getcmdwintype() == '' | checktime | endif
+augroup END
+
 " better fold display
 fu! CustomFoldText()
     "get first non-blank line
@@ -201,16 +269,6 @@ inoremap <Esc>D <nop>
 " splits
 nnoremap <leader>q :enew\|bd<CR>
 
-" using escape sequences, aka alt
-"noremap <esc>mu <C-w>k
-"noremap <esc>md <C-w>j
-"noremap <esc>ml <C-w>h
-"noremap <esc>mr <C-w>l
-"inoremap <esc>mu <esc><C-w>k
-"inoremap <esc>md <esc><C-w>j
-"inoremap <esc>ml <esc><C-w>h
-"inoremap <esc>mr <esc><C-w>l
-
 let g:tmux_navigator_no_mappings = 1
 
 " coordinated vim & tmux pane/split navigation
@@ -278,7 +336,7 @@ nnoremap <C-y> 7<C-y>
 " statusline
 set laststatus=2
 set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%{exists('*SyntasticStatuslineFlag')?SyntasticStatuslineFlag():''}
 set statusline+=%*
 
 " visual indent
@@ -303,9 +361,6 @@ nnoremap N Nzzzv
 
 " disable ex-mode and let Q be @q
 nnoremap Q @q
-
-" \c compiles coffeescript
-autocmd FileType coffeescript map <buffer> <leader>c :CoffeeCompile<CR>
 
 
 " ==============================
@@ -363,13 +418,6 @@ let g:markdown_fenced_languages = [
 let g:airline_powerline_fonts = 1
 let g:airline_theme='powerlineish'
 
-" autoreload buffers
-let autoreadargs={'autoread':1,'quiet':1}
-augroup WatchForChanges
-  autocmd!
-  au VimEnter * execute WatchForChanges("*",autoreadargs)
-augroup END
-
 " ctrl-p
 let g:ctrlp_map = '<leader>p'
 let g:ctrlp_cmd = 'CtrlP'
@@ -387,37 +435,10 @@ nnoremap <leader>r :CtrlPTag<CR>
 nnoremap <leader>t :CtrlPBufTag<CR>
 nnoremap <leader>T :CtrlPBufTagAll<CR>
 
-" you complete me
-let g:ycm_add_preview_to_completeopt = 0
-let g:ycm_confirm_extra_conf = 0
-
-" you complete me + utilsnips integration
-if filereadable($HOME . "/.vim/bundle/you-complete-me/third_party/ycmd/ycm_core.so")
-  function! g:UltiSnips_Complete()
-    call UltiSnips_ExpandSnippet()
-    if g:ulti_expand_res == 0
-      if pumvisible()
-        return "\<C-n>"
-      else
-        call UltiSnips_JumpForwards()
-        if g:ulti_jump_forwards_res == 0
-          return "\<TAB>"
-        endif
-      endif
-    endif
-    return ""
-  endfunction
-
-  au BufEnter * exec "inoremap <silent> " . g:UltiSnipsExpandTrigger . " <C-R>=g:UltiSnips_Complete()<cr>"
-  let g:UltiSnipsExpandTrigger="<leader><tab>"
-  let g:UltiSnipsJumpForwardTrigger="<tab>"
-endif
-
-" ycm + typescript autocomplete
-if !exists("g:ycm_semantic_triggers")
-  let g:ycm_semantic_triggers = {}
-endif
-let g:ycm_semantic_triggers['typescript'] = ['.']
+" ultisnips
+let g:UltiSnipsExpandTrigger="<leader><tab>"
+let g:UltiSnipsJumpForwardTrigger="<tab>"
+let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
 
 " easy-align
 vnoremap <leader>a :LiveEasyAlign<cr>
@@ -426,15 +447,11 @@ nmap <leader>a vii:LiveEasyAlign<cr>
 " ack
 nnoremap <leader>/ :Ack!<space>
 let g:ackprg = "ack-git-ls-files"
-"let g:ack_use_dispatch = 1
 let g:ack_mappings = { "<CR>": "<CR>zz" }
 let g:ack_default_options =
             \ " -s -H --nocolor --nogroup --column --smart-case"
 
 " syntastic
-let g:syntastic_objc_checkers    = ['ycm']
-let g:syntastic_c_checkers       = ['ycm']
-let g:syntastic_cpp_checkers     = ['ycm']
 let g:syntastic_error_symbol     = '✗'
 let g:syntastic_warning_symbol   = '!'
 let g:syntastic_quiet_messages   = {'type': 'style'}
@@ -442,8 +459,6 @@ let g:syntastic_aggregate_errors = 1
 let g:syntastic_check_on_open    = 1
 let g:syntastic_ruby_checkers    = ['mri']
 let g:syntastic_always_populate_loc_list = 1
-let g:tsuquyomi_disable_quickfix = 1
-let g:syntastic_typescript_checkers = ['tsuquyomi']
 command! Syn call CustomSyn()
 function! CustomSyn()
   let g:syntastic_ruby_checkers  = ['mri']
@@ -456,8 +471,6 @@ function! CustomSynS()
   let g:syntastic_quiet_messages = {}
   :SyntasticCheck
 endfunction
-" unfortunately CJSX files are considered coffee and break syntastic
-au BufEnter *.cjsx let b:syntastic_skip_checks = 1
 
 " tagbar
 nnoremap <leader>R :TagbarToggle<CR>
@@ -488,23 +501,6 @@ augroup textobj_sentence
   autocmd FileType markdown call textobj#sentence#init()
   autocmd FileType textile  call textobj#sentence#init()
 augroup END
-
-" indent-guide
-let g:indent_guides_auto_colors = 0
-hi clear IndentGuidesOdd
-hi IndentGuidesEven ctermbg=235
-
-" NOTE: temporarily disabled until fix:
-" https://github.com/nathanaelkane/vim-indent-guides/issues/80
-"autocmd FileType coffeescript :IndentGuidesEnable
-"autocmd FileType sass         :IndentGuidesEnable
-"autocmd FileType haml         :IndentGuidesEnable
-"autocmd FileType python       :IndentGuidesEnable
-
-" lexima
-"call lexima#add_rule({'char': '<', 'input_after': '>'})
-"call lexima#add_rule({'char': '>', 'at': '\%#>', 'leave': 1})
-"call lexima#add_rule({'char': '<BS>', 'at': '\<\%#\>', 'delete': 1})
 
 " disable vim-pasta in other plugin prompts
 let g:pasta_disabled_filetypes = ['ctrlp', 'fzf', 'TelescopePrompt']
