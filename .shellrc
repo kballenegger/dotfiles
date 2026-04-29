@@ -13,12 +13,11 @@
 # -----------------------------------------------------------------
 
 export CLICOLOR="xterm-256color"
-export DISPLAY=:0.0
 export LC_ALL="en_US.UTF-8"
 
 # command_exists
 command_exists () {
-    type "$1" &> /dev/null ;
+    type "$1" >/dev/null 2>&1
 }
 
 if command_exists nvim; then
@@ -27,9 +26,19 @@ else
     export EDITOR="vim"
 fi
 
-# Tailscale on Mac has the binary inside the app
-alias tailscale="/Applications/Tailscale.app/Contents/MacOS/Tailscale"
-alias ts=tailscale
+
+# -----------------------------------------------------------------
+# HOMEBREW (Apple Silicon, Intel mac, or Linuxbrew)
+# -----------------------------------------------------------------
+
+if [ -x /opt/homebrew/bin/brew ]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [ -x /usr/local/bin/brew ]; then
+    eval "$(/usr/local/bin/brew shellenv)"
+elif [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+fi
+
 
 # -----------------------------------------------------------------
 # BUILD TOOLS
@@ -44,15 +53,7 @@ fi
 # GIT
 # -----------------------------------------------------------------
 
-export GIT_EDITOR="~/bin/git-editor-wrapper"
-
-# github credentials
-
-if command_exists security; then
-    export GITHUB_USER=$(security find-generic-password -D github-creds 2>/dev/null \
-        | sed -n 's/^.*"acct".*"\([a-zA-Z0-9]*\)"$/\1/p')
-    export GITHUB_PASSWORD=$(security find-generic-password -D github-creds -w 2>/dev/null)
-fi
+export GIT_EDITOR="$HOME/bin/git-editor-wrapper"
 
 alias gco="git checkout"
 alias gps="git push"
@@ -75,56 +76,32 @@ alias diffg="git diff --no-index --"
 # gack = ack search only files in git
 alias gack="git ls-files -oc --exclude-standard | ack -x"
 
-# note this needs to be after rvm, otherwise wrong ruby will be used
-if command_exists hub; then
-    eval "$(hub alias -s)"
-fi
-
 
 # -----------------------------------------------------------------
 # PROGRAMMING LANGUAGES
 # -----------------------------------------------------------------
 
 # rvm
-if [[ -s $HOME/.rvm/scripts/rvm ]] ; then
-    source $HOME/.rvm/scripts/rvm
+if [ -s "$HOME/.rvm/scripts/rvm" ]; then
+    . "$HOME/.rvm/scripts/rvm"
 fi
-
-# python
-alias pyi="easy_install"
-alias python=python3
-
-# node
-export NODE_PATH="/usr/local/lib/node"
-
-# go
-command_exists brew && brew ls go >/dev/null 2>&1 | grep vim >/dev/null && \
-   export GOROOT=`brew ls go | grep vim | head -n 1 | ruby -ne 'Process.exit(1) unless $_ =~ /^(.+)\/misc\/vim/; puts $1'`
-
-
-# -----------------------------------------------------------------
-# DOCKER, VAGRANT
-# -----------------------------------------------------------------
-
-export DOCKER_TLS_VERIFY=
-
-export VAGRANT_DEFAULT_PROVIDER="vmware_fusion"
-
-export VAGRANT_VMWARE_CLONE_DIRECTORY="$HOME/.vagrant-vms"
 
 
 # -----------------------------------------------------------------
 # ALIASES
 # -----------------------------------------------------------------
 
-alias free='free -m'
-alias flushdns='dscacheutil -flushcache'
+# Linux only — `free -m` doesn't exist on macOS.
+if [ "$(uname)" = "Linux" ]; then
+    alias free='free -m'
+fi
 
-alias fig=docker-compose
+# macOS DNS cache flush
+if [ "$(uname)" = "Darwin" ]; then
+    alias flushdns='dscacheutil -flushcache'
+fi
 
 alias ta='tmux a -t'
-
-# vim can auto load sessions
 
 if command_exists nvim; then
     export vim=nvim
@@ -143,41 +120,11 @@ vim () {
 # keep environment when doing sudo su
 alias ssu='sudo su -m'
 
-# figure out what the ips are
+# show non-loopback IPs
 alias ip10="ifconfig | grep '10\\.'"
 
-function fgr {
-    fgrep -r -n $@ .
-}
-
-function pbgist {
-    if [ -z $1 ]; then
-        _opt=""
-    else
-        _opt="-t $1"
-    fi
-    # export GITHUB_PASSWORD=`git config --get github.password`
-    _out=`pbpaste | tab2space  | gist $_opt`
-    echo $_out | pbcopy
-    echo $_out
-}
-
-function macc {
-    if [ -z $1]; then
-        open /Applications/Macchiato.app
-    else
-        touch $1
-        open -a /Applications/Macchiato.app $1
-    fi
-}
-
-# quickly find directories for substition
-function percol-dir {
-    if [ -z $1]; then
-        fasd d -l | percol
-    else
-        fasd d -l $1 | percol
-    fi
+fgr () {
+    fgrep -r -n "$@" .
 }
 
 
@@ -185,59 +132,36 @@ function percol-dir {
 # LS, GREP, AND DIRCOLORS
 # -----------------------------------------------------------------
 
-# we always pass these to ls(1)
-LS_COMMON="-hBG"
+# BSD ls (macOS) accepts -G for color; GNU ls (Linux) uses --color=auto.
+if ls --color=auto >/dev/null 2>&1; then
+    alias ls="command ls -hB --color=auto"
+else
+    alias ls="command ls -hBG"
+fi
 
-# setup the main ls alias if we've established common args
-test -n "$LS_COMMON" &&
-alias ls="command ls $LS_COMMON"
-
-# these use the ls aliases above
 alias ll="ls -l"
 alias l.="ls -d .*"
 alias ll.="ls -dl .*"
 alias lla="ls -al"
 
-# grep colors
-if echo hello|grep --color=auto l >/dev/null 2>&1; then
-    export GREP_OPTIONS='--color=auto' GREP_COLOR='1;32'
-fi
-
-
 
 # -----------------------------------------------------------------
-# PATH MANIPULATION FUNCTIONS
+# PATH
 # -----------------------------------------------------------------
 
 puniq () {
-    echo "$1" |tr : '\n' |nl |sort -u -k 2,2 |sort -n |
-    cut -f 2- |tr '\n' : |sed -e 's/:$//' -e 's/^://'
+    echo "$1" | tr : '\n' | nl | sort -u -k 2,2 | sort -n |
+        cut -f 2- | tr '\n' : | sed -e 's/:$//' -e 's/^://'
 }
 
-
-# ~/bin
 export PATH="$HOME/bin:$PATH"
-# brew
-export PATH="/usr/local/sbin:/usr/local/bin:$PATH"
+PATH=$(puniq "$PATH")
 
-export PATH="/usr/local/Cellar/ruby/2.7.1/bin:$PATH"
-
-# condense PATH entries
-PATH=$(puniq $PATH)
-#MANPATH=$(puniq $MANPATH)
-
-# -----------------------------------------------------------------
-# PROXY CLAUDE THROUGH VPS
-# -----------------------------------------------------------------
-
-alias claude='HTTPS_PROXY=http://127.0.0.1:2080 HTTP_PROXY=http://127.0.0.1:2080 ALL_PROXY=socks5h://127.0.0.1:2080 /opt/homebrew/bin/claude'
 
 # -----------------------------------------------------------------
 # SOURCING LOCAL .SHELLRC
 # -----------------------------------------------------------------
 
 if [ -f ~/.shellrc.local ]; then
-    source ~/.shellrc.local
+    . ~/.shellrc.local
 fi
-
-

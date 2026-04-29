@@ -2,11 +2,16 @@
 # PRE-ZPREZTO CUSTOM ZSH CONFIGURATION
 # -----------------------------------------------------------------
 
-
 # Native site-functions come first
 # NOTE: this must happen before initializing zprezto
-fpath=(/usr/local/share/zsh/site-functions $fpath)
-zstyle ':completion:*:*:git:*' script /usr/local/etc/bash_completion.d/git-completion.bash
+if command -v brew >/dev/null 2>&1; then
+    BREW_PREFIX="$(brew --prefix)"
+    fpath=("$BREW_PREFIX/share/zsh/site-functions" $fpath)
+    if [ -f "$BREW_PREFIX/etc/bash_completion.d/git-completion.bash" ]; then
+        zstyle ':completion:*:*:git:*' script "$BREW_PREFIX/etc/bash_completion.d/git-completion.bash"
+    fi
+    unset BREW_PREFIX
+fi
 
 
 # -----------------------------------------------------------------
@@ -31,8 +36,8 @@ set -k
 unsetopt share_history
 
 # Deal with slow git completion
-__git_files () { 
-    _wanted files expl 'local files' _files 
+__git_files () {
+    _wanted files expl 'local files' _files
 }
 
 # Source the common shell rc settings in .shellrc.
@@ -62,29 +67,13 @@ bindkey '\emr' emacs-forward-word
 # AUTOJUMPING
 # -----------------------------------------------------------------
 
-#alias j="fasd_cd -d"
-alias j=z
-eval "$(zoxide init zsh)"
+if command -v zoxide >/dev/null 2>&1; then
+    eval "$(zoxide init zsh)"
+    alias j=z
+fi
 
 # fzf config (auto-added)
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-
-# -----------------------------------------------------------------
-# PERCOL HISTORY
-# -----------------------------------------------------------------
-
-if exists percol; then
-    function percol_select_history() {
-        local tac
-        exists gtac && tac="gtac" || { exists tac && tac="tac" || { tac="tail -r" } }
-        BUFFER=$(fc -l -n 1 | eval $tac | percol --query "$LBUFFER")
-        CURSOR=$#BUFFER         # move cursor
-        zle -R -c               # refresh
-    }
-
-    zle -N percol_select_history
-    bindkey '^R' percol_select_history
-fi
 
 
 # -----------------------------------------------------------------
@@ -96,11 +85,5 @@ if [ -f ~/.zshrc.local ]; then
 fi
 
 
-
-
-
-
-
-# the end
-
+# iTerm2 shell integration (mac-only; harmless no-op elsewhere)
 test -e ${HOME}/.iterm2_shell_integration.zsh && source ${HOME}/.iterm2_shell_integration.zsh
