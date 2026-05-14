@@ -1,0 +1,167 @@
+# Channel Routes — per-channel routing configuration for Hermes gateway.
+#
+# Each key under `routes:` is a chat_id (Slack channel ID, WhatsApp JID, etc.).
+# The gateway reads this file on each request (cached, auto-reloads on change).
+#
+# Supported route fields:
+#   label:          Human-friendly name (for logging / debugging)
+#   platform:       slack | whatsapp | telegram | discord | ...
+#   system_prompt:  Injected as the ephemeral system prompt for this channel
+#   model_override: "provider/model" — override the default model selection
+#   receipt_model_override:
+#                   "provider/model" — workspace-side override read by
+#                   butler/process_receipt.py for the receipt OCR +
+#                   perishable classifier LLM calls.  Hermes itself does
+#                   not consume this field; the workspace reader is
+#                   lib/channel_routes.get_receipt_model_override.
+#   tool_progress:  "all" | "new" | "verbose" | "off" — per-channel override
+#   free_response:  true — (Slack only) bypass mention requirement
+#
+# Platform-level defaults apply when a route doesn't specify a field.
+# Secret channel IDs can also be set via SLACK_FREE_RESPONSE_CHANNELS env var.
+
+routes:
+  # ── WhatsApp groups ──────────────────────────────────────────────────
+  "120363426060828527@g.us":
+    label: "Chinese Tutor"
+    platform: whatsapp
+    model_override: "override-code/chinese-tutor"
+    provider_override: "custom:override-code"
+    system_prompt: >
+      You are a Chinese language tutor. Before every reply, read
+      ~/klaw-workspace/SOUL-tutor.md for the full tutor state machine
+      and follow it exactly.
+
+  "120363399398244268@g.us":
+    label: "Zai Money Matters"
+    platform: whatsapp
+    model_override: "gpt-5.5"
+    receipt_model_override: "anthropic/claude-haiku-4-5"
+    system_prompt_file: "~/klaw-workspace/SOUL-butler.md"
+
+  "120363408202990022@g.us":
+    label: "Sous Chef"
+    platform: whatsapp
+    model_override: "gpt-5.5"
+    receipt_model_override: "anthropic/claude-haiku-4-5"
+    system_prompt_file: "~/klaw-workspace/SOUL-butler.md"
+
+  # ── Slack channels ───────────────────────────────────────────────────
+  "C0AL8NCE3D0":
+    label: "k-travel"
+    platform: slack
+    system_prompt: >
+      You are in #k-travel. Requests here are travel-related: award
+      flights, hotels, loyalty programs, flight status, folio requests.
+      Auto-load travel context from the travel-tracker DB and
+      travel-workflow skill.
+
+  "C0ALRRV7QSD":
+    label: "k-feature-building"
+    platform: slack
+    free_response: true
+    tool_progress: "all"
+    system_prompt: |
+      You are in #k-feature-building. All requests here are dev/coding tasks.
+
+      MANDATORY FIRST ACTIONS on every coding request:
+      1. Load the coding-workflow skill (skill_view: coding-workflow) and follow it exactly.
+      2. For any task that touches multiple files or takes >5 minutes: load the spawn-task-hermes skill and use it to spawn a background Claude Code agent. Do NOT do the coding work inline in this chat — your only job is to spawn the task, confirm it's running, and STOP. The background agent does all the work.
+      3. For quick fixes (<20 lines, single file): you may do them inline, but still follow coding-workflow rules (plan first, git commit after).
+
+      CRITICAL: When using spawn-task-hermes, the watcher cron must NOT have a deliver target. The watcher posts to Slack itself via send_message. Do not pass deliver to cronjob create.
+
+      Show reasoning step-by-step. Before building anything non-trivial, explain your plan and wait for Kenneth's go-ahead.
+
+  "C0ALASWT0BG":
+    label: "k-general"
+    platform: slack
+    system_prompt: >
+      You are in #k-general. General-purpose channel for any request.
+
+  "C0AM0L351GR":
+    label: "k-emails"
+    platform: slack
+    system_prompt: |
+      You are in #k-emails. Handle email drafts, approvals, and classification.
+
+      MANDATORY FIRST ACTION on every task: load the email-workflow skill
+      via skill_view("email-workflow") and follow it exactly. Do not proceed
+      with any email-related work until you have read the skill.
+
+      Never send emails directly — always post drafts for approval.
+
+  "C0AN597RH16":
+    label: "k-finance-notifications"
+    platform: slack
+    free_response: true
+
+  "C0AP5SM5L9W":
+    label: "k-trader"
+    platform: slack
+    free_response: true
+
+  "C0B06P7R57T":
+    label: "k-heretic"
+    platform: slack
+    free_response: true
+    model_override: "qwen36-heretic-q4km.gguf"
+    provider_override: "custom:lijiang-heretic"
+    system_prompt: >
+      You are running on a local Qwen 3.6 35B Heretic model hosted on lijiang
+      (llama.cpp, Vulkan GPU). Be helpful and concise.
+
+  "C0B3947UCP7":
+    label: "the-signal"
+    platform: slack
+    free_response: true
+    system_prompt: >
+      You are in #the-signal — the private feedback channel for The Travel
+      Signal (https://thetravelsignal.com). Every newly-published signal
+      story is auto-posted here so Kenneth can react with feedback on
+      classification, tagging, headline quality, or noise calls. Reply
+      directly to the relevant thread; no @mention required.
+
+  "C0AN4NTKYGK":
+    label: "u-general"
+    platform: slack
+    free_response: true
+    system_prompt: |
+      You are in #u-general — the main channel for Utopian Ventures (formerly Oyster Ventures), Kenneth's seed-stage VC firm.
+
+      All requests here relate to the Utopian/Oyster portfolio, fund operations, deal flow, or investor relations.
+      
+      CONTEXT:
+      - Utopian DB: ~/utopian/data/utopian.db (SQLite — tables: companies, investments, founders, vehicles, exits, pricing_events, company_founders)
+      - Background: ~/utopian/ROADMAP.md has firm context, investment philosophy, and fund history
+      - Vehicles: SPVs + Funds (I through III, Fund IV is the fundraising priority)
+      - ~93 portfolio companies, ~109 investments, ~206 founders tracked
+
+      When asked about portfolio, deal data, or fund metrics, query the SQLite DB directly. Read ROADMAP.md for strategic context when relevant.
+
+  "C0B3Q1PQP5K":
+    label: "creative-media-generation"
+    platform: slack
+    free_response: true
+    system_prompt: |
+      You are in a dedicated creative media generation channel. Every request in this channel should be interpreted as a creative media generation request using Sogni and GPT Images.
+
+      Channel-specific routing:
+      - If Kenneth explicitly asks to create/generate an image with GPT Images, Images GPT, GPT Image, GPT Image 2, or OpenAI image generation, use the GPT image model directly.
+      - For every other creative media generation request, load and follow the sogni-creative-agent-skill and generate through Sogni.
+      - This instruction applies only in this Slack channel.
+
+# ── Sender restrictions ──────────────────────────────────────────────
+# Restrict specific senders to specific channels only.
+# Sender names are matched case-insensitively (substring) against display name.
+# Messages from restricted senders in unlisted chats are silently dropped.
+sender_restrictions:
+  "Aizalyn":
+    only_in:
+      - "120363399398244268@g.us"  # Zai Money Matters
+      - "120363408202990022@g.us"  # Sous Chef
+
+# ── Platform-level defaults ──────────────────────────────────────────
+platform_defaults:
+  whatsapp:
+    tool_progress: "off"
