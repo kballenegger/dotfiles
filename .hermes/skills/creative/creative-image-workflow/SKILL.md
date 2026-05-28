@@ -51,7 +51,7 @@ This umbrella covers user-facing creative image generation and delivery. It cons
 ## Class Workflow
 
 1. Clarify the deliverable format, aspect ratio, style constraints, brand/reference materials, and destination platform.
-2. Select the generation path: native `image_generate`, provider-specific CLI/API, brand/reference workflow, or Stable Diffusion/Diffusers.
+2. Select the generation path: native `image_generate`, provider-specific CLI/API, brand/reference workflow, or Stable Diffusion/Diffusers. **Hard rule:** GPT Image 2 / GPT Images 2.0 must always go direct through Kenneth’s OpenAI subscription path, never through Sogni. If Kenneth explicitly asks for GPT/Image 2.0, use the workspace helper `lib.llm.generate_image(provider='openai-codex', model='gpt-image-2-high')` so the request does not silently route through another configured image backend.
 3. Preserve reference assets and generated outputs in clear cache/tmp paths. For repo/project work, put assets under that project's gitignored `tmp/<mini-project>/` folder rather than a loose global temp path.
 4. For large identity/style batches, generate a small representative test set first (usually 3 images), deliver those, then run the full batch only after Kenneth approves or asks for all.
 5. Iterate prompts with visible quality criteria, not vague “make it better” loops.
