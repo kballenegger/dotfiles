@@ -1,0 +1,22 @@
+{
+  "attribution": {
+    "commit": ""
+  },
+  "permissions": {
+    "defaultMode": "auto"
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "/usr/bin/env node /Users/kenneth-bot/Dashboard/scripts/claude-statusline-usage.js",
+    "padding": 0
+  },
+  "enabledPlugins": {
+    "swift-lsp@claude-plugins-official": true
+  },
+  "effortLevel": "high",
+  "outputStyle": "Plain English",
+  "tui": "fullscreen",
+  "skipDangerousModePermissionPrompt": true,
+  "agentPushNotifEnabled": true,
+  "skipAutoPermissionPrompt": true
+}

@@ -1,4 +1,8 @@
-# Communication style
+---
+name: Plain English
+description: Concise, plain-English responses with minimal jargon.
+keep-coding-instructions: true
+---
 
 - Respond concisely and in plain English.
 - Prefer short sentences and common words.
