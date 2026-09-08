@@ -33,10 +33,12 @@ This is especially important on WhatsApp. Kenneth expects business-card images t
 4. **Generate/save a clean business-card scan artifact** for each card: image containing just the card, cropped/perspective-corrected/cleaned when possible. Save it alongside the extracted data in the target system's artifact storage.
 5. **Show Kenneth a concise summary for confirmation before committing contact ingestion** when the target workflow requires confirmation. Include the artifact path/reference and the destination database.
 6. **If vision/OCR fails, say the exact failure and retry/fallback** instead of asking Kenneth to describe the card immediately:
+   - if the error is an auxiliary vision timeout around 30s, restore the default with `hermes config set auxiliary.vision.timeout 120` when Kenneth asks for the default, then retry the same cached image path;
    - retry `vision_analyze` if appropriate;
    - use OCR/document tooling;
    - inspect/crop the cached image locally;
    - only ask for resend/clarification when the image truly cannot be read.
+7. **Do not stop at extraction when the intended workflow is ingestion.** After a successful retry/extraction, continue toward per-card clean-scan artifacts and the correct target database unless Kenneth explicitly asked only for analysis.
 
 ## People-Tracker Route
 

@@ -38,7 +38,11 @@ Do **not** use for:
 Follow this order and stop as soon as you have enough lawful content:
 
 1. **Try normal extraction first.** Use `web_extract` on the provided URL. If it works, summarize or quote only short excerpts needed for the task.
-2. **Use browser only for rendering/accessibility issues.** If extraction fails due to JavaScript or layout, use browser tools to read what is visible without bypassing access controls.
+2. **Use browser only for rendering/accessibility issues.** If extraction fails due to JavaScript, layout, bot protection, or a search/extract backend error, use browser tools to read what is visible without bypassing access controls.
+   - Start with `browser_navigate` and `browser_snapshot(full=true)` for rendered text.
+   - If the snapshot is truncated but the article is visibly accessible, use `browser_console(expression="document.body.innerText")` to extract the rendered page text for summarization.
+   - For official vote/result pages or dashboards, inspect embedded frames/widgets in the snapshot; key facts such as turnout, yes/no percentages, and result status may appear only inside an iframe.
+   - If a gifted/subscriber link is blocked by bot protection, do **not** attempt to defeat the challenge. Search the exact title for lawful republications/syndications. Some legitimate news republications expose article text in `application/ld+json` or `__NEXT_DATA__`; parse that rendered/source JSON as accessible publisher data, label the source used, and avoid reproducing the full article text.
 3. **Search for official copies.** Search by exact title, author, outlet, date, and distinctive phrases. Prefer:
    - publisher pages that expose the content legitimately,
    - author personal sites/newsletters,
@@ -60,6 +64,16 @@ Do not provide or execute instructions that intentionally defeat a publisher's a
 - Sharing full subscriber-only text obtained from unauthorized sources.
 
 If Kenneth asks for a bypass, respond briefly: you can't help bypass paywalls, but you can find lawful access paths or summarize accessible context.
+
+## Archive-Grounded Creative Continuations
+
+When Kenneth asks to predict or write an unpublished next post from a blog/archive, this is a source-intensive writing task rather than an ordinary summary.
+
+1. **Ingest the relevant corpus before drafting.** For a requested startup essay, read the complete relevant articles/engineering/product/opinion archive where available—not only a homepage bio, titles, excerpts, or the latest post.
+2. **Build a short internal voice brief.** Track recurring arguments, technical depth, sentence and paragraph rhythm, evidence habits, level of certainty, and typical ending style. Separate relevant authorial traits from dated, harmful, or unrelated views that should not be reproduced gratuitously.
+3. **Use chronology to infer a plausible subject.** Follow unresolved ideas and the author context supplied by the user. Do not invent specific factual events, performance metrics, quotes, employers, investments, or anecdotes merely to make the piece sound authentic.
+4. **Deliver the requested form in full.** If the request is for an essay, write a complete, self-contained essay, not a caption, outline, or a few sample paragraphs.
+5. **Label it precisely.** Describe it as a fictional, archive-grounded continuation—not a recovered draft or a factual prediction. Keep that label brief and put the writing first.
 
 ## Response Pattern
 
