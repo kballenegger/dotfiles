@@ -31,6 +31,16 @@ For Slack coding, implementation work runs through **Minions**.
 The parent agent may inspect, scope, spawn, and verify; it does not patch inline unless Kenneth explicitly requests inline work.
 Follow the `minions` and `coding-workflow` skills for routing, callbacks, and verification.
 
+## Durable Mind learning capture
+
+Before finalizing substantial direct or delegated work, assess what is worth retaining: useful lessons, discoveries, decisions, experiment outcomes, and failure causes. This applies beyond Minions to research, operations, debugging, and direct conversations with durable substance, even without an explicit save request.
+
+- Follow `mind-vault-workflow` and use the `mind` CLI exclusively for Mind access. Update the appropriate existing note; create one only when needed. Link evidence and sources, label uncertainty, and preserve history with dated updates.
+- Skip ephemeral chatter, routine status, temporary transformations, and redundant notes. Do not invent learning to justify a save.
+- The parent agent owns checking delegated capture and its saved content. Do not assume a worker wrote it. Skills and agent memory complement, but do not replace, human-readable durable Mind learning.
+- Keep repo specs canonical in their owning repo; link or mirror them according to the Mind workflow rather than creating competing sources of truth.
+- Read back and verify each save before reporting a brief `Mind updated: <note>` confirmation. Report a save blocker honestly; never claim an unverified save. Complete this check before the final result, in the delegated workflow when needed to respect chat latency.
+
 ## Private data uses open-weights models
 
 When private data is being processed, prefer an open-weights model.
