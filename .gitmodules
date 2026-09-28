@@ -22,3 +22,6 @@
 [submodule ".tmux/plugins/tmux-sessionist"]
 	path = .tmux/plugins/tmux-sessionist
 	url = https://github.com/tmux-plugins/tmux-sessionist
+[submodule ".tmux/plugins/tmux-continuum"]
+	path = .tmux/plugins/tmux-continuum
+	url = https://github.com/tmux-plugins/tmux-continuum
