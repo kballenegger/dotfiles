@@ -1,26 +1,42 @@
-# Channel Routes — per-channel routing configuration for Hermes gateway.
+# Channel Routes — workspace-side per-channel metadata. NOT read by the gateway.
+#
+# ┌─ READ THIS BEFORE EDITING ─────────────────────────────────────────────┐
+# │ The Hermes gateway stopped reading this file on 2026-07-14, when the   │
+# │ local routing patch was replaced by upstream's native channel          │
+# │ overrides. model_override / provider_override / system_prompt /        │
+# │ tool_progress / free_response here change NOTHING at runtime.          │
+# │                                                                        │
+# │ To pin a channel's model, edit ~/.hermes/config.yaml:                  │
+# │   platforms.<platform>.channel_overrides.<chat_id>.{model,provider}    │
+# │ Mentions: <platform>.free_response_channels. Prompts:                  │
+# │ <platform>.channel_prompts. Restart the gateway to apply.              │
+# │                                                                        │
+# │ The one field still consumed is receipt_model_override (Butler).       │
+# │ The stale model pins below are kept only as history (2026-09-29 audit).│
+# └────────────────────────────────────────────────────────────────────────┘
 #
 # Each key under `routes:` is a chat_id (Slack channel ID, WhatsApp JID, etc.).
-# The gateway reads this file on each request (cached, auto-reloads on change).
 #
-# Supported route fields:
-#   label:          Human-friendly name (for logging / debugging)
+# Route fields:
+#   label:          Human-friendly name
 #   platform:       slack | whatsapp | telegram | discord | ...
-#   system_prompt:  Injected as the ephemeral system prompt for this channel
-#   model_override: "provider/model" — override the default model selection
+#   system_prompt:  DEAD for the gateway (see box above)
+#   model_override: DEAD for the gateway (see box above)
 #   receipt_model_override:
 #                   "provider/model" — workspace-side override read by
 #                   butler/process_receipt.py for the receipt OCR +
 #                   perishable classifier LLM calls.  Hermes itself does
 #                   not consume this field; the workspace reader is
 #                   lib/channel_routes.get_receipt_model_override.
-#   tool_progress:  "all" | "new" | "verbose" | "off" — per-channel override
-#   free_response:  true — (Slack only) bypass mention requirement
-#
-# Platform-level defaults apply when a route doesn't specify a field.
-# Secret channel IDs can also be set via SLACK_FREE_RESPONSE_CHANNELS env var.
+#   tool_progress:  DEAD for the gateway (see box above)
+#   free_response:  DEAD for the gateway (see box above)
 
 routes:
+  "120363408580186875@g.us":
+    label: "Creative Agent"
+    platform: whatsapp
+    model_override: "gpt-6-astra"
+    provider_override: "openai-codex"
   # ── WhatsApp groups ──────────────────────────────────────────────────
   "120363426060828527@g.us":
     label: "Chinese Tutor"
@@ -36,20 +52,22 @@ routes:
     label: "Zai Money Matters"
     platform: whatsapp
     model_override: "gpt-5.5"
-    receipt_model_override: "anthropic/claude-haiku-4-5"
+    receipt_model_override: "gpt-6-astra"
     system_prompt_file: "~/klaw-workspace/SOUL-butler.md"
 
   "120363408202990022@g.us":
     label: "Sous Chef"
     platform: whatsapp
     model_override: "gpt-5.5"
-    receipt_model_override: "anthropic/claude-haiku-4-5"
+    receipt_model_override: "gpt-6-astra"
     system_prompt_file: "~/klaw-workspace/SOUL-butler.md"
 
   # ── Slack channels ───────────────────────────────────────────────────
   "C0AL8NCE3D0":
     label: "k-travel"
     platform: slack
+    model_override: "gpt-6-astra"
+    provider_override: "openai-codex"
     system_prompt: >
       You are in #k-travel. Requests here are travel-related: award
       flights, hotels, loyalty programs, flight status, folio requests.
@@ -66,10 +84,10 @@ routes:
 
       MANDATORY FIRST ACTIONS on every coding request:
       1. Load the coding-workflow skill (skill_view: coding-workflow) and follow it exactly.
-      2. For any task that touches multiple files or takes >5 minutes: load the spawn-task-hermes skill and use it to spawn a background Claude Code agent. Do NOT do the coding work inline in this chat — your only job is to spawn the task, confirm it's running, and STOP. The background agent does all the work.
+      2. For any implementation that is not a trivial single-file quick fix: load the minions skill and spawn via `~/minions/scripts/minions`. Do NOT do multi-file or multi-minute coding work inline — your only job is to spawn the mission, confirm it's running, and STOP. The background minion does the work.
       3. For quick fixes (<20 lines, single file): you may do them inline, but still follow coding-workflow rules (plan first, git commit after).
 
-      CRITICAL: When using spawn-task-hermes, the watcher cron must NOT have a deliver target. The watcher posts to Slack itself via send_message. Do not pass deliver to cronjob create.
+      CRITICAL: Never create per-task watcher or callback crons for coding missions. The Minions launchd watcher posts Slack progress; completion callbacks are registered by the minions CLI.
 
       Show reasoning step-by-step. Before building anything non-trivial, explain your plan and wait for Kenneth's go-ahead.
 
@@ -105,12 +123,9 @@ routes:
     label: "k-heretic"
     platform: slack
     free_response: true
-    model_override: "qwen36-heretic-q4km.gguf"
-    provider_override: "custom:lijiang-heretic"
-    system_prompt: >
-      You are running on a local Qwen 3.6 35B Heretic model hosted on lijiang
-      (llama.cpp, Vulkan GPU). Be helpful and concise.
-
+    model_override: "lijiang-qwen36-35b-a3b"
+    provider_override: "custom:lijiang-qwen-llamacpp"
+    system_prompt: "You are running on Qwen3.6-35B-A3B Heretic, served by llama.cpp on the self-hosted Lijiang tailnet endpoint as `lijiang-qwen36-35b-a3b`. The live context window is 32768 tokens. Be helpful and concise.\n"
   "C0B3947UCP7":
     label: "the-signal"
     platform: slack
@@ -151,14 +166,21 @@ routes:
   "C0B3Q1PQP5K":
     label: "creative-media-generation"
     platform: slack
+    model_override: "gpt-6-astra"
+    provider_override: "openai-codex"
     free_response: true
     system_prompt: |
-      You are in a dedicated creative media generation channel. Every request in this channel should be interpreted as a creative media generation request using Sogni and GPT Images.
+      Sogni Creative Agent channel: dedicated creative media generation. Every request in this channel is a creative media generation request.
 
-      Channel-specific routing:
-      - If Kenneth explicitly asks to create/generate an image with GPT Images, Images GPT, GPT Image, GPT Image 2, or OpenAI image generation, use the GPT image model directly.
-      - For every other creative media generation request, load and follow the sogni-creative-agent-skill and generate through Sogni.
-      - This instruction applies only in this Slack channel.
+      PRIMARY POLICY. For every request in this channel, load and follow the creative-image-workflow skill before choosing a provider or generating anything, plus the task-specific reference its Operation Index points to. Pass this same instruction through to every worker you launch.
+
+      PROVIDER RULES. Never silently substitute a provider; always disclose the actual model/provider used. GPT Image 2 / GPT Images / GPT Image / Images GPT / OpenAI image requests go direct through Kenneth's OpenAI subscription via lib.llm.generate_image(provider='openai-codex', model='gpt-image-2-high') - never through Sogni. Sogni is explicit opt-in only: use it when Kenneth names Sogni/Spark/a Sogni model id, or when a more specific existing contract for that request requires it. Otherwise use the provider creative-image-workflow prescribes for the request type. Grok/xAI only for explicit Grok/xAI or video workflows. If the requested route is blocked or fails, stop and report the exact failure rather than delivering a substitute.
+
+      KENNETH'S IDENTITY. "me", "myself", "my likeness", "my character sheet" - and "my face", "draw/paint/make/turn me", "a self-portrait" - mean Kenneth. Attach ~/creative-assets/characters/kenneth/visuals/kenneth-character-sheet-clean-shaven.png as a real reference image on the generation call; a text description of him is not a substitute. His appearance constraints in ~/creative-assets/characters/kenneth/character.yaml stay in force - clean-shaven, no beard, mustache, stubble, or beard shadow; the old bearded headshot is never a facial-hair reference. If the sheet cannot be attached, say so and stop rather than delivering an ungrounded likeness.
+
+      DELIVERY. Verify the artifact exists, then upload it as a real Slack attachment - a MEDIA:/path rendered as text is a failed delivery. State the actual model/provider in the message.
+
+      This instruction applies only in this Slack channel.
 
 # ── Sender restrictions ──────────────────────────────────────────────
 # Restrict specific senders to specific channels only.
