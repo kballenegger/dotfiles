@@ -87,3 +87,15 @@ fi
 
 # iTerm2 shell integration (mac-only; harmless no-op elsewhere)
 test -e ${HOME}/.iterm2_shell_integration.zsh && source ${HOME}/.iterm2_shell_integration.zsh
+
+# >>> grok installer >>>
+export PATH="$HOME/.grok/bin:$PATH"
+fpath=(~/.grok/completions/zsh $fpath)
+autoload -Uz compinit && compinit -C
+# <<< grok installer <<<
+
+# Minions: private deployment loader (~/.minions/service.env) ahead of any
+# other `minions` on PATH. The public CLI at ~/minions/scripts/minions is
+# generic by design; invoking it directly spawns with default (direct)
+# routing. See ~/klaw-workspace/docs/minions-deployment.md.
+export PATH="$HOME/klaw-workspace/bin:$PATH"
