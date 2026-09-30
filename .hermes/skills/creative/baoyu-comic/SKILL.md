@@ -1,7 +1,7 @@
 ---
 name: baoyu-comic
 description: "Knowledge comics (知识漫画): educational, biography, tutorial."
-version: 1.56.1
+version: 1.56.2
 author: 宝玉 (JimLiu)
 license: MIT
 platforms: [linux, macos, windows]
@@ -186,6 +186,8 @@ Use Hermes' built-in `image_generate` tool for all image rendering. Its schema a
 
 **Prompt file requirement (hard)**: write each image's full, final prompt to a standalone file under `prompts/` (naming: `NN-{type}-[slug].md`) BEFORE calling `image_generate`. The prompt file is the reproducibility record.
 
+**Kenneth correction / hard preference:** Do **not** add deterministic/local text overlays to generated comics unless Kenneth explicitly asks for local/deterministic typesetting, or unless exact quoted dialogue is required and the image provider refuses model-native text/dialogue generation. If he asks for text/exclamations, prompt the image model to render them directly as part of the comic, then QA/iterate. Do not use Pillow/SVG/ImageMagick speech bubbles as a default “clever” fix for generated text. Exception: for exact quoted/salacious dialogue that a provider refuses, create a model-generated visual comic base/panels and deterministically replace whole bubble text blocks only as a disclosed fallback, with visual QA for panel/bubble cropping and readability. Never ship pasted character-sheet crops/collages as a final comic page. For the full pipeline, see `references/exact-dialogue-comic-pipeline.md`.
+
 **Aspect ratio mapping** — the storyboard's `aspect_ratio` field maps to `image_generate`'s format as follows:
 
 | Storyboard ratio | `image_generate` format |
@@ -242,6 +244,7 @@ Full step-by-step workflow (analysis, storyboard, review gates, regeneration var
 ## Pitfalls
 
 - Image generation: 10-30 seconds per page; auto-retry once on failure
+- **Exact-dialogue / adult-dialogue comics:** do not ship a page made from pasted character-sheet crops. For long exact dialogue, explicit dialogue, or model text/refusal problems, use the panel pipeline in [references/exact-dialogue-comic-panel-pipeline.md](references/exact-dialogue-comic-panel-pipeline.md): choose a real comic-page layout first, generate each panel independently at the needed ratio, compose the page in code, and replace the *whole* bubble text deterministically when the user asks for exact copy. If likeness matters, prefer a provider/API path that supports reference images, then QA the final page beside the character sheets.
 - **Always download** the URL returned by `image_generate` to a local PNG — downstream tooling (and the user's review) expects files in the output directory, not ephemeral URLs
 - **Use absolute paths for `curl -o`** — never rely on persistent-shell CWD across batches. Silent footgun: files land in the wrong directory and subsequent `ls` on the intended path shows nothing. See Step 7 "Download step".
 - Use stylized alternatives for sensitive public figures
