@@ -1,0 +1,49 @@
+onboarding = false
+
+[ui.sound]
+enabled = false
+
+# Key bindings ported from ~/.tmux.conf (prefix `, tmux defaults,
+# pain-control and sessionist). Press ` twice to type a literal backtick.
+[keys]
+prefix = "backtick"
+
+# tmux: | splits side by side, - and _ split top/bottom
+split_vertical = ["prefix+|", "prefix+backslash"]
+split_horizontal = ["prefix+minus", "prefix+_"]
+close_pane = "prefix+x"
+zoom = "prefix+z"
+
+# tmux: arrows (your vim-aware binds) and h/j/k/l (pain-control) move between panes
+focus_pane_left = ["prefix+left", "prefix+h"]
+focus_pane_down = ["prefix+down", "prefix+j"]
+focus_pane_up = ["prefix+up", "prefix+k"]
+focus_pane_right = ["prefix+right", "prefix+l"]
+cycle_pane_next = "prefix+o"
+last_pane = "prefix+;"
+# pain-control: H/J/K/L resize
+resize_pane_left = "prefix+shift+h"
+resize_pane_down = "prefix+shift+j"
+resize_pane_up = "prefix+shift+k"
+resize_pane_right = "prefix+shift+l"
+
+# tmux windows -> herdr tabs
+new_tab = "prefix+c"
+next_tab = ["prefix+]", "prefix+n"]
+previous_tab = ["prefix+[", "prefix+p"]
+rename_tab = "prefix+,"
+close_tab = "prefix+&"
+switch_tab = "prefix+1..9"
+
+# tmux sessions -> herdr workspaces
+workspace_picker = ["prefix+s", "prefix+w"]
+rename_workspace = ["prefix+.", "prefix+$"]
+new_workspace = "prefix+shift+c"
+close_workspace = "prefix+shift+x"
+previous_workspace = "prefix+("
+next_workspace = "prefix+)"
+goto = "prefix+g"
+
+detach = "prefix+d"
+edit_scrollback = "prefix+y"
+settings = "prefix+shift+s"
