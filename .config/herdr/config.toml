@@ -1,0 +1,41 @@
+# herdr theme on klaw: copied from Gimel's tmux/vimline-derived theme, with a
+# gold accent (colour220) instead of Gimel's green (colour148) so the two hosts
+# are telling apart at a glance.
+
+[ui.sound]
+enabled = false
+
+# Colours ported from ~/.tmux/vimline.tmux.conf (tmuxline/airline style):
+# colour233 bar, colour236 current window, colour247/231 text,
+# colour148 green badge, colour236 inactive pane borders.
+[theme]
+name = "catppuccin"  # base only for the current tab's dark text on green; colours overridden below
+
+[theme.custom]
+panel_bg = "reset"
+sidebar_bg = "#121212"     # colour233 status bar
+surface_dim = "#1c1c1c"
+surface0 = "#121212"       # colour233 inactive window bg
+surface1 = "#3a3a3a"
+active_row_bg = "#303030"  # colour236 current window
+selection_bg = "#303030"
+overlay0 = "#6c6c6c"       # colour242: dim sidebar text (branches, machine/tab) and inactive pane borders
+overlay1 = "#ffffff"       # colour231 inactive window text, status-right text
+subtext0 = "#9e9e9e"       # colour247
+text = "#ffffff"           # colour231
+accent = "#ffd700"         # colour220 gold: current tab bg and active pane border (Gimel uses green)
+green = "#afd700"
+
+[ui]
+accent = "#ffd700"
+pane_outer_borders = false # tmux-style internal splitters only
+pane_gaps = false          # shared single dividers; only the active pane's edge is highlighted, like tmux
+tab_bar_position = "bottom"
+tab_bar_right = [
+  { type = "command", command = "$HOME/.local/bin/herdr workspace list | jq -r '.result.workspaces[] | select(.focused) | .label'", interval_seconds = 2, timeout_seconds = 2 },  # tmux #S
+  { type = "datetime", format = "%Y-%m-%d  %H:%M" },
+  { type = "command", command = "hostname -s", interval_seconds = 3600 },  # tmux #h
+]
+tab_bar_right_separator = "  "
+window_title = "{workspace}"  # tmux set-titles-string "#S"
+
