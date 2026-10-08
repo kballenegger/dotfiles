@@ -40,8 +40,8 @@ workspace_picker = ["prefix+s", "prefix+w"]
 rename_workspace = ["prefix+.", "prefix+$"]
 new_workspace = "prefix+shift+c"
 close_workspace = "prefix+shift+x"
-previous_workspace = "prefix+("
-next_workspace = "prefix+)"
+previous_workspace = ["prefix+(", "prefix+{"]
+next_workspace = ["prefix+)", "prefix+}"]
 goto = "prefix+g"
 
 detach = "prefix+d"
