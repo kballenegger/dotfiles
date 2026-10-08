@@ -59,15 +59,15 @@ name = "terminal"
 panel_bg = "reset"
 sidebar_bg = "#121212"     # colour233 status bar
 surface_dim = "#1c1c1c"
-surface0 = "#303030"       # colour236
+surface0 = "#121212"       # colour233 inactive window bg
 surface1 = "#3a3a3a"
 active_row_bg = "#303030"  # colour236 current window
 selection_bg = "#303030"
-overlay0 = "#6c6c6c"
-overlay1 = "#9e9e9e"       # colour247
+overlay0 = "#121212"       # inactive pane borders, kept darker than the active one
+overlay1 = "#ffffff"       # colour231 inactive window text, status-right text
 subtext0 = "#9e9e9e"       # colour247
 text = "#ffffff"           # colour231
-accent = "#afd700"         # colour148 session badge / active border
+accent = "#303030"         # colour236 current window bg (also the active pane border)
 green = "#afd700"
 teal = "#005f5f"           # tmux.conf active pane border
 
@@ -75,5 +75,10 @@ teal = "#005f5f"           # tmux.conf active pane border
 accent = "#afd700"
 pane_outer_borders = false # tmux-style internal splitters only
 tab_bar_position = "bottom"
-tab_bar_right = [{ type = "datetime" }, { type = "hostname" }]
+tab_bar_right = [
+  { type = "command", command = "herdr workspace list | jq -r '.result.workspaces[] | select(.focused) | .label'", interval_seconds = 2, timeout_seconds = 2 },  # tmux #S
+  { type = "datetime", format = "%Y-%m-%d  %H:%M" },
+  { type = "command", command = "hostname -s", interval_seconds = 3600 },  # tmux #h
+]
+tab_bar_right_separator = "  "
 window_title = "{workspace}"  # tmux set-titles-string "#S"
