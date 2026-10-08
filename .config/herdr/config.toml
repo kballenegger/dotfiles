@@ -63,13 +63,12 @@ surface0 = "#121212"       # colour233 inactive window bg
 surface1 = "#3a3a3a"
 active_row_bg = "#303030"  # colour236 current window
 selection_bg = "#303030"
-overlay0 = "#121212"       # inactive pane borders, kept darker than the active one
+overlay0 = "#6c6c6c"       # colour242: dim sidebar text (branches, machine/tab) and inactive pane borders
 overlay1 = "#ffffff"       # colour231 inactive window text, status-right text
 subtext0 = "#9e9e9e"       # colour247
 text = "#ffffff"           # colour231
 accent = "#303030"         # colour236 current window bg (also the active pane border)
 green = "#afd700"
-teal = "#005f5f"           # tmux.conf active pane border
 
 [ui]
 accent = "#afd700"
