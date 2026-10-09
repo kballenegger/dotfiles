@@ -43,7 +43,7 @@ new_workspace = "prefix+shift+c"
 close_workspace = "prefix+shift+x"
 previous_workspace = ["prefix+(", "prefix+{"]
 next_workspace = ["prefix+)", "prefix+}"]
-goto = "prefix+g"
+goto = ""  # built-in goto replaced by herdr-fuzzygo (prefix+g below)
 
 detach = "prefix+d"
 edit_scrollback = "prefix+y"
@@ -97,10 +97,23 @@ rows = [
   ["branch", "git_status"],
 ]
 
+# ---- herdr-fuzzygo (kballenegger/herdr-fuzzygo): fuzzy goto + pane/agent inbox ----
+[[keys.command]]
+key = "prefix+g"
+type = "shell"
+description = "fuzzy goto pane (recent first)"
+command = "herdr plugin pane open --plugin herdr-fuzzygo --entrypoint go"
+
 [[keys.command]]
 key = "prefix+i"
 type = "shell"
-description = "open agent inbox popup"
+description = "panes & agents inbox (attention first, fuzzy)"
+command = "herdr plugin pane open --plugin herdr-fuzzygo --entrypoint inbox"
+
+[[keys.command]]
+key = "prefix+shift+i"
+type = "shell"
+description = "open herdr-agent-inbox popup (settle/history)"
 command = "herdr plugin pane open --plugin herdr-agent-inbox --entrypoint inbox"
 
 [[keys.command]]
