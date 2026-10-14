@@ -31,6 +31,7 @@ Plug 'tpope/vim-endwise'
 Plug 'tpope/vim-obsession'
 Plug 'tpope/vim-dispatch'
 Plug 'tpope/vim-markdown'
+Plug 'dhruvasagar/vim-table-mode'
 Plug 'scrooloose/nerdcommenter'
 Plug 'junegunn/vim-easy-align'
 Plug 'easymotion/vim-easymotion'
@@ -431,10 +432,10 @@ let g:ctrlp_open_new_file = 'r'
 " git files plus Claude Code's scratchpads for this project (~/bin/ctrlp-files, 2026-10-14)
 let g:ctrlp_user_command = ['.git/', 'ctrlp-files %s']
 let g:ctrlp_dotfiles = 1
-nnoremap <leader>b :CtrlPBuffer<CR>
 " rescan on every open: git ls-files is instant, so live results beat the per-session cache
 " (2026-10-14). <C-r> inside the prompt still flushes the cache for the threshold case.
 let g:ctrlp_use_caching = 5000
+nnoremap <leader>b :CtrlPBuffer<CR>
 nnoremap <leader>r :CtrlPTag<CR>
 nnoremap <leader>t :CtrlPBufTag<CR>
 nnoremap <leader>T :CtrlPBufTagAll<CR>
