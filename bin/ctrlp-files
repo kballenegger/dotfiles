@@ -1,0 +1,15 @@
+#!/bin/sh
+# CtrlP file source (2026-10-14): the repo's git files plus the files in Claude Code's scratchpads
+# for this project. Claude Code keeps a per-session scratchpad at
+#   /private/tmp/claude-$UID/<root with / replaced by ->/<session-id>/scratchpad
+# so a picker that only reads `git ls-files` never shows what a session wrote there.
+# Usage: ctrlp-files <root>   (CtrlP passes the directory holding .git as %s)
+set -eu
+root=${1:-.}
+root=$(cd "$root" && pwd -P)
+git --git-dir="$root/.git" ls-files -oc --exclude-standard
+slug=$(printf '%s' "$root" | tr / -)
+for dir in "/private/tmp/claude-$(id -u)/$slug"/*/scratchpad; do
+  [ -d "$dir" ] || continue
+  find "$dir" -type f -not -name '.DS_Store' 2>/dev/null
+done

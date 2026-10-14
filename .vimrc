@@ -428,7 +428,8 @@ let g:ctrlp_prompt_mappings = {
             \ }
 let g:ctrlp_arg_map = 1
 let g:ctrlp_open_new_file = 'r'
-let g:ctrlp_user_command = ['.git/', 'git --git-dir=%s/.git ls-files -oc --exclude-standard']
+" git files plus Claude Code's scratchpads for this project (~/bin/ctrlp-files, 2026-10-14)
+let g:ctrlp_user_command = ['.git/', 'ctrlp-files %s']
 let g:ctrlp_dotfiles = 1
 nnoremap <leader>b :CtrlPBuffer<CR>
 " rescan on every open: git ls-files is instant, so live results beat the per-session cache
