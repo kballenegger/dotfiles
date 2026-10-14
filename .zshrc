@@ -87,3 +87,6 @@ fi
 
 # iTerm2 shell integration (mac-only; harmless no-op elsewhere)
 test -e ${HOME}/.iterm2_shell_integration.zsh && source ${HOME}/.iterm2_shell_integration.zsh
+
+# Hermes Agent — ensure ~/.local/bin is on PATH
+export PATH="$HOME/.local/bin:$PATH"

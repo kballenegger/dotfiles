@@ -4,3 +4,4 @@
 
 # Source login
 source ~/.login
+. "$HOME/.cargo/env"
