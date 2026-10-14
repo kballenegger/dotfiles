@@ -1,0 +1,37 @@
+#!/bin/bash
+# Trim rebuildable build caches that have gone unused, so parallel agent
+# lanes cannot fill Gimel's disk (0.2 GB free on 2026-10-14, go-build grew
+# ~38 GB in a day). Run by the com.kballenegger.cache-trim LaunchAgent.
+#   go-build:            entries untouched for 1+ day (Go refreshes the
+#                        mtime of entries it uses, at most hourly)
+#   Xcode DerivedData:   project dirs with no file written in 3+ days
+#   herdrchat-ota:       DerivedData* dirs with no file written in 3+ days
+# --dry-run lists what would go.
+set -u
+dry=0; [ "${1:-}" = "--dry-run" ] && dry=1
+free_gb() { df -k /System/Volumes/Data | awk 'NR==2 {printf "%.1f", $4/1e6}'; }
+log() { echo "$(date '+%F %T') $*"; }
+
+zap_dir() {   # dir: delete if nothing inside was modified in 3+ days
+  local d=$1
+  [ -d "$d" ] || return 0
+  [ -n "$(find "$d" -mtime -3 -print -quit 2>/dev/null)" ] && return 0
+  log "stale $(du -sh "$d" 2>/dev/null | cut -f1) $d"
+  [ $dry = 1 ] || /bin/rm -rf "$d"
+}
+
+before=$(free_gb)
+gc="$HOME/Library/Caches/go-build"
+if [ -d "$gc" ]; then
+  if [ $dry = 1 ]; then
+    log "go-build: $(find "$gc" -type f -mtime +0 | wc -l | tr -d ' ') entries older than 1 day"
+  else
+    find "$gc" -type f -mtime +0 -delete 2>/dev/null
+  fi
+fi
+for d in "$HOME/Library/Developer/Xcode/DerivedData"/*/; do
+  case "$(basename "$d")" in ModuleCache.noindex|SDKExplicitPrecompiledModules) continue ;; esac
+  zap_dir "${d%/}"
+done
+for d in "$HOME/.cache/herdrchat-ota"/DerivedData*/; do zap_dir "${d%/}"; done
+log "free ${before} GB -> $(free_gb) GB"
