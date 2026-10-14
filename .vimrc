@@ -431,6 +431,9 @@ let g:ctrlp_open_new_file = 'r'
 let g:ctrlp_user_command = ['.git/', 'git --git-dir=%s/.git ls-files -oc --exclude-standard']
 let g:ctrlp_dotfiles = 1
 nnoremap <leader>b :CtrlPBuffer<CR>
+" rescan on every open: git ls-files is instant, so live results beat the per-session cache
+" (2026-10-14). <C-r> inside the prompt still flushes the cache for the threshold case.
+let g:ctrlp_use_caching = 5000
 nnoremap <leader>r :CtrlPTag<CR>
 nnoremap <leader>t :CtrlPBufTag<CR>
 nnoremap <leader>T :CtrlPBufTagAll<CR>
